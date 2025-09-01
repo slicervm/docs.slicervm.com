@@ -76,9 +76,9 @@ Slicer isn't tied to Firecracker. With the Cloud Hypervisor support, any kind of
 
 Ephemeral VMs can be launched for agents via API, or command line - supplying a userdata script for bootstrap. You can then set up your own agent for command & control.
 
-### Better than containers - some of the time
+### Better misusing containers
 
-Docker is convenient and ubiquitous, but if you're having to give it all kinds of privileged flags just to make something work like Wireguard or Docker In Docker, then you have the wrong tool for the job.
+Docker is convenient and ubiquitous, it's totally the right option most of the time. But if you're having to give it all kinds of privileged flags just to make something work like Wireguard, or Docker In Docker, then you have the wrong tool for the job.
 
 A microVM gives you an isolated guest Kernel. You can even build new modules and load them in for R&D, or for testing new frameworks based upon eBPF - all without compromising the host.
 
