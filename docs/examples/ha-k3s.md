@@ -52,11 +52,12 @@ curl -sLS http://127.0.0.1:8080/nodes > nodes.json
 
 Copy nodes.json back to your workstation.
 
-Check the options like disabling Traefik etc:
+Check the options like disabling Traefik, so that you can install Ingress Nginx or Istio instead.
 
 ```bash
 k3sup-pro plan --help
-k3sup-pro plan
+
+k3sup-pro plan --traefik=false --user ubuntu
 ```
 
 This will generate a plan.yaml file, you can review and edit it.

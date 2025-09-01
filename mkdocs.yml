@@ -92,10 +92,13 @@ nav:
   - Getting Started:
       - Installation: getting-started/install.md
       - Walkthrough: getting-started/walkthrough.md
+      - Running in the background: getting-started/daemon.md
   - Examples:
       - HA Kubernetes: examples/ha-k3s.md
+      - Large scale Kubernetes: examples/large-scale-k3s.md
   - Storage:
       - Overview: storage/overview.md
+      - ZFS: storage/zfs.md
 
 
 # extra:
