@@ -39,6 +39,8 @@ Slicer is evolving, and for the better. Today it uses part of the installation p
 The installer sets up Firecracker, Cloud Hypervisor, containerd for storage, and a few networking options.
 
 ```bash
+# The installer usually looks for an actuated license, but you don't
+# need one to run the installation. We'll create a temporary file via touch.
 mkdir -p ~/.actuated
 touch ~/.actuated/LICENSE
 
@@ -58,12 +60,14 @@ sudo -E ./install.sh
 )
 ```
 
-Then, get the slicer binary:
+Then, get the Slicer binary:
 
 ```bash
 sudo -E arkade oci install ghcr.io/openfaasltd/slicer:latest \
   --path /usr/local/bin
 ```
+
+The same command can be repeated to update Slicer to future versions.
 
 Activate Slicer to obtain a license key:
 
@@ -73,3 +77,4 @@ slicer activate --help
 slicer activate
 ```
 
+Next, start your first VM with the [walk through](/getting-started/walkthrough.md).
