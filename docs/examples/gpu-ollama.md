@@ -13,6 +13,8 @@ What if you have multiple GPUs? Let's imagine you have a ATX tower PC with 2x Nv
 ![Ollama running the qwen3 model to generate a story about a microVM's first day at school](/images/ollama.png)
 > Ollama running the qwen3 model to generate a story about a microVM's first day at school.
 
+GPU / VFIO mounting only works with Slicer running on `x86_64` at present.
+
 ## Set up your VM configuration
 
 There a three differences to the other examples we've seen so far:
