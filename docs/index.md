@@ -4,7 +4,7 @@ Slice up bare-metal into microVMs for R&D, customer support and production workl
 
 When commodity clouds are charging [~ 200 USD / mo for as little as 8vCPU and 32GB of RAM](https://blog.alexellis.io/n100-mini-computer/), working at scale becomes prohibitively expensive. You can obtain a brand new mini PC, or used server from eBay for a similar amount as a one-off cost. Or pay a bare-metal cloud provider like Hetzner Robot 33-100 EUR / mo for a powerful server for a public IP with reliable power and Internet. 
 
-Why we built Slicer:
+Why we built Slicer at OpenFaaS Ltd:
 
 * Customer support and R&D of new versions of software.
 * Kubernetes has a node limit of around 100 Pods - making it wasteful on larger machines.
