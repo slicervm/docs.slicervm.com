@@ -142,3 +142,45 @@ Mon Sep  1 15:04:11 2025
 |  No running processes found                                                             |
 +-----------------------------------------------------------------------------------------+
 ```
+
+## Enable Device Plugin
+
+Install Nvidia's [Device Plugin](https://github.com/NVIDIA/k8s-device-plugin) for Kubernetes:
+
+```bash
+kubectl create -f https://raw.githubusercontent.com/NVIDIA/k8s-device-plugin/v0.17.1/deployments/static/nvidia-device-plugin.yml
+```
+
+Patch it so it works with K3s:
+
+```bash
+# add runtimeClassName: nvidia to the DS pod spec
+kubectl -n kube-system patch ds nvidia-device-plugin-daemonset \
+  --type='json' \
+  -p='[{"op":"add","path":"/spec/template/spec/runtimeClassName","value":"nvidia"}]'
+
+kubectl -n kube-system rollout status ds/nvidia-device-plugin-daemonset -n kube-system
+```
+
+Then run the Pod from earlier, but with the `limits` in place:
+
+```bash
+cat > nvidia-smi-pod.yaml <<EOF
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nvidia-smi
+spec:
+  runtimeClassName: nvidia
+  restartPolicy: OnFailure
+  containers:
+    - name: nvidia-smi
+      image: nvidia/cuda:12.1.0-base-ubuntu22.04
+      command: ['sh', '-c', "nvidia-smi"]
+      resources:
+        limits:
+            nvidia.com/gpu: "1"
+EOF
+
+kubectl create -f nvidia-smi-pod.yaml
+```

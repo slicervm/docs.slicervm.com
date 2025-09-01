@@ -61,7 +61,8 @@ sudo -E ./install.sh
 Then, get the slicer binary:
 
 ```bash
-sudo -E arkade octi install ghcr.io/openfaasltd/slicer:latest --path /usr/local/bin
+sudo -E arkade oci install ghcr.io/openfaasltd/slicer:latest \
+  --path /usr/local/bin
 ```
 
 Activate Slicer to obtain a license key:
