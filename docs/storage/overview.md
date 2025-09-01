@@ -11,6 +11,8 @@ The current installation supports Disk Images only, and we will add the instruct
 
 ## Disk images
 
+Disk images are similar to loopback filesystems which you may have created in the past via `fallocate` and `mkfs.ext4`.
+
 Pros:
 
 * Convenient, with a custom disk size
@@ -22,6 +24,8 @@ Cons:
 * Launch/clone time slower than CoW when launching many VMs
 
 ## ZFS
+
+[ZFS](https://en.wikipedia.org/wiki/ZFS) is an advanced filesystem that supports CoW snapshots.
 
 Pros:
 
@@ -41,6 +45,8 @@ Cons:
 
 ## Devmapper
 
+[Devmapper](https://en.wikipedia.org/wiki/Device_mapper) is available for Slicer, but not set up by default. Reach out if you have tried ZFS and need to use it instead.
+
 Pros:
 
 * Reasonably well known from the Docker space
@@ -51,6 +57,4 @@ Cons:
 * Requires an additional disk or partition
 * No custom size for VMs - the size of any VM must match the base snapshot
 * Difficult to debug and troubleshoot - it's easier to recreate the whole storage pool
-
-Devmapper is available for Slicer, but not set up by default. Reach out if you have tried ZFS and need to use it instead.
 
