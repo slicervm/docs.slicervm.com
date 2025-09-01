@@ -2,7 +2,7 @@
 
 Slice up bare-metal into microVMs for R&D, customer support and production workloads.
 
-When commodity clouds are charging over 200 USD / mo for as little as 16vCPU and 32GB of RAM, working at scale becomes prohibitively expensive.
+When commodity clouds are charging [~ 200 USD / mo for as little as 8vCPU and 32GB of RAM](https://blog.alexellis.io/n100-mini-computer/), working at scale becomes prohibitively expensive.
 
 Why we built Slicer:
 
