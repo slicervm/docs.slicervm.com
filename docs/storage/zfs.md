@@ -61,19 +61,16 @@ sudo zfs create slicer/snapshots
 
 The containerd project already has a ZFS snapshotter, however it is unsuitable for use for VMs, therefore we needed to implement our own snapshotter which can present ZFS volumes as block devices to a microVM.
 
-```
-version="0.2.1"
-arch="amd64"
+The zvol-snapshotter can be installed using [arkade](https://github.com/alexellis/arkade):
 
-wget https://github.com/welteki/zvol-snapshotter/releases/download/v${version}/zvol-snapshotter-${version}-linux-${arch}.tar.gz
-sudo tar -C /usr/local/bin \
-  -xvf zvol-snapshotter-${version}-linux-${arch}.tar.gz containerd-zvol-grpc
-
-tar -xvf zvol-snapshotter-${version}-linux-${arch}.tar.gz
-sudo cp containerd-zvol-grpc /usr/local/bin/
+```bash
+arkade system install zvol-snapshotter \
+  --dataset slicer/snapshots
 ```
 
-Edit `/etc/containerd/config.toml`, add:
+You can specify the size of any VM drive that will be created by the snapshotter using the `--size` flage, e.g. `--size=40G`. The default size is `20G`.
+
+Configure containerd to enable Zvol snapshotter, edit `/etc/containerd/config.toml` and add:
 
 ```ini
 [proxy_plugins]
@@ -82,57 +79,16 @@ Edit `/etc/containerd/config.toml`, add:
     address = "/run/containerd-zvol-grpc/containerd-zvol-grpc.sock"
 ```
 
-Create a config file for the snapshotter, specifying the size of any VM drive that will be created:
+Restart containerd:
 
 ```bash
-cat > config.toml <<EOF
-root_path="/var/lib/containerd-zvol-grpc"
-dataset="slicer/snapshots"
-volume_size="30G"
-fs_type="ext4"
-EOF
-
-sudo mkdir -p /etc/containerd-zvol-grpc
-sudo cp config.toml /etc/containerd-zvol-grpc/
-```
-
-Create a unit file and install the service:
-
-```bash
-cat > ./containerd-zvol-grpc.service <<EOF
-[Unit]
-Description=zvol snapshotter
-After=network.target
-Before=containerd.service
-
-[Service]
-Type=simple
-Environment=HOME=/root
-ExecStart=/usr/local/bin/containerd-zvol-grpc --log-level=info --config=/etc/containerd-zvol-grpc/config.toml
-Restart=always
-RestartSec=1
-
-[Install]
-WantedBy=multi-user.target
-
-EOF
-
-sudo cp ./containerd-zvol-grpc.service /etc/systemd/system/
-sudo systemctl enable containerd-zvol-grpc
-sudo systemctl start containerd-zvol-grpc
-```
-
-Check it worked OK:
-
-```bash
-sudo journalctl -u containerd-zvol-grpc -f
-```
-
-Reload containerd:
-
-```bash
-sudo systemctl daemon-reload
 sudo systemctl restart containerd
+```
+
+Check if the snapshotter is running OK:
+
+```bash
+sudo journalctl -u zvol-snapshotter -f
 ```
 
 Now, test the Zvol snapshotter:
@@ -146,25 +102,24 @@ sudo -E ctr run --snapshotter zvol docker.io/library/hello-world:latest test
 
 ## Adjust the base snapshot size
 
-Replace 30G with the desired value i.e. `40G`, then run the following:
+The base snapshot size can be configured when installing or updating the snapshotter with `arkade system install` by including the `--size` flag.
 
-```bash
-cat > config.toml <<EOF
+You can also manually edit the snapshotter configuration file.
+
+Edit `/etc/containerd-zvol-grpc/config.toml` and replace the volume size with the desired value, e.g `40G`:
+
+```diff
 root_path="/var/lib/containerd-zvol-grpc"
 dataset="your-zpool/snapshots"
-volume_size="30G"
+-volume_size="30G"
++volume_size="40G"
 fs_type="ext4"
-EOF
-
-sudo mkdir -p /etc/containerd-zvol-grpc
-sudo cp config.toml /etc/containerd-zvol-grpc/
 ```
 
 Finally reload and restart the service:
 
 ```bash
-sudo systemctl daemon-reload
-sudo systemctl restart containerd-zvol-grpc
+sudo systemctl restart zvol-snapshotter
 ```
 
 ## Footnote on ZFS on a loopback file
@@ -172,7 +127,7 @@ sudo systemctl restart containerd-zvol-grpc
 It is absolutely not recommended to use a loopback file for ZFS for Slicer.
 
 ```bash
-$ fallocate -l 250G zfs.img 
+$ fallocate -l 250G zfs.img
 $ sudo zpool create slicer $HOME/zfs.img
 
 zpool list
@@ -183,4 +138,3 @@ $ zfs list
 NAME     USED  AVAIL     REFER  MOUNTPOINT
 slicer   105K   240G       24K  /slicer
 ```
-
