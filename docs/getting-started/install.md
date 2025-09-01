@@ -1,5 +1,7 @@
 # Installation
 
+Don't wait for the perfect system. Slicer can run practically anywhere.
+
 ## System requirements
 
 Any reasonably modern computer can run Slicer, the requirements are very low - x86_64 or Arm64 (including the Raspberry Pi).
@@ -12,7 +14,7 @@ Sustainably sourced:
 * Self-built ATX tower
 * Computer under your desk / old Thinkpad / Dell server from eBay
 
-New/cloud-based:
+Cloud-based bare-metal:
 
 * Hetzner Robot (cheapest, best value)
 * Phoenix NAP

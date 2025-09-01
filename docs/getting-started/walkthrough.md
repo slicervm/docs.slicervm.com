@@ -32,6 +32,8 @@ config:
   hypervisor: firecracker
 ```
 
+The `storage: image` setting means a disk image will be cloned from the root filesystem into a local file. It's not the fastest option for the initial setup, but it's the simplest, persistent and great for long-living VMs. 
+
 Now, open a new terminal window, or ideally launch `tmux` so you can leave the binary running in the background.
 
 ```bash
