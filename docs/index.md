@@ -2,7 +2,7 @@
 
 Slicer turns any machine into your own private cloud from a Raspberry Pi to a mini PC to a cloud server in minutes.
 
-It's ideal for learning & experimenting, as well as for R&D, customer support and production workloads.
+It's ideal for learning & experimentation - and powerful enough for R&D, customer support, and even production workloads
 
 *How we use Slicer at OpenFaaS Ltd*
 
@@ -15,7 +15,7 @@ It's ideal for learning & experimenting, as well as for R&D, customer support an
 
 *Where can you run it?*
 
-When commodity cloud vendors charge ~ 200 USD / mo for as little as 8vCPU and 32GB of RAM, working at scale becomes prohibitively expensive. You can obtain a brand new mini PC, or used server from eBay for a similar amount as a one-off cost. Or pay a bare-metal cloud provider like Hetzner Robot 33-100 EUR / mo for a powerful server for a public IP with reliable power and Internet. If you're tied to the cloud - Slicer also works on DigitalOcean, Azure and GCP via nested virtualisation.
+When commodity cloud vendors charge ~ 200 USD / mo for as little as 8vCPU and 32GB of RAM, working at scale becomes prohibitively expensive. You can obtain a brand new mini PC, or used server from eBay for a similar amount as a one-off cost. Or pay a bare-metal cloud provider like Hetzner Robot 33-100 EUR / mo for a powerful server for a public IP with reliable power and Internet. If you're tied to the cloud - Slicer also runs on DigitalOcean, Azure and GCP via nested virtualisation.
 
 Learn more in Alex's blog post [Preview: Slice Up Bare-Metal with Slicer](https://blog.alexellis.io/slicer-bare-metal-preview/).
 
@@ -36,9 +36,9 @@ Slicer is probably the easiest, and most versatile way to learn about microVMs, 
 
 You can have fun, whilst learning and experimenting. You could even set up a permanent K3s cluster with K3sup Pro which you'll get as a free add-on.
 
-All at less than the cost of 1 Starbucks per week.
+All at less than the cost of a weekly coffee.
 
-Think of Slicer like your own fast and private AWS Elastic Cloud region, without the elastic bill.
+Think of Slicer like your own fast and private AWS EC2 region, without the surprise bill because you left something running.
 
 ## The power user and technologist of the team
 
@@ -70,7 +70,7 @@ We used Slicer's Serial Over SSH console to connect to the machine running the l
 
 The first way we deployed Slicer into a permanent setup was by taking a Hetzner host with a 8-core AMD Ryzen and 64GB of RAM, and local NVMe. We created a HA, 3-node K3s cluster capable of running 300 Pods and deployed our long term testing environments to it, later adding production workloads SaaS like Inlets Cloud - running them there instead of creating myriad of costs in AWS.
 
-### AI and the agentic future
+### GPU-powered AI and agentic workflows
 
 Slicer isn't tied to Firecracker. With the Cloud Hypervisor support, any kind of GPU from an Nvidia 3090 RTX to a Tesla A100 can be used run local LLMs using Ollama, or a tool of your choice.
 
