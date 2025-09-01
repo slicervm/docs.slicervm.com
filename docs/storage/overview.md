@@ -36,7 +36,7 @@ Cons:
 * Additional setup required
 * No custom sizing - must match the base snapshot
 
-[Setup ZFS storage for Slicer](../storage/zfs)
+[Setup ZFS storage for Slicer](/storage/zfs)
 
 
 ## Devmapper
