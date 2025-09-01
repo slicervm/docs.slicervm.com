@@ -10,14 +10,13 @@ permissions:
   pages: write
   id-token: write   # to verify the deployment originates from an appropriate source
 
-
 jobs:
   build:
     name: Deploy docs
     runs-on: ubuntu-latest
     steps:
       - name: Checkout main
-        uses: actions/checkout@master
+        uses: actions/checkout@v5
 
       - name: Deploy docs
         uses: mhausenblas/mkdocs-deploy-gh-pages@master
