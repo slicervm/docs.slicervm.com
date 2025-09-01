@@ -2,6 +2,8 @@
 
 Don't wait for the perfect system. Slicer can run practically anywhere.
 
+You'll get a Discord invite at the end of the installation, once you successfully complete the `slicer activate` command.
+
 ## System requirements
 
 Any reasonably modern computer can run Slicer, the requirements are very low - x86_64 or Arm64 (including the Raspberry Pi).
@@ -78,3 +80,12 @@ slicer activate
 ```
 
 Next, start your first VM with the [walk through](/getting-started/walkthrough.md).
+
+## Updating slicer
+
+To update Slicer run the arkade command from above, and overwrite the binary:
+
+```bash
+sudo -E arkade oci install ghcr.io/openfaasltd/slicer:latest \
+  --path /usr/local/bin
+```
