@@ -96,6 +96,7 @@ nav:
   - Examples:
       - HA Kubernetes: examples/ha-k3s.md
       - Large scale Kubernetes: examples/large-scale-k3s.md
+      - Run a one-shot task: examples/run-a-task.md
   - Tasks:
       - Customise with userdata: tasks/userdata.md
       - Build a custom root filesystem: tasks/custom-image.md
