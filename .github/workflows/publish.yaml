@@ -5,6 +5,10 @@ on:
       - master
   workflow_dispatch:
 
+permissions:
+  contents: read
+  pages: write
+
 jobs:
   build:
     name: Deploy docs
