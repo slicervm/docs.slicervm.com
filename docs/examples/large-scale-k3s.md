@@ -72,11 +72,15 @@ sudo slicer up ./k3s-scale.yaml
 
 The Root filesystem will be downloaded and unpacked, then all the VMs will be launched.
 
+## Install Kubernetes with K3sup Pro
+
 Access the API on the server to download the devices file:
 
 ```bash
 curl -LsS http://127.0.0.1:8080/devices -o devices.json
 ```
+
+On your workstation, add any routes that are specified so you can access the VMs on their own network.
 
 Download the devices.json file to your local computer, and install K3sup Pro:
 
@@ -106,6 +110,8 @@ k3sup pro apply --parallel 8
 ```
 
 After a short period of time, your cluster will be ready.
+
+## Get access to the kubeconfig
 
 Merge it into your KUBECONFIG file:
 

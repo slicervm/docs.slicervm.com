@@ -8,7 +8,7 @@ Whilst ZFS can run on a loopback device, this is not recommended and may be unst
 
 You'll need to follow the installation instructions below, then you can use the `zfs` type of storage for your VMs.
 
-Take the [walkthrough](../getting-started/walkthrough) example, and change the `storage` type from `image` to `zfs`:
+Take the [walkthrough](/getting-started/walkthrough) example, and change the `storage` type from `image` to `zfs`:
 
 ```diff
 config:

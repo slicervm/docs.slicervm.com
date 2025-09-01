@@ -1,6 +1,6 @@
 # Storage for Slicer
 
-In the walkthrough, we show how to use disk images for storage.
+In the [walkthrough](/getting-started/walkthrough), we show how to use disk images for storage.
 
 Disk images were not the first choice for Slicer, initially, only snapshotting filesystems were supported. With a snapshot, the initial filesystem is "unpacked" once - taking anywhere between 30 and 90 seconds, then can be cloned instantly.
 

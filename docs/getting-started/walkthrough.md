@@ -40,10 +40,37 @@ sudo -E slicer up ./vm-image.yaml
 
 Having customised the `github_user` to your own username, your SSH keys will have been fetched from your profile, and preinstalled into the VM.
 
+On your workstation, add any routes that are specified so you can access the VMs on their own network.
+
 Connect with:
 
 ```bash
 ssh ubuntu@192.168.137.2
+```
+
+## View the serial console
+
+The logs from the serial console including the output from the boot process are available on disk:
+
+```
+$ sudo tail -f /var/log/slicer/vm-1.txt
+
+         Starting OpenBSD Secure Shell server...
+[  OK  ] Started OpenBSD Secure Shell server.
+[  OK  ] Reached target Multi-User System.
+[  OK  ] Reached target Graphical Interface.
+         Starting Record Runlevel Change in UTMP...
+[  OK  ] Finished Record Runlevel Change in UTMP.
+
+Ubuntu 22.04.5 LTS vm-1 ttyS0
+
+vm-1 login: 
+```
+
+If you want to tail the logs from all available VMs at once, use `fstail` via `arkade get fstail`:
+
+```bash
+sudo -E fstail /var/log/slicer/
 ```
 
 ## Configuration for an Arm VM

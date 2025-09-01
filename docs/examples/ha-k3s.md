@@ -36,6 +36,8 @@ The IP addresses of the VMs will be as follows:
 * `192.168.137.3`
 * `192.168.137.4`
 
+## Setup Kubernetes with K3sup Pro
+
 Download K3sup Pro:
 
 ```bash
@@ -51,6 +53,8 @@ curl -sLS http://127.0.0.1:8080/nodes > nodes.json
 ```
 
 Copy nodes.json back to your workstation.
+
+On your workstation, add any routes that are specified so you can access the VMs on their own network.
 
 Check the options like disabling Traefik, so that you can install Ingress Nginx or Istio instead.
 
@@ -78,6 +82,8 @@ k3sup-pro get-config \
 Then you can run `kubectx slicer-k3s-ha`, and start using kubectl.
 
 Your cluster is running in HA mode.
+
+## Create a HA LoadBalancer for the VMs
 
 If you would like to create a load balancer for the microVMs, you can do so using the mixctl add-on.
 

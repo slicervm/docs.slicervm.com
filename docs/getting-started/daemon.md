@@ -4,7 +4,7 @@ The term "daemon" is a well established phrase from UNIX meaning a process that 
 
 Not only can we monitor Slicer's logs via `journalctl`, but we can manage it with standard `systemctl` commands.
 
-Let's take the example from the [walkthrough](walkthrough) and create a systemd service for it:
+Let's take the example from the [walkthrough](/getting-started/walkthrough) and create a systemd service for it:
 
 Create a service named i.e. `vm-image.service`:
 
