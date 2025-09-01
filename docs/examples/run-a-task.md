@@ -53,6 +53,7 @@ Write a userdata script to send a POST request to your HTTP endpoint on boot-up,
 Save task.sh:
 
 ```bash
+cat > task.sh <<'EOF'
 #!/bin/bash
 curl -i -X POST -d "$(cat /etc/hostname) booted\nUptime: $(uptime)" \
     https://webhook.site/f38eddbf-6285-4ff8-ae3e-f2e782c73d8f
@@ -60,6 +61,7 @@ curl -i -X POST -d "$(cat /etc/hostname) booted\nUptime: $(uptime)" \
 sleep 1
 sudo reboot
 exit 0
+EOF
 ```
 
 Then run your task by booting a VM with the script as its userdata:
@@ -87,3 +89,26 @@ done
 
 ![Each of the 5 tasks that executed and exited, posted to the endpoint](/images/tasks-web.png)
 > Each of the 5 tasks that executed and exited, posted to the endpoint
+
+## Optimise the image for start-up speed
+
+After various Kernel modules are loaded, and the system has performed its self-checking, your code should be running at about the 2.5s mark, or a bit earlier depending on your machine.
+
+To optimise the boot time further for one-shot use-cases, the SSH host key regenerate step that is present on start-up. It can add a few seconds to the boot time, especially if entropy is low on your system.
+
+You can derive your own image to use, with this disabled:
+
+```
+FROM ghcr.io/openfaasltd/slicer-systemd:5.10.240-x86_64-latest
+
+RUN systemctl disable regen-ssh-host-keys &&
+    systemctl disable ssh && \
+    systemctl disable sshd && \
+    systemctl disable slicer-vmmeter
+```
+
+After SSH is disabled, the only way to debug a machine is via the Slicer agent using `slicer vm exec` to get a shell.
+
+You can also disable `slicer-ssh-agent` (not actually a full SSH daemon), however the `slicer vm` commands will no longer work.
+
+If you publish an image to the Docker Hub, make sure you include its prefix i.e. `docker.io/owner/repo:tag`.

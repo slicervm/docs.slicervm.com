@@ -40,6 +40,8 @@ All at less than the cost of a weekly coffee.
 
 Think of Slicer like your own fast and private AWS EC2 region, without the surprise bill because you left something running.
 
+After running `slicer activate`, you'll get a link to join our Slicer Discord Server.
+
 ## The power user and technologist of the team
 
 For the power user or the technologist of the team, Slicer offers a quick and easy way to experiment with ideas and new technology in isolation, on fast hardware that you control.
