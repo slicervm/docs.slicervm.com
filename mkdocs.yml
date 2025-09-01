@@ -92,6 +92,11 @@ nav:
   - Getting Started:
       - Installation: getting-started/install.md
       - Walkthrough: getting-started/walkthrough.md
+  - Examples:
+      - HA Kubernetes: examples/ha-k3s.md
+  - Storage:
+      - Overview: storage/overview.md
+
 
 # extra:
 #   analytics:
