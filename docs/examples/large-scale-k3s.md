@@ -34,6 +34,7 @@ config:
   host_groups:
   - name: k3s
     storage: zfs
+    persistent: true
     count: 24
     vcpu: 4
     ram_gb: 8
@@ -58,6 +59,8 @@ config:
 
   hypervisor: firecracker
 ```
+
+If you need to run the same test with a fresh cluster over and over again, you can change the `persistent: true` configuration to `persistent: false`. Then the snapshots will be discarded when Slicer exits. Otherwise, they are retained indefinitely.
 
 Now launch Slicer in a tmux window, so you can come back to it later:
 

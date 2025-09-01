@@ -44,7 +44,7 @@ Within that device, you may have `/dev/nvme1n1p1` for your operating system, and
 Use the following command to enroll that free space into ZFS:
 
 ```bash
-sudo zpool create -f slicer /dev/nvme1n1p2
+sudo zpool create slicer /dev/nvme1n1p2
 ```
 
 ZFS has many different options such as checksuming, compression, deduplication, encryption, and the ability to run in different RAID-like modes across multiple drives.
@@ -54,7 +54,7 @@ We recommend that you do the simplest thing first, to get it working before tink
 ## Create a filesystem for Slicer
 
 ```bash
-sudo zfs create slicer/data
+sudo zfs create slicer/snapshots
 ```
 
 ## Install the zvol-snapshotter for containerd
@@ -68,6 +68,9 @@ arch="amd64"
 wget https://github.com/welteki/zvol-snapshotter/releases/download/v${version}/zvol-snapshotter-${version}-linux-${arch}.tar.gz
 sudo tar -C /usr/local/bin \
   -xvf zvol-snapshotter-${version}-linux-${arch}.tar.gz containerd-zvol-grpc
+
+tar -xvf zvol-snapshotter-${version}-linux-${arch}.tar.gz
+sudo cp containerd-zvol-grpc /usr/local/bin/
 ```
 
 Edit `/etc/containerd/config.toml`, add:
@@ -84,8 +87,8 @@ Create a config file for the snapshotter, specifying the size of any VM drive th
 ```bash
 cat > config.toml <<EOF
 root_path="/var/lib/containerd-zvol-grpc"
-dataset="your-zpool/snapshots"
-volume_size="20G"
+dataset="slicer/snapshots"
+volume_size="30G"
 fs_type="ext4"
 EOF
 
@@ -119,22 +122,37 @@ sudo systemctl enable containerd-zvol-grpc
 sudo systemctl start containerd-zvol-grpc
 ```
 
+Check it worked OK:
+
+```bash
+sudo journalctl -u containerd-zvol-grpc -f
+```
+
+Reload containerd:
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl restart containerd
+```
+
 Now, test the Zvol snapshotter:
 
 ```bash
-ctr images pull --snapshotter zvol docker.io/library/hello-world:latest
-ctr run --snapshotter zvol docker.io/library/hello-world:latest test
+(
+sudo -E ctr images pull --snapshotter zvol docker.io/library/hello-world:latest
+sudo -E ctr run --snapshotter zvol docker.io/library/hello-world:latest test
+)
 ```
 
 ## Adjust the base snapshot size
 
-Replace 20G with the desired value i.e. `40G`, then run the following:
+Replace 30G with the desired value i.e. `40G`, then run the following:
 
 ```bash
 cat > config.toml <<EOF
 root_path="/var/lib/containerd-zvol-grpc"
 dataset="your-zpool/snapshots"
-volume_size="20G"
+volume_size="30G"
 fs_type="ext4"
 EOF
 
@@ -148,3 +166,21 @@ Finally reload and restart the service:
 sudo systemctl daemon-reload
 sudo systemctl restart containerd-zvol-grpc
 ```
+
+## Footnote on ZFS on a loopback file
+
+It is absolutely not recommended to use a loopback file for ZFS for Slicer.
+
+```bash
+$ fallocate -l 250G zfs.img 
+$ sudo zpool create slicer $HOME/zfs.img
+
+zpool list
+NAME     SIZE  ALLOC   FREE  CKPOINT  EXPANDSZ   FRAG    CAP  DEDUP    HEALTH  ALTROOT
+slicer   248G   105K   248G        -         -     0%     0%  1.00x    ONLINE  -
+
+$ zfs list
+NAME     USED  AVAIL     REFER  MOUNTPOINT
+slicer   105K   240G       24K  /slicer
+```
+
