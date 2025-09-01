@@ -1,5 +1,7 @@
 # Highly Available (HA) Kubernetes with K3s
 
+The following example sets up a 3x Node Kubernetes cluster using K3s. As an optional step, you can set up a Load Balancer running on the Slicer host to distribute traffic across the nodes for the API server and HTTP/HTTPS.
+
 Create k3s-ha.yaml:
 
 ```yaml
