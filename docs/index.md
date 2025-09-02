@@ -17,6 +17,8 @@ It's ideal for learning & experimentation - and powerful enough for R&D, custome
 
 When commodity cloud vendors charge ~ 200 USD / mo for as little as 8vCPU and 32GB of RAM, working at scale becomes prohibitively expensive. You can obtain a brand new mini PC, or used server from eBay for a similar amount as a one-off cost. Or pay a bare-metal cloud provider like Hetzner Robot 33-100 EUR / mo for a powerful server for a public IP with reliable power and Internet. If you're tied to the cloud - Slicer also runs on DigitalOcean, Azure and GCP via nested virtualisation.
 
+> Slicer [is also fully functional on WSL2!](https://x.com/alexellisuk/status/1962785021976076322)
+
 Learn more in Alex's blog post [Preview: Slice Up Bare-Metal with Slicer](https://blog.alexellis.io/slicer-bare-metal-preview/).
 
 See initial customer interest via this [X/Twitter post](https://x.com/alexellisuk/status/1961752898552914074)
