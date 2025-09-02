@@ -28,6 +28,38 @@ The token will be saved to: `/var/lib/slicer/auth/token`.
 
 Send an `Authorization: Bearer TOKEN` header for authenticated Slicer daemons.
 
+If you intend to expose the Slicer API over the Internet using something like a [self-hosted inlets tunnel](https://inlets.dev/), or [Inlets Cloud](https://cloud.inlets.dev), then make sure you use the TLS termination option.
+
+i.e.
+
+```bash
+DOMAIN=example.com
+inletsctl create \
+    slicer-api \
+    --letsencrypt-domain $DOMAIN \
+    --letsencrypt-email webmaster@$DOMAIN
+```
+
+Alternatively, if Slicer is on a machine that's public facing, i.e. on Hetzner or another bare-metal cloud, you can use Caddy to terminate TLS. Make sure the API is bound to 127.0.0.1:
+
+Caddyfile:
+
+```
+{
+    email "webmaster@example.com"
+    # Uncomment to try the staging certificate issuer first
+    #acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
+    # The production issuer:
+    acme_ca https://acme-v02.api.letsencrypt.org/directory
+ }
+
+slicer-1.example.com {
+ reverse_proxy 127.0.0.1:8080
+}
+```
+
+You can install Caddy via `arkade system install caddy`
+
 ## Conventions
 
 - Content-Type: application/json unless noted.
