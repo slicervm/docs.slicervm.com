@@ -105,6 +105,8 @@ nav:
   - Storage:
       - Overview: storage/overview.md
       - ZFS: storage/zfs.md
+  - Reference:
+      - Slicer REST API: reference/api.md
 
 # extra:
 #   analytics:
