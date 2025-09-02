@@ -49,10 +49,10 @@ If you want to leave off `sudo`, then just move the `k3sup-pro` binary into your
 Next, on the host where slicer is running, get the devices file from Slicer's API:
 
 ```bash
-curl -sLS http://127.0.0.1:8080/nodes > nodes.json
+curl -sLS http://127.0.0.1:8080/nodes > devices.json
 ```
 
-Copy nodes.json back to your workstation.
+Copy devices.json back to your workstation.
 
 On your workstation, add any routes that are specified so you can access the VMs on their own network.
 
