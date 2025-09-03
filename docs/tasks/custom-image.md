@@ -41,3 +41,16 @@ If you wanted Docker to be pre-installed into all your VMs, with the default use
 +RUN usermod -aG docker ubuntu
 ```
 
+If you want to run a local registry, without TLS authentication enabled, you can do so with the following within your YAML file:
+
+```yaml
+config:
+  insecure_registry: true
+```
+
+Then if you want to run a temporary [Docker registry](https://hub.docker.com/_/registry) on another machine on your network:
+
+```bash
+docker run -d -p 5000:5000 --restart always \
+  --name registry registry:3
+```
