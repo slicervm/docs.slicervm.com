@@ -2,7 +2,7 @@
 
 You can customise a Slicer VM in two ways:
 
-1. Via [userdata on first boot](userdata.md) (a bash script included via the config file)
+1. Via [userdata on first boot](/tasks/userdata) (a bash script included via the config file)
 2. By extending an existing root filesystem with Docker and adding various `COPY` and `RUN` statements
 
 ## Build a custom image

@@ -1,6 +1,6 @@
 # Kubernetes with GPUs
 
-In this example, we'll adapt elements of the [HA Kubernetes](/examples/ha-k3s.md) example and the [GPU Ollama](/examples/gpu-ollama.md) setup to work together, so you can launch Pods with GPU acceleration.
+In this example, we'll adapt elements of the [HA Kubernetes](/examples/ha-k3s) example and the [GPU Ollama](/examples/gpu-ollama) setup to work together, so you can launch Pods with GPU acceleration.
 
 ## Set up a config
 

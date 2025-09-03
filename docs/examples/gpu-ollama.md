@@ -86,7 +86,7 @@ chmod +x ./setup-nvidia-run.sh
 sudo bash ./setup-nvidia-run.sh
 ```
 
-Compilation can take a minute or two, but can be sped up by caching all changed files and untaring them over the top of the root filesystem in [userdata](/tasks/userdata.md), or by [building a custom VM image](/tasks/custom-image.md) with the generated tar expanded. 
+Compilation can take a minute or two, but can be sped up by caching all changed files and untaring them over the top of the root filesystem in [userdata](/tasks/userdata), or by [building a custom VM image](/tasks/custom-image) with the generated tar expanded. 
 
 If you run into an error, you can edit the script and uncomment the line `--no-unified-memory`.
 

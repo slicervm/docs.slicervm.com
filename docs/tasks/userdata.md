@@ -1,6 +1,6 @@
 # Userdata for Slicer VMs
 
-Userdata can be used to customise VMs on first boot. Another option is to [build a custom image](custom-image.md).
+Userdata can be used to customise VMs on first boot. Another option is to [build a custom image](/tasks/custom-image).
 
 This can include anything from installing packages, configuring services, or setting up user accounts.
 

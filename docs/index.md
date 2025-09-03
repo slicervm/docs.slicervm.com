@@ -44,13 +44,15 @@ Think of Slicer like your own fast and private AWS EC2 region, without the surpr
 
 After running `slicer activate`, you'll get a link to join our Slicer Discord Server.
 
+[Sign up now](https://slicervm.com/pricing)
+
 ## The power user and technologist of the team
 
 For the power user or the technologist of the team, Slicer offers a quick and easy way to experiment with ideas and new technology in isolation, on fast hardware that you control.
 
 Whether you work on a Kubernetes product, support customers who do, or are looking for a way to start experimenting with agentic flows, LLMs with GPU acceleration, or a way to get the absolute most out of a large bare-metal host, Slicer will get you there and fast.
 
-The cost for commercial use starts at 250 USD / seat. A seat can be taken by a developer, or a production deployment on a server. For larger plans that scale for your needs, [contact](/contact.md) us and we can set up a demo.
+The cost for commercial use starts at 250 USD / seat. A seat can be taken by a developer, or a production deployment on a server. For larger plans that scale for your needs, [contact us](https://slicervm.com/pricing) and we can set up a demo.
 
 ## Use-cases
 

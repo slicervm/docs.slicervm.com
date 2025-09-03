@@ -79,7 +79,7 @@ slicer activate --help
 slicer activate
 ```
 
-Next, start your first VM with the [walk through](/getting-started/walkthrough.md).
+Next, start your first VM with the [walk through](/getting-started/walkthrough).
 
 ## Updating slicer
 
