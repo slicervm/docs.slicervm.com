@@ -70,8 +70,7 @@ WantedBy=multi-user.target
 FROM ghcr.io/openfaasltd/slicer-systemd:5.10.240-x86_64-latest
 
 RUN curl -fsSL https://get.docker.com | sh && \
-    usermod -aG docker ubuntu && \
-    docker pull registry:3
+    usermod -aG docker ubuntu
 
 COPY docker-registry.service /etc/systemd/system/docker-registry.service
 
@@ -86,6 +85,8 @@ Next, customise your `config.yaml` to use your new image:
 config:
    image: "docker.io/alexellis2/slicer-docker-registry:latest"
 ```
+
+In order to pre-pull the container image during the Docker build, you'd have to use [crane](https://github.com/google/go-containerregistry/tree/main/cmd/crane) to export the image to a local tarball, and then to import that during userdata. This is because you can't run `docker pull` during a Docker build.
 
 ## Try out your container
 
