@@ -9,6 +9,9 @@ In this example, we'll show you spread Kubernetes clusters over multiple machine
 
 The basic idea is that you run Slicer on two or more machines, which manages its own set of VMs. These are put on distinct subnets to avoid IP address conflicts, then a rule is added to the routing table to enable inter-connectivity. This isn't limited to just Kubernetes, you could run any network-based product or service you like across multiple machines with this technique. 
 
+[![Adlink Ampere Developer Platform](/images/aadp.jpg)](/images/aadp.jpg)
+> If I need a very large Kubernetes cluster I'll often run the control-plane on an x86_64 Ryzen 9 7900X machine, and the worker nodes on an Arm64 Ampere Altra machine like the Adlink AADP pictured above. The machine above has 96 Arm cores and 196GB RAM.
+
 ## Install Slicer on each machine
 
 First, install Slicer on each machine, following the [installation instructions](/getting-started/installation.md).

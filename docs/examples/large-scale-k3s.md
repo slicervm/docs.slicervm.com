@@ -17,7 +17,10 @@ Since K3sup Pro runs in parallel, is designed to work with Slicer's API, and is 
 
 Consider the target hardware, and the specification you require for your nodes.
 
-If your system has a 96-core Arm processor, with 196GB of RAM, you could split it up in any number of ways.
+If your system like ours has a 96-core Arm processor, with 196GB of RAM, you could split it up in any number of ways.
+
+[![The Adlink Ampere Developer Platform](/images/htop-aadp.jpg)](/images/htop-aadp.jpg)
+> The Adlink Ampere Developer Platform loaded up with 96 cores and 196GB RAM.
 
 * 12 nodes with 8 cores and 16GB RAM each
 * 24 nodes with 4 cores and 8GB RAM each

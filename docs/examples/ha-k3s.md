@@ -2,7 +2,9 @@
 
 The following example sets up a 3x Node Kubernetes cluster using K3s. As an optional step, you can set up a Load Balancer running on the Slicer host to distribute traffic across the nodes for the API server and HTTP/HTTPS.
 
-Create k3s-ha.yaml:
+If you would like to try out a smaller cluster first, you can simply change the `count` from `3` to `1` when saving the file below.
+
+Create `k3s-ha.yaml`:
 
 ```yaml
 config:
