@@ -104,6 +104,7 @@ nav:
   - Tasks:
       - Customise with userdata: tasks/userdata.md
       - Build a custom root filesystem: tasks/custom-image.md
+      - Monitoring: tasks/monitoring.md
   - Storage:
       - Overview: storage/overview.md
       - ZFS: storage/zfs.md
