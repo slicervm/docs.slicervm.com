@@ -112,6 +112,7 @@ nav:
       - Slicer REST API: reference/api.md
       - SSH access to VMs: reference/ssh.md
       - Serial Over SSH (SOS): reference/sos.md
+      - Troubleshooting: reference/troubleshooting.md
 
 # extra:
 #   analytics:
