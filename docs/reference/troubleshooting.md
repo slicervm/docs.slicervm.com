@@ -2,6 +2,10 @@
 
 The best place to get help with the Home Edition is via Discord. For Pro users, email support is available, check the welcome email for details.
 
+## The problem may be fixed by upgrading Slicer
+
+You can upgrade the Slicer binary by running the instructions at the end of the [installation page](/getting-started/install).
+
 ## I can't connect over SSH
 
 Have a look at the VM's serial console, written to: `/var/log/slicer/vm-1.txt` where `1` is the VM number, and vm is the host group name. 
@@ -57,3 +61,10 @@ sudo rm -rf /var/run/slicer
 sudo rm -rf /var/log/slicer
 ```
 
+For the nuclear option, delete all of the containerd's data, this will remove all images, snapshots, including any from containers that you run via Docker, if that's also installed.
+
+```bash
+sudo systemctl stop containerd
+sudo rm -rf /var/lib/containerd
+sudo systemctl restart containerd
+```
