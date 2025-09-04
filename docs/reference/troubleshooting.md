@@ -6,6 +6,18 @@ The best place to get help with the Home Edition is via Discord. For Pro users, 
 
 Have a look at the VM's serial console, written to: `/var/log/slicer/vm-1.txt` where `1` is the VM number, and vm is the host group name. 
 
+## The VM can't connect to the Internet
+
+This can occur when there are old or stable routes in place, for instance, if you added a route for `192.168.137.0/24` on another host, but are now running Slicer on your own workstation.
+
+Check routes with:
+
+```bash
+sudo ip route
+```
+
+Then delete one with i.e. `sudo ip route del 192.168.137.0/24`.
+
 ## I've run out of disk space
 
 There are three places to perform a prune/clean-up.
