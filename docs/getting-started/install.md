@@ -28,7 +28,7 @@ Enterprise:
 * OpenStack / VMware (with nested virtualisation)
 * Azure, DigitalOcean, GCP VMs (with nested virtualisation)
 
-A Linux system with KVM is required, so if you see `/dev/kvm`, Slicer will work.
+A Linux system with KVM is required (bare-metal or nested virtualisation), so if you see `/dev/kvm`, Slicer will work there.
 
 Ubuntu LTS is formally supported, whilst Arch Linux and RHEL-like Operating Systems should work - we won't be able to debug your system.
 
@@ -38,7 +38,7 @@ Ideally, nothing else should be installed on a host that runs Slicer. It should 
 
 Slicer is evolving, and for the better. Today it uses part of the installation process for [actuated](https://actuated.com).
 
-The installer sets up Firecracker, Cloud Hypervisor, containerd for storage, and a few networking options.
+The installer sets up [Firecracker](https://firecracker-microvm.github.io), [Cloud Hypervisor](https://github.com/cloud-hypervisor/cloud-hypervisor), [containerd](https://containerd.io/) for storage, and a few networking options.
 
 ```bash
 # The installer usually looks for an actuated license, but you don't

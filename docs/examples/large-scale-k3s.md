@@ -13,6 +13,10 @@ You can of course install any Kubernetes distribution in two ways:
 
 Since K3sup Pro runs in parallel, is designed to work with Slicer's API, and is included for free for Slicer customers, we'll use it here for a speedy installation.
 
+Video demo of setting up a large scale K3s cluster:
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/YMPyNrYEVLA?si=hqm6t_2igdEOFAT8" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
 ## Setup the VM configuration
 
 Consider the target hardware, and the specification you require for your nodes.
