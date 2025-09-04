@@ -78,7 +78,7 @@ The first way we deployed Slicer into a permanent setup was by taking a Hetzner 
 
 ### GPU-powered AI and agentic workflows
 
-Slicer isn't tied to Firecracker. With the Cloud Hypervisor support, any kind of GPU from an Nvidia 3090 RTX to a Tesla A100 can be used run local LLMs using Ollama, or a tool of your choice.
+Slicer isn't tied to Firecracker. With the Cloud Hypervisor support, any kind of Nvidia GPU from a 3060 RTX, to a 3090 RTX, to an A100 can be used run local LLMs using Ollama, or a tool of your choice.
 
 Ephemeral VMs can be launched for agents via API, or command line - supplying a userdata script for bootstrap. You can then set up your own agent for command & control.
 
