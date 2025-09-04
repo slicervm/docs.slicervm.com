@@ -102,6 +102,8 @@ nav:
   - Tasks:
       - Customise with userdata: tasks/userdata.md
       - Build a custom root filesystem: tasks/custom-image.md
+      - SSH access to VMs: tasks/ssh.md
+      - Serial Over SSH (SOS): tasks/sos.md
   - Storage:
       - Overview: storage/overview.md
       - ZFS: storage/zfs.md
