@@ -14,7 +14,7 @@ The basic idea is that you run Slicer on two or more machines, which manages its
 
 ## Install Slicer on each machine
 
-First, install Slicer on each machine, following the [installation instructions](/getting-started/installation).
+First, install Slicer on each machine, following the [installation instructions](/getting-started/install).
 
 For storage, we'll use the `image` setting, however if you're going to create many nodes, consider using [ZFS](/storage/zfs) for an instant clone of the VM filesystem, and reduced disk space consumption through ZFS's snapshots and Copy On Write (CoW) feature.
 

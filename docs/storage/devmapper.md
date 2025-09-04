@@ -27,7 +27,7 @@ nvme0n1                          259:4    0   1.8T  0 disk
 
 In this instance, you can see that my 2TB NVMe SSD is called nvme0n1 and is currently not allocated.
 
-Head over to the [installation page](/getting-started/installation) and run the installation script again, this time include the `VM_DEV` environment variable.
+Head over to the [installation page](/getting-started/install) and run the installation script again, this time include the `VM_DEV` environment variable.
 
 The default size for any unpacked VM is `30GB`, so if you want to alter that size do it now.
 
