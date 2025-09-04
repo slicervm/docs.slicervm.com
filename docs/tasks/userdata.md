@@ -30,7 +30,7 @@ config:
   host_groups:
   - name: agent
 +   userdata: |
-+     # Install Ollama
++     # Install Docker
 +     curl -fsSL https://get.docker.com | sh
 ```
 
