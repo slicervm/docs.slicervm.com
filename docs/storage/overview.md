@@ -45,7 +45,9 @@ Cons:
 
 ## Devmapper
 
-[Devmapper](https://en.wikipedia.org/wiki/Device_mapper) is available for Slicer, but not set up by default. Reach out if you have tried ZFS and need to use it instead.
+[Devmapper](https://en.wikipedia.org/wiki/Device_mapper) is available for Slicer, but not set up by default and requires additional setup.
+
+Generally, we'd recommend using ZFS instead of devmapper unless you have a specific need for it.
 
 Pros:
 
@@ -58,3 +60,4 @@ Cons:
 * No custom size for VMs - the size of any VM must match the base snapshot
 * Difficult to debug and troubleshoot - it's easier to recreate the whole storage pool
 
+[Setup devmapper storage for Slicer](/storage/devmapper)

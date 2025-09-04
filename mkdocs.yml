@@ -107,6 +107,7 @@ nav:
   - Storage:
       - Overview: storage/overview.md
       - ZFS: storage/zfs.md
+      - Devmapper: storage/devmapper.md
   - Reference:
       - Slicer REST API: reference/api.md
       - SSH access to VMs: reference/ssh.md

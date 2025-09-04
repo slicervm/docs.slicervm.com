@@ -32,7 +32,7 @@ If your system like ours has a 96-core Arm processor, with 196GB of RAM, you cou
 * 48 nodes with 2 cores and 4GB RAM each
 * 96 nodes with 1 core and 2GB RAM each
 
-Even if you don't have a large machine like this, you could run [Slicer on multiple machines](/examples/multiple-machine-k3s.md) to get to a similar size.
+Even if you don't have a large machine like this, you could run [Slicer on multiple machines](/examples/multiple-machine-k3s) to get to a similar size.
 
 Let's go for the mid-ground with 24 nodes.
 

@@ -3,7 +3,7 @@
 This page covers two concepts:
 
 1. SSH access to a running VM over the network (covered on this page)
-2. [Serial Over SSH console (SOS)](/reference/sos.md)
+2. [Serial Over SSH console (SOS)](/reference/sos)
 
 ## SSH access to a running VM over the network
 

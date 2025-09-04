@@ -1,6 +1,6 @@
 # Multiple machine Kubernetes
 
-In the [HA Kubernetes](/examples/ha-k3s.md) and [Large scale Kubernetes](/examples/large-scale-k3s.md) examples, we showed a single Kubernetes cluster running on a single Slicer host.
+In the [HA Kubernetes](/examples/ha-k3s) and [Large scale Kubernetes](/examples/large-scale-k3s) examples, we showed a single Kubernetes cluster running on a single Slicer host.
 
 In this example, we'll show you spread Kubernetes clusters over multiple machines, each running Slicer.
 
@@ -14,9 +14,9 @@ The basic idea is that you run Slicer on two or more machines, which manages its
 
 ## Install Slicer on each machine
 
-First, install Slicer on each machine, following the [installation instructions](/getting-started/installation.md).
+First, install Slicer on each machine, following the [installation instructions](/getting-started/installation).
 
-For storage, we'll use the `image` setting, however if you're going to create many nodes, consider using [ZFS](/storage/zfs.md) for an instant clone of the VM filesystem, and reduced disk space consumption through ZFS's snapshots and Copy On Write (CoW) feature.
+For storage, we'll use the `image` setting, however if you're going to create many nodes, consider using [ZFS](/storage/zfs) for an instant clone of the VM filesystem, and reduced disk space consumption through ZFS's snapshots and Copy On Write (CoW) feature.
 
 ## Create a YAML file for each machine
 

@@ -73,6 +73,8 @@ Press Enter to select, Esc or 'b' to go back
 
 ```
 
+In order for the shell be be operational, you'll need to make sure the `slicer-ssh-agent.service` is running within the VM using systemd. This is pre-installed in all the official VM images, but can be disabled for a slightly faster boot time, if you do not need to use SOS.
+
 When you connect, you'll be logged in as the `root` user.
 
 ```bash
