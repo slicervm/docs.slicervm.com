@@ -13,6 +13,8 @@ The basic idea is that you run Slicer on two or more machines, which manages its
 
 First, install Slicer on each machine, following the [installation instructions](/getting-started/installation.md).
 
+For storage, we'll use the `image` setting, however if you're going to create many nodes, consider using [ZFS](/storage/zfs.md) for an instant clone of the VM filesystem, and reduced disk space consumption through ZFS's snapshots and Copy On Write (CoW) feature.
+
 ## Create a YAML file for each machine
 
 You need to dedicate one subnet per machine, so that there are no IP address conflicts.
