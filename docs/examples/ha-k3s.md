@@ -73,6 +73,9 @@ This will install the first server, then server 2 and 3 in parallel.
 Finally run:
 
 ```bash
+mkdir -p ~/.kube
+cp ~/.kube/config ~/.kube/config.bak || true
+
 k3sup-pro get-config \
  --local-path ~/.kube/config \
  --merge \

@@ -116,6 +116,9 @@ After a short period of time, your cluster will be ready.
 Merge it into your KUBECONFIG file:
 
 ```bash
+mkdir -p ~/.kube
+cp ~/.kube/config ~/.kube/config.bak || true
+
 k3sup-pro get-config \
  --local-path ~/.kube/config \
  --merge \
