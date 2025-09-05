@@ -8,7 +8,7 @@ It's incredibly convenient.
 
 Alex recently migrated his blog from Ghost 1.x which had a built-in markdown editor, over to a static Next.js site. This example lets him edit the content of his blog without having a laptop with him. This whole setup could be run on a Raspberry Pi 5, or a cheap N100 mini computer.
 
-![VSCode tunneled to the web with built-in authentication and Copilot helping out](/images/vscode-blog.jpg)
+[![VSCode tunneled to the web with built-in authentication and Copilot helping out](/images/vscode-blog.jpg)](/images/vscode-blog.jpg)
 > VSCode tunneled to the web with built-in authentication and Copilot helping out
 
 ## Set up your initial VM
