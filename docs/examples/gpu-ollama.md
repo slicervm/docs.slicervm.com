@@ -10,7 +10,7 @@ What if you have multiple GPUs? Let's imagine you have a ATX tower PC with 2x Nv
 * Allocate each GPU to its own microVM
 * Start up with zero microVMs and [launch up to two short-lived tasks at once](/examples/run-a-task)
 
-![Ollama running the qwen3 model to generate a story about a microVM's first day at school](/images/ollama.png)
+[![Ollama running the qwen3 model to generate a story about a microVM's first day at school](/images/ollama.png)](/images/ollama.png)
 > Ollama running the qwen3 model to generate a story about a microVM's first day at school.
 
 GPU / VFIO mounting only works with Slicer running on `x86_64` at present.
