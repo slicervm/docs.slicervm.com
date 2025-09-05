@@ -23,8 +23,8 @@ Learn more in Alex's blog post [Preview: Slice Up Bare-Metal with Slicer](https:
 
 See initial customer interest via this [X/Twitter post](https://x.com/alexellisuk/status/1961752898552914074)
 
-![Slicer running on a Raspberry Pi 5 with NVMe](images/rpi5.png)
-> Slicer running on a Raspberry Pi 5 with NVMe
+[![Slicer running on a Raspberry Pi 5 with NVMe](images/rpi5.png)](https://youtu.be/f_YAbqI7YoQ)
+> Slicer running on a Raspberry Pi 5 with NVMe. Click above to watch the video.
 
 ## Target users for Slicer
 
