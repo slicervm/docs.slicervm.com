@@ -95,7 +95,7 @@ nav:
       - Running in the background: getting-started/daemon.md
   - Examples:
       - Run containers with Docker: examples/docker.md
-      - Remote VSCode: examples/vscode.md
+      - Remote VSCode: examples/remote-vscode.md
       - HA Kubernetes: examples/ha-k3s.md
       - Large scale Kubernetes: examples/large-scale-k3s.md
       - Multiple machine Kubernetes: examples/multiple-machine-k3s.md
