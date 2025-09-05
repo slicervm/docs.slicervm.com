@@ -45,7 +45,9 @@ config:
         )
 ```
 
-You can watch the installation by adding the fstail tool via `arkade get fstail`, then running:
+You can watch the installation by adding the [fstail](https://github.com/alexellis/fstail) tool via `arkade get fstail`.
+
+Then run the following to attach to any VM log files that are detected:
 
 ```bash
 sudo fstail /var/log/slicer
