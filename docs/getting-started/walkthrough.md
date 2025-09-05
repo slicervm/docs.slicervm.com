@@ -50,6 +50,27 @@ Connect with:
 ssh ubuntu@192.168.137.2
 ```
 
+## Ignore changing SSH host keys
+
+If, like the developers of Slicer, you'll be re-creating many hosts with the same IP addresses, you have two options:
+
+* Memorise and get familiar with the `ssh-keygen -R <ip-address>` command
+* Or add the following to your `~/.ssh/config` file to stop it complaining
+
+```
+Host 192.168.137.*
+    StrictHostKeyChecking no
+    UserKnownHostsFile /dev/null
+    GlobalKnownHostsFile /dev/null
+    CheckHostIP no
+    LogLevel QUIET
+    User ubuntu
+```
+
+Repeat it once for each IP range you use with Slicer.
+
+And bear in mind that you should not do this for production or long-running hosts.
+
 ## View the serial console
 
 The logs from the serial console including the output from the boot process are available on disk:
