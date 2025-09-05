@@ -17,6 +17,8 @@ Use the [walkthrough](/getting-started/walkthrough) to get a basic VM with the s
 
 When you create your config, you can [add userdata](/tasks/userdata) to install the VSCode server, so it's already there by the time you get in.
 
+The below is based upon the [Official VSCode Documentation](https://code.visualstudio.com/docs/setup/linux).
+
 ```yaml
 config:
   host_groups:
