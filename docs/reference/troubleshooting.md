@@ -18,7 +18,27 @@ sudo journalctl -u mount-config --no-pager
 
 Look for networking issues, or a bad routing.
 
-If your networking equipment is forcing the microVMs to use IPv6, but you do not have IPv6 connectivity, then you can disable IPv6 on first boot.
+If your networking equipment is forcing the microVMs to use IPv6, but you do not have IPv6 connectivity, then you could try to disable IPv6.
+
+The host is easier to fix and may mean you can leave the microVMs as they are.
+
+```bash
+sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1
+sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1
+sudo sysctl -w net.ipv6.conf.lo.disable_ipv6=1
+```
+
+To make it permanent:
+
+Then add the following lines to `/etc/sysctl.conf`:
+
+```
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+net.ipv6.conf.lo.disable_ipv6 = 1
+```
+
+Alternatively, you could try disabling only within the microVM on first boot:
 
 ```yaml
 config:
@@ -42,15 +62,8 @@ config:
         # reboot
 ```
 
-Alternatively, you can simply import SSH keys directly by specifying them in an array in the config.
+If you're having issues reaching GitHub for your SSH keys, you can [set them manually](/reference/ssh) in the config or userdata.
 
-```yaml
-config:
-  ssh_keys:
-   - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC3..."
-```
-
-You may also be able to disable IPv6 on your host instead of the microVM for an easier, less involved fix.
 
 ## The problem may be fixed by upgrading Slicer
 
