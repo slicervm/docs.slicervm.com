@@ -1,16 +1,20 @@
 # OpenFaaS Pro and CE in Slicer
 
-Boot up a pre-configured environment with the defaults for OpenFaaS Pro or CE.
+Boot up a pre-configured microVM with OpenFaaS Pro or CE setup along with `faas-cli`, `helm`, and `stern` for log tailing.
 
-In either case, the URL for the gateway is set in the default user's `.bashrc` file as:
+For either edition, the URL for the gateway is set up for you for in the default user's `.bashrc` file:
 
 ```bash
 export OPENFAAS_URL=http://127.0.0.1:31112
 ```
 
-You'll also be able to access the gateway from other machines by using the VM's IP i.e. `http://192.168.137.2:31112`.
+You can use that address directly on the VM during an SSH session, but you'll also be able to access the gateway from other machines by using the VM's IP i.e. `http://192.168.137.2:31112`.
 
 Get instructions to fetch the password via `arkade info openfaas`.
+
+For SSH access, customise the `github_user` field, or set the keys as a list via `ssh_keys`. Learn more about [SSH in Slicer](/reference/ssh).
+
+A multi-node setup is possible, but in that case, it's better to set up K3s using K3sup Pro from outside the VMs, and to follow the [HA K3s example](/examples/ha-k3s) followed by the [OpenFaaS for Kubernetes instructions](https://docs.openfaas.com/deployment/).
 
 ## OpenFaaS Pro
 
