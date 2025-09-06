@@ -2,6 +2,54 @@
 
 The best place to get help with the Home Edition is via Discord. For Pro users, email support is available, check the welcome email for details.
 
+## Doesn't boot right or has a networking issue - perhaps GitHub keys aren't being imported?
+
+Look in the log file outputted from slicer. So if you are running i.e. `k3s` as the host group and VM 1 isn't booting:
+
+```bash
+sudo cat /var/log/slicer/k3s-1.txt
+```
+
+If you can get into the VM via the [SOS console](/reference/sos), then run the following:
+
+```bash
+sudo journalctl -u mount-config --no-pager
+```
+
+Look for networking issues, or a bad routing.
+
+If your networking equipment is forcing the microVMs to use IPv6, but you do not have IPv6 connectivity, then you can disable IPv6 on first boot.
+
+```yaml
+config:
+    host_groups:
+    - name: k3s
+      userdata: |
+        #!/bin/bash
+        sysctl -w net.ipv6.conf.all.disable_ipv6=1
+        sysctl -w net.ipv6.conf.default.disable_ipv6=1
+        sysctl -w net.ipv6.conf.lo.disable_ipv6=1
+
+        echo "net.ipv6.conf.all.disable_ipv6 = 1" |tee -a /etc/sysctl.conf
+        echo "net.ipv6.conf.default.disable_ipv6 = 1" |tee -a /etc/sysctl.conf
+        echo "net.ipv6.conf.lo.disable_ipv6 = 1" |tee -a /etc/sysctl.conf
+
+        # Cause the SSH keys to re re-imported from GitHub on the next boot
+        
+        rm -rf /home/ubuntu/.ssh/github_keys_imported
+
+        # Optionally, reboot the VM to re-import the keys from GitHub
+        # reboot
+```
+
+Alternatively, you can simply import SSH keys directly by specifying them in an array in the config.
+
+```yaml
+config:
+  ssh_keys:
+   - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC3..."
+```
+
 ## The problem may be fixed by upgrading Slicer
 
 You can upgrade the Slicer binary by running the instructions at the end of the [installation page](/getting-started/install).
