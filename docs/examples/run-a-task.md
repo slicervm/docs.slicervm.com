@@ -125,6 +125,8 @@ If you publish an image to the Docker Hub, make sure you include its prefix i.e.
 
 Rather than downloading an extracting the Kernel on each run of Slicer, you can extract a given vmlinux file and tell the YAML file to use that.
 
+This is preferred for a long-running host, where we need to keep the root-filesystem image and Kernel in sync.
+
 The Kernel must agree with the root filesystem image, which means using a proper tag and not a `latest` tag.
 
 Why? The Kernel is built as a vmlinux, however its modules are packaged into the root filesystem image.
@@ -145,7 +147,7 @@ $ crane ls ghcr.io/openfaasltd/actuated-kernel:5.10.240-x86_64-latest
 5.10.240-x86_64-5c59e9b9b08eea49499be8449099291c93469b80
 ```
 
-Pick a stable for your architecture i.e. `x86_64-SHA` or `aarch64-SHA`, then run:
+Pick a stable tag for your architecture i.e. `x86_64-SHA` or `aarch64-SHA`, then run:
 
 ```bash
 $ arkade oci install ghcr.io/openfaasltd/actuated-kernel:5.10.240-x86_64-2f2ebc0bbefe128aa3061e6ea6806cbcdc975208 --output ./
