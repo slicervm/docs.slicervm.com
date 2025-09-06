@@ -50,6 +50,8 @@ config:
    - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC3..."
 ```
 
+You may also be able to disable IPv6 on your host instead of the microVM for an easier, less involved fix.
+
 ## The problem may be fixed by upgrading Slicer
 
 You can upgrade the Slicer binary by running the instructions at the end of the [installation page](/getting-started/install).
