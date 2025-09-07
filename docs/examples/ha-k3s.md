@@ -46,7 +46,7 @@ Download K3sup Pro:
 PRO=true curl -sSL https://get.k3sup.dev | sudo sh
 ```
 
-If you want to leave off `sudo`, then just move the `k3sup-pro` binary into your `$PATH` variable manually.
+If you want to leave off `sudo`, then just move the `k3sup` binary into your `$PATH` variable manually.
 
 Next, on the host where slicer is running, get the devices file from Slicer's API:
 
@@ -61,14 +61,14 @@ On your workstation, add any routes that are specified so you can access the VMs
 Check the options like disabling Traefik, so that you can install Ingress Nginx or Istio instead.
 
 ```bash
-k3sup-pro plan --help
+k3sup plan --help
 
-k3sup-pro plan --traefik=false --user ubuntu
+k3sup plan --traefik=false --user ubuntu
 ```
 
 This will generate a plan.yaml file, you can review and edit it.
 
-Next, run `k3sup-pro apply`.
+Next, run `k3sup apply`.
 
 This will install the first server, then server 2 and 3 in parallel.
 
@@ -78,7 +78,7 @@ Finally run:
 mkdir -p ~/.kube
 cp ~/.kube/config ~/.kube/config.bak || true
 
-k3sup-pro get-config \
+k3sup get-config \
  --local-path ~/.kube/config \
  --merge \
  --context slicer-k3s-ha
@@ -131,10 +131,10 @@ Finally, revisit your plan so each server obtains a TLS certificate for the Kube
 So if the Slicer host were 192.168.1.100:
 
 ```bash
-k3sup-pro plan --tls-san 192.168.1.100 \
+k3sup plan --tls-san 192.168.1.100 \
   --update
 
-k3sup-pro apply
+k3sup apply
 ```
 
 Then edit your `~/.kube/config` file and replace `192.168.137.2:6443` with `192.168.1.100:6443`.
