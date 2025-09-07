@@ -5,6 +5,16 @@ You can customise a Slicer VM in two ways:
 1. Via [userdata on first boot](/tasks/userdata) (a bash script included via the config file)
 2. By extending an existing root filesystem with Docker and adding various `COPY` and `RUN` statements
 
+When building within Docker, you must bear in mind that not all of the files shown to you will persist into the final image.
+
+Additionally, if you're copying and pasting commands from installation guides, certain `systemctl` commands will need to be adapted.
+
+If a guide gave you `systemctl enable --now bind` for a custom DNS server, you'd simply remove the `--now` flag. The meaning of `--now` is to instruct the build container to start a systemd service immediately - that's not possible or desirable during a build.
+
+In short, if you are trying to extend a Slicer image, treat it as if it were a Docker container, and only run commands that you know work in a regular Dockerfile.
+
+For anything that does not run or work within a Dockerfile, either use userdata to run the steps on first boot, or add a one-shot systemd unit file that will run your custom steps on first boot.
+
 ## Build a custom image
 
 First, refer to the image you want to customise - whether it's for aarch64 or x86_64.
