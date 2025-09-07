@@ -6,7 +6,7 @@ This can include anything from installing packages, configuring services, or set
 
 If you wanted to run AI agents within Slicer, you could use userdata to install a custom AI framework, library, or agent for Remote Procedure Control (RPC).
 
-## Userdata in the config file
+## Inline userdata in the config file
 
 ```diff
 config:
@@ -32,6 +32,27 @@ config:
 +   userdata: |
 +     # Install Docker
 +     curl -fsSL https://get.docker.com | sh
+```
+
+## Userdata via a local file
+
+Instead of inlining long scripts in the config file, you can reference a local file.
+
+```diff
+config:
+  host_groups:
+  - name: agent
++   userdata_file: ./userdata.sh
+```
+
+Then simply write the script in `userdata.sh`, here's one to set up Docker:
+
+```bash
+#!/bin/bash
+# Install Docker
+curl -fsSL https://get.docker.com | sh
+# Add user to docker group
+usermod -aG docker ubuntu
 ```
 
 ## Userdata via the CLI
