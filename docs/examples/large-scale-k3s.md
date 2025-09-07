@@ -128,7 +128,7 @@ Merge it into your KUBECONFIG file:
 mkdir -p ~/.kube
 cp ~/.kube/config ~/.kube/config.bak || true
 
-k3sup get-config \
+k3sup-pro get-config \
  --local-path ~/.kube/config \
  --merge \
  --context slicer-k3s-scale

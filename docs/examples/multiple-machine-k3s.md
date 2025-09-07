@@ -111,17 +111,17 @@ PRO=1 curl -sSL https://get.k3sup.dev | sudo sh
 ```
 
 ```bash
-k3sup plan --user ubuntu \
+k3sup-pro plan --user ubuntu \
   --devices ./devices-a.json \
   --devices ./devices-b.json \
   --servers 3 \
   --traefik=false
 ```
 
-After the plan.yaml file is generated, you can run `k3sup apply` to setup the cluster.
+After the plan.yaml file is generated, you can run `k3sup-pro apply` to setup the cluster.
 
 ```bash
-k3sup apply
+k3sup-pro apply
 ```
 
 After a few moments, you can get the KUBECONFIG and merge it into your existing kubeconfig file:
@@ -130,7 +130,7 @@ After a few moments, you can get the KUBECONFIG and merge it into your existing 
 mkdir -p ~/.kube
 cp ~/.kube/config ~/.kube/config.bak || true
 
-k3sup get-config \
+k3sup-pro get-config \
     --local-path ~/.kube/config \
     --merge \
     --context slicer-multi
