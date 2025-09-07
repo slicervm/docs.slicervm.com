@@ -43,7 +43,7 @@ The IP addresses of the VMs will be as follows:
 Download K3sup Pro:
 
 ```bash
-PRO=true curl -sSL https://get.k3sup.dev | sudo sh
+curl -sSL https://get.k3sup.dev | PRO=true sudo -E sh
 ```
 
 If you want to leave off `sudo`, then just move the `k3sup-pro` binary into your `$PATH` variable manually.

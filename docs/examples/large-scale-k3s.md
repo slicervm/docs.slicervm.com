@@ -94,7 +94,7 @@ On your workstation, add any routes that are specified so you can access the VMs
 Download the devices.json file to your local computer, and install K3sup Pro:
 
 ```bash
-PRO=true curl -sLS https://get.k3sup.dev | sudo sh
+curl -sSL https://get.k3sup.dev | PRO=true sudo -E sh
 ```
 
 Next, create a K3sup Pro plan using the devices file. Simply run the command in the same folder as `devices.json`.
