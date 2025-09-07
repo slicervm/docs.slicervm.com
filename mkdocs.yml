@@ -102,6 +102,7 @@ nav:
       - K3s with a GPU: examples/k3s-gpu.md
       - Ollama with a GPU: examples/gpu-ollama.md
       - OpenFaaS on K3s: examples/openfaas.md
+      - PiHole Adblocker: examples/pihole-adblock.md
       - Run a one-shot task: examples/run-a-task.md
   - Tasks:
       - Customise with userdata: tasks/userdata.md

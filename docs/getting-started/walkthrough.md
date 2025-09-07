@@ -32,6 +32,17 @@ config:
   hypervisor: firecracker
 ```
 
+**Configuration for an Arm64 Slicer installation**
+
+If you're deploying to an Arm64 host, then the only changes needed to the `vm.yaml` file are to the `kernel_image` and `image` fields:
+
+```diff
+-  kernel_image: "ghcr.io/openfaasltd/actuated-kernel:5.10.240-x86_64-latest"
+-  image: "ghcr.io/openfaasltd/slicer-systemd:5.10.240-x86_64-latest"
++  kernel_image: "ghcr.io/openfaasltd/actuated-kernel:6.1.90-aarch64-latest"
++  image: "ghcr.io/openfaasltd/slicer-systemd-arm64:6.1.90-aarch64-latest"
+```
+
 The `storage: image` setting means a disk image will be cloned from the root filesystem into a local file. It's not the fastest option for the initial setup, but it's the simplest, persistent and great for long-living VMs. 
 
 Now, open a new terminal window, or ideally launch `tmux` so you can leave the binary running in the background.
@@ -94,17 +105,6 @@ If you want to tail the logs from all available VMs at once, use `fstail` via `a
 
 ```bash
 sudo -E fstail /var/log/slicer/
-```
-
-## Configuration for an Arm VM
-
-The only changes needed to the `vm.yaml` file are to the `kernel_image` and `image` fields:
-
-```diff
--  kernel_image: "ghcr.io/openfaasltd/actuated-kernel:5.10.240-x86_64-latest"
--  image: "ghcr.io/openfaasltd/slicer-systemd:5.10.240-x86_64-latest"
-+  kernel_image: "ghcr.io/openfaasltd/actuated-kernel:6.1.90-aarch64-latest"
-+  image: "ghcr.io/openfaasltd/slicer-systemd-arm64:6.1.90-aarch64-latest"
 ```
 
 ## Launch a second VM
