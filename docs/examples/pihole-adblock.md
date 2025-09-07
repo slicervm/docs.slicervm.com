@@ -186,3 +186,13 @@ sudo iptables -t nat -A PREROUTING -i $SLICER_IFACE -p tcp --dport 53 -j DNAT --
 # Add MASQUERADE rule so return traffic works properly
 sudo iptables -t nat -A POSTROUTING -j MASQUERADE
 ```
+
+If you'd also like a rule for the admin dashboard, so it's also accessible from the host IP:
+
+```bash
+# Set your PiHole VM IP and detect the network interface
+export PIHOLE_IP=192.168.136.2  # Update this to match your actual PiHole VM IP
+export SLICER_IFACE=$(ip -o -4 route show to default | awk '{print $5}' | head -n1)
+
+sudo iptables -t nat -A PREROUTING -i $SLICER_IFACE -p tcp --dport 80 -j DNAT --to-destination $PIHOLE_IP:80
+```
