@@ -83,7 +83,13 @@ Next, start your first VM with the [walk through](/getting-started/walkthrough).
 
 ## Updating slicer
 
-To update Slicer run the arkade command from above, and overwrite the binary:
+To update Slicer, use the `slicer update` command:
+
+```bash
+sudo -E slicer update
+```
+
+Alternatively, if you're on an earlier version, repeat this command from the installation step:
 
 ```bash
 sudo -E arkade oci install ghcr.io/openfaasltd/slicer:latest \
