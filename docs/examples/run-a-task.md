@@ -36,8 +36,6 @@ config:
       tap_prefix: tsktap
       gateway: 192.168.138.1/24
 
-  github_user: alexellis
-
   api:
     bind_address: 127.0.0.1
     port: 8081
@@ -97,6 +95,36 @@ done
 
 ![Each of the 5 tasks that executed and exited, posted to the endpoint](/images/tasks-web.png)
 > Each of the 5 tasks that executed and exited, posted to the endpoint
+
+### Launch a task from the CLI
+
+The slicer CLI can act as a HTTP client to the REST API, which makes it a bit easier for initial exploration:
+
+```bash
+for i in {1..5};
+do
+  slicer vm add \
+    task \
+    --api http://127.0.0.1:8081 \
+    --userdata-file ./task.sh
+done
+```
+
+The output will be as follows:
+
+```
+VM created
+  Hostname: task-1
+  Group:    task
+  IP:       192.168.138.2/24
+  Specs:    1 vCPU, 2GB RAM, GPUs: 0
+  Persistent: false
+  Created:  2025-09-09T09:45:27+01:00
+```
+
+When using Cloud Hypervisor for GPU support, the `--gpus` flag can be passed to allocate a number of GPUs from the host into the guest VM.
+
+This would be useful for batch inference, or AI jobs that benefit from direct access to a local LLM.
 
 ## Optimise the image for start-up speed
 
