@@ -16,6 +16,9 @@ The general idea is that everything is orchestrated via an initial userdata scri
 
 This example is one-shot, so it's designed to run to completion once, without any further interaction.
 
+[![Example of a one-shot execution](/images/oneshot-opencode.jpg)](/images/oneshot-opencode.jpg)
+> Example of a one-shot execution for a sample prompt to create a Go HTTP server, and to test it via `curl`
+
 ## Example config
 
 The slicer config will be adapted from the [walkthrough](/getting-started/walkthrough). When you create the YAML, name it `opencode.yaml`.
