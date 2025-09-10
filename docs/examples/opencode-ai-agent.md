@@ -1,5 +1,11 @@
 # Run an AI Agent with OpenCode
 
+We'll run an AI agent within a microVM using [OpenCode](https://opencode.ai/), an open-source tool to generate code using large language models (LLMs).
+
+OpenCode occasionally supports free trials for popular LLMs. This guide was written whilst Grok's Coder model was available for free - and at no cost.
+
+OpenCode supports [various model providers](https://opencode.ai/docs/providers/) including GitHub CoPilot, OpenAI, Ollama (self-hosted models), and Anthropic.
+
 This example is very minimal and can be tuned and adapted in many ways to suit your workflow.
 
 The general idea is that everything is orchestrated via an initial userdata script:
