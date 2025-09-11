@@ -26,6 +26,12 @@ config:
     port: 8080
     bind_address: "127.0.0.1:"
 
+
+# Comment out the image depending on your system's architecture
+
+  # kernel_image: "ghcr.io/openfaasltd/actuated-kernel:6.1.90-aarch64-latest"
+  # image: "ghcr.io/openfaasltd/slicer-systemd-arm64:6.1.90-aarch64-latest"
+
   kernel_image: "ghcr.io/openfaasltd/actuated-kernel:5.10.240-x86_64-latest"
   image: "ghcr.io/openfaasltd/slicer-systemd:5.10.240-x86_64-latest"
 
