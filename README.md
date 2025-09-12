@@ -15,8 +15,13 @@ Local testing:
 mkdocs serve
 ```
 
-Access the site at http://127.0.0.1:8000
+Local testing with docker:
 
+```bash
+docker run --rm -it -p 8000:8000 -v `pwd`:/docs squidfunk/mkdocs-material:latest
+```
+
+Access the site at http://127.0.0.1:8000
 
 ## Contributing
 

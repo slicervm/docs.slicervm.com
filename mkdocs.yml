@@ -16,16 +16,16 @@ theme:
   logo: images/logo.png
 
   palette:
-  - scheme: default
-    primary: black
-    toggle:
-      icon: material/toggle-switch-off-outline
-      name: Switch to dark mode
-  - scheme: slate
-    primary: black
-    toggle:
-      icon: material/toggle-switch
-      name: Switch to light mode
+    - scheme: default
+      primary: black
+      toggle:
+        icon: material/toggle-switch-off-outline
+        name: Switch to dark mode
+    - scheme: slate
+      primary: black
+      toggle:
+        icon: material/toggle-switch
+        name: Switch to light mode
 
   font:
     text: Roboto, Helvetica
@@ -53,7 +53,7 @@ extra:
 
 plugins:
   - search
-  
+
 markdown_extensions:
   - attr_list
   - tables
@@ -109,6 +109,7 @@ nav:
       - Customise with userdata: tasks/userdata.md
       - Build a custom root filesystem: tasks/custom-image.md
       - Monitoring: tasks/monitoring.md
+      - Share files with NFS: tasks/share-files-with-nfs.md
   - Storage:
       - Overview: storage/overview.md
       - ZFS: storage/zfs.md
@@ -118,7 +119,6 @@ nav:
       - SSH access to VMs: reference/ssh.md
       - Serial Over SSH (SOS): reference/sos.md
       - Troubleshooting: reference/troubleshooting.md
-
 # extra:
 #   analytics:
 #     provider: google
