@@ -8,10 +8,19 @@ Example use-cases:
 
 * Web scraping, data extraction and analysis
 * Code or content generation
+* Analyze user-submitted content such as code, comments, or documents
 * Image or video conversion
 * Chat bots, and webhook receivers / responders - i.e. from GitHub, GitLab, Discord, Slack, etc.
 
 Running within a microVM means you can run the agent in a secure, isolated environment, and you can easily discard the VM when done.
+
+> Note: Overall, Cursor's CLI has some rough edges, and you may prefer to use [opencode](/examples/opencode-ai-agent), which at time of writing worked better headless and was more polished.
+> 
+> The CLI may require an initial interactive session to enable MCP usage and to "trust" the working directory.
+> 
+> The CLI can also hang indefinitely after responding to a prompt, even in --print mode.
+> 
+> The CLI seems to have no practical way to read a prompt from a file or a stdin pipe, so you have to use `$(cat prompt.txt)` which can end up reading subsequent commands into the prompt.
 
 ## Quick overview
 
@@ -52,7 +61,7 @@ cd
 
 curl https://cursor.com/install -fsS | sudo -E bash
 
-mkdir -p .cursor/
+mkdir -p ~/.cursor/
 
 echo 'export PATH="$HOME/.local/bin:$PATH"' >> ./.bashrc
 
@@ -70,15 +79,39 @@ npx playwright install --with-deps chromium
 
 cat << EOF > ~/.cursor/mcp.json
 {
-    "mcpServers": {
-        "playwright-mcp": {
-            "command": "npx",
-            "args": [
-                "@playwright/mcp@latest"
-            ]
-        }
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--browser", "chromium",
+        "--headless"
+        ]
     }
+  }
 }
+
+EOF
+
+cat << EOF > ~/.cursor/cli-config.json
+{
+  "permissions": {
+    "allow": [
+      "*"
+    ],
+    "deny": []
+  }
+}
+
+EOF
+
+mkdir -p ~/.cursor/projects/home-ubuntu/
+
+cat << EOF > ~/.cursor/projects/home-ubuntu/mcp-approvals.json
+[
+  "playwright-aced25c5e5b87b1c"
+]
+
 EOF
 
 mkdir -p ~/.cache/ms-playwright/
@@ -91,15 +124,17 @@ EOF
 source ~/.bashrc
 
 # Belt and braces..
-sudo chown -R ubuntu *
+sudo chown -R "$USER:$USER" "$HOME"
 
-# Present your task/prompt in non-interactive mode for the agent/CLI:
-# Output format also supports JSON
-time cursor-agent --output-format=text --print <<< $(cat ~/prompt.txt) > ~/cursor.log
+cursor-agent mcp list
+cursor-agent mcp list-tools playwright
 
-echo "Done" > cursor-done.txt
-date >> ~/cursor.log
+time cursor-agent --model auto --force --output-format=text --print "$(cat ./prompt.txt)" > ~/cursor.log
 ```
+
+Note: at time of writing, a `mcp-approvals.json` file had to be created to get the MCP tool calls to work. Hopefully the cursor team will negate this requirement for headless use in a future release.
+
+The approval file is not required if you do not use MCP tools.
 
 ## Config file
 
@@ -125,6 +160,8 @@ sudo slicer up ./cursor.yaml
 ```
 
 ## Taking it further
+
+You can learn more about the [Cursor CLI here](https://docs.cursor.com/en/cli/overview) and its [headless usage here](https://docs.cursor.com/en/cli/headless)
 
 If your agent doesn't need to browse the web, then you can speed up the boot by removing the Playwright instructions.
 
