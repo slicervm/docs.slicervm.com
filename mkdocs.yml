@@ -118,6 +118,7 @@ nav:
       - Devmapper: storage/devmapper.md
   - Reference:
       - Slicer REST API: reference/api.md
+      - Images for microVMs: reference/images.md
       - SSH access to VMs: reference/ssh.md
       - Serial Over SSH (SOS): reference/sos.md
       - Troubleshooting: reference/troubleshooting.md
