@@ -4,7 +4,7 @@ site_author: OpenFaaS Ltd
 site_url: https://docs.slicervm.com/
 
 # Repository
-repo_name: self-actuated/actuated
+repo_name: slicervm/docs.slicervm.com
 repo_url: https://github.com/slicervm/docs.slicervm.com
 edit_uri: ""
 
@@ -40,7 +40,7 @@ theme:
 
   language: en
 
-  # favicon: images/favicon.ico
+  favicon: images/favicon.ico
 
 extra:
   search:
@@ -94,19 +94,22 @@ nav:
       - Walkthrough: getting-started/walkthrough.md
       - Running in the background: getting-started/daemon.md
   - Examples:
-      - Run containers with Docker: examples/docker.md
-      - Remote Docker builds over SSH: examples/buildkit.md
-      - Remote VSCode: examples/remote-vscode.md
-      - HA Kubernetes: examples/ha-k3s.md
-      - Large scale Kubernetes: examples/large-scale-k3s.md
-      - Multiple machine Kubernetes: examples/multiple-machine-k3s.md
-      - K3s with a GPU: examples/k3s-gpu.md
-      - Ollama with a GPU: examples/gpu-ollama.md
-      - OpenFaaS on K3s: examples/openfaas.md
-      - PiHole Adblocker: examples/pihole-adblock.md
-      - Headless OpenCode AI Agent: examples/opencode-ai-agent.md
-      - Headless Cursor AI Agent: examples/cursor-cli-agent.md
+      - Kubernetes:
+          - HA Kubernetes: examples/ha-k3s.md
+          - Large scale Kubernetes: examples/large-scale-k3s.md
+          - Multiple machine Kubernetes: examples/multiple-machine-k3s.md
+          - K3s with a GPU: examples/k3s-gpu.md
+          - OpenFaaS on K3s: examples/openfaas.md
+      - AI/LLMs:
+          - Ollama with a GPU: examples/gpu-ollama.md
+          - Headless OpenCode AI Agent: examples/opencode-ai-agent.md
+          - Headless Cursor AI Agent: examples/cursor-cli-agent.md
+      - Productivity:
+          - Remote Docker builds over SSH: examples/buildkit.md
+          - Remote VSCode: examples/remote-vscode.md
+          - PiHole Adblocker: examples/pihole-adblock.md
       - Run a one-shot task: examples/run-a-task.md
+      - Run containers with Docker: examples/docker.md
   - Tasks:
       - Customise with userdata: tasks/userdata.md
       - Build a custom root filesystem: tasks/custom-image.md
