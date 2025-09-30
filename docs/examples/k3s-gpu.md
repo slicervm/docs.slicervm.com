@@ -23,7 +23,6 @@ config:
 
   github_user: alexellis
 
-  kernel_image: "ghcr.io/openfaasltd/actuated-kernel-ch:5.10.240-x86_64-latest"
   image: "ghcr.io/openfaasltd/slicer-systemd-ch:5.10.240-x86_64-latest"
 
   hypervisor: cloud-hypervisor
@@ -121,7 +120,7 @@ kubectl logs nvidia-smi
 
 ```bash
 $ kubectl logs pod/nvidia-smi
-Mon Sep  1 15:04:11 2025       
+Mon Sep  1 15:04:11 2025
 +-----------------------------------------------------------------------------------------+
 | NVIDIA-SMI 580.76.05              Driver Version: 580.76.05      CUDA Version: 13.0     |
 +-----------------------------------------+------------------------+----------------------+

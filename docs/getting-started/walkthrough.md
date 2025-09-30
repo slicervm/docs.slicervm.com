@@ -26,7 +26,6 @@ config:
 
   github_user: alexellis
 
-  kernel_image: "ghcr.io/openfaasltd/actuated-kernel:5.10.240-x86_64-latest"
   image: "ghcr.io/openfaasltd/slicer-systemd:5.10.240-x86_64-latest"
 
   hypervisor: firecracker
@@ -34,16 +33,14 @@ config:
 
 **Configuration for an Arm64 Slicer installation**
 
-If you're deploying to an Arm64 host, then the only changes needed to the `vm.yaml` file are to the `kernel_image` and `image` fields:
+If you're deploying to an Arm64 host, then the only changes needed is to select a different `image` in the `vm.yaml` file:
 
 ```diff
--  kernel_image: "ghcr.io/openfaasltd/actuated-kernel:5.10.240-x86_64-latest"
 -  image: "ghcr.io/openfaasltd/slicer-systemd:5.10.240-x86_64-latest"
-+  kernel_image: "ghcr.io/openfaasltd/actuated-kernel:6.1.90-aarch64-latest"
 +  image: "ghcr.io/openfaasltd/slicer-systemd-arm64:6.1.90-aarch64-latest"
 ```
 
-The `storage: image` setting means a disk image will be cloned from the root filesystem into a local file. It's not the fastest option for the initial setup, but it's the simplest, persistent and great for long-living VMs. 
+The `storage: image` setting means a disk image will be cloned from the root filesystem into a local file. It's not the fastest option for the initial setup, but it's the simplest, persistent and great for long-living VMs.
 
 Now, open a new terminal window, or ideally launch `tmux` so you can leave the binary running in the background.
 
@@ -98,7 +95,7 @@ $ sudo tail -f /var/log/slicer/vm-1.txt
 
 Ubuntu 22.04.5 LTS vm-1 ttyS0
 
-vm-1 login: 
+vm-1 login:
 ```
 
 If you want to tail the logs from all available VMs at once, use `fstail` via `arkade get fstail`:
@@ -150,4 +147,3 @@ Example:
 ```bash
 ssh -p 2222 ubuntu@localhost
 ```
-

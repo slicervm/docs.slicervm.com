@@ -21,7 +21,7 @@ There a three differences to the other examples we've seen so far:
 
 1. `gpu_count: N` is added to the hostgroup, N is a the number of GPUs to allocate to each VM
 2. `hypervisor: cloud-hypervisor` - Cloud Hypervisor is used instead of Firecracker, to enable VFIO passthrough of a PCI device
-3. `image` / `kernel_image` - a separate Kernel and root filesystem is required for Cloud Hypervisor
+3. `image` - a separate Kernel and root filesystem is required for Cloud Hypervisor
 
 The following to `gpu.yaml`, make sure you update `vcpu` and `ram_gb`
 
@@ -42,7 +42,6 @@ config:
 
   github_user: alexellis
 
-  kernel_image: "ghcr.io/openfaasltd/actuated-kernel-ch:5.10.240-x86_64-latest"
   image: "ghcr.io/openfaasltd/slicer-systemd-ch:5.10.240-x86_64-latest"
 
   hypervisor: cloud-hypervisor
@@ -86,7 +85,7 @@ chmod +x ./setup-nvidia-run.sh
 sudo bash ./setup-nvidia-run.sh
 ```
 
-Compilation can take a minute or two, but can be sped up by caching all changed files and untaring them over the top of the root filesystem in [userdata](/tasks/userdata), or by [building a custom VM image](/tasks/custom-image) with the generated tar expanded. 
+Compilation can take a minute or two, but can be sped up by caching all changed files and untaring them over the top of the root filesystem in [userdata](/tasks/userdata), or by [building a custom VM image](/tasks/custom-image) with the generated tar expanded.
 
 If you run into an error, you can edit the script and uncomment the line `--no-unified-memory`.
 
@@ -95,9 +94,9 @@ Other commands to start a custom agent, or to install frameworks/tools can be ad
 Check the status of the driver with `nvidia-smi`:
 
 ```bash
-ubuntu@gpu-1:~$ nvidia-smi 
+ubuntu@gpu-1:~$ nvidia-smi
 
-Mon Sep  1 11:28:45 2025       
+Mon Sep  1 11:28:45 2025
 +-----------------------------------------------------------------------------------------+
 | NVIDIA-SMI 580.76.05              Driver Version: 580.76.05      CUDA Version: 13.0     |
 +-----------------------------------------+------------------------+----------------------+
@@ -145,4 +144,3 @@ curl -SLs http://192.168.137.2:11434/api/generate -d '{
 ```
 
 Since we're using a persistent disk image, any models you download will be available if you restart or shutdown Slicer.
-
