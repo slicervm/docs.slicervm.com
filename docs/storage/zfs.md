@@ -19,9 +19,9 @@ config:
 +   storage: zfs
 ```
 
-Bear in mind that with this initial version of ZFS storage, the VM size will have to match whatever is configured for the zvol snapshotter.
+If `storage_size` is not set in the host group configuration the size of the storage volume is set to whatever is configured for the zvol snapshotter. It is possible to request a custom size by setting `storage_size`. Bear in mind that zvol snapshotter can only increase the snapshot size for a VM. This means the `storage_size` has to be the same or bigger than the default size configured for the zvol snapshotter (the default size is `20G`).
 
-So if the default is not large enough for your needs, delete the snapshot, then adjust the configuration and restart the snapshotter.
+So if the default is too large for your needs, delete the snapshot, then adjust the configuration and restart the snapshotter.
 
 ## Install packages for ZFS
 
