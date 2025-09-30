@@ -40,7 +40,6 @@ config:
     bind_address: 127.0.0.1
     port: 8081
 
-  kernel_image: "ghcr.io/openfaasltd/actuated-kernel:5.10.240-x86_64-latest"
   image: "ghcr.io/openfaasltd/slicer-systemd:5.10.240-x86_64-latest"
 
   hypervisor: firecracker
@@ -195,4 +194,3 @@ Use it in your YAML file, replacing `kernel_image` with `kernel_file`:
   kernel_file: "./vmlinux"
   image: "ghcr.io/openfaasltd/slicer-systemd:5.10.240-x86_64-2f2ebc0bbefe128aa3061e6ea6806cbcdc975208"
 ```
-

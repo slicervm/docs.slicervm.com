@@ -83,8 +83,7 @@ config:
       addresses:
       - 192.168.137.2/24
   github_user: alexellis
-  
-  kernel_image: "ghcr.io/openfaasltd/actuated-kernel:5.10.240-x86_64-latest"
+
   image: "ghcr.io/openfaasltd/slicer-systemd:5.10.240-x86_64-latest"
 
   api:
@@ -188,8 +187,7 @@ config:
       addresses:
       - 192.168.137.2/24
   github_user: alexellis
-  
-  kernel_image: "ghcr.io/openfaasltd/actuated-kernel:5.10.240-x86_64-latest"
+
   image: "ghcr.io/openfaasltd/slicer-systemd:5.10.240-x86_64-latest"
 
   api:
