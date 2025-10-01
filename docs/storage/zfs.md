@@ -6,22 +6,56 @@ Whilst ZFS can run on a loopback device, this is not recommended and may be unst
 
 ## Use ZFS for VM storage
 
-You'll need to follow the installation instructions below, then you can use the `zfs` type of storage for your VMs.
+Before you can start using `zfs` storage for your VMs, you'll have to run through the installation steps below.
 
-Take the [walkthrough](/getting-started/walkthrough) example, and change the `storage` type from `image` to `zfs`:
+Let's customise the [walkthrough](/getting-started/walkthrough) example for ZFS.
 
-```diff
-config:
-  host_groups:
-  - name: vm
--   storage: image
--   storage_size: 25G
-+   storage: zfs
+1) Change the `storage` type from `image` to `zfs`:
+
+  ```diff
+  config:
+    host_groups:
+    - name: vm
+  -   storage: image
+  +   storage: zfs
+  -   storage_size: 20G
+  ```
+
+  See the note below on `storage_size`.
+
+2) Customise the `storage_size`
+
+  The `storage_size` field is optional for ZFS.
+
+  If not specified, the default size of the base snapshot will be used. A custom size can be given, so long as it is equal to or larger than the base snapshot size.
+  
+  ```diff
+  config:
+    host_groups:
+    - name: vm
+      storage: zfs
+  +   storage_size: 40G
+  ```
+
+If the base snapshot size is large for any existing VMs, then you can find its lease and remove it before having it re-created with the new settings for the vzol-snapshotter.
+
+```bash
+$ sudo ctr -n slicer leases ls
+ID            CREATED AT           LABELS 
+slicer/k3s-1  2025-09-04T13:53:07Z -      
 ```
 
-If `storage_size` is not set in the host group configuration the size of the storage volume is set to whatever is configured for the zvol snapshotter. It is possible to request a custom size by setting `storage_size`. Bear in mind that zvol snapshotter can only increase the snapshot size for a VM. This means the `storage_size` has to be the same or bigger than the default size configured for the zvol snapshotter (the default size is `20G`).
+Then, find the lease ID for the VM in question, and delete it. The lease ID is the hostname of the VM i.e.`k3s-1`.
 
-So if the default is too large for your needs, delete the snapshot, then adjust the configuration and restart the snapshotter.
+```bash
+sudo ctr -n slicer leases rm slicer/k3s-1
+```
+
+To delete all leases:
+
+```bash
+sudo ctr -n slicer leases ls -q | xargs -n1 sudo ctr -n slicer leases rm
+```
 
 ## Install packages for ZFS
 
