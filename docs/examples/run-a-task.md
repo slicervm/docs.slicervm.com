@@ -1,8 +1,16 @@
 # Run a task in a VM
 
-This example shows how to run a one-shot task in a VM via API. You can also use the CLI if you wish.
+This example shows how to run a one-shot task in a VM via API. The CLI can also act as a client to the API during testing.
 
-Tasks could include: CI jobs, databases for testing, isolated environments for privileged AI agents, crons, batch jobs and other kinds of temporary processes.
+Use-cases could include:
+
+* Starting on-demand IDEs for pull request development or review
+* Running an AI coding agent in a contained environment without risking your whole workstation
+* Running a CI build or compiling untrusted customer code
+* Starting a temporary service such as a database for end to end testing
+* Cron jobs, batch jobs, and serverless functions
+
+One-shot tasks are VMs that are launched on demand for a specific purposes. But there's no limit on the lifetime of these VMs, they can run for any period of time - be that 250ms to process a webhook, 48 hours to run some fine-tuning, or several weeks. Just bear in mind that if you shut down or close Slicer, they will also be shut down and destroyed.
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/5RjtVM4bvp0?si=2TPpSKn9YXFw_Nnt" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
