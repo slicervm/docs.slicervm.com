@@ -4,8 +4,9 @@ This example shows how to run a one-shot task in a VM via API. The CLI can also 
 
 Use-cases could include:
 
-* Starting on-demand IDEs for pull request development or review
 * Running an AI coding agent in a contained environment without risking your whole workstation
+* Starting on-demand IDEs for pull request development or review
+* Autoscaling Kubernetes nodes - added and removed on demand
 * Running a CI build or compiling untrusted customer code
 * Starting a temporary service such as a database for end to end testing
 * Cron jobs, batch jobs, and serverless functions
