@@ -14,6 +14,9 @@ For the first two use-cases, there's nothing extra for you to do. You're simply 
 
 For the third use-case, to run Slicer within Slicer, you just need to pay careful attention to the IP addresses and routing configurations if you want the host to be accessible on the outer network.
 
+[![Example of Nested Virtualization](https://pbs.twimg.com/media/G2mW2PBWoAAbG6-?format=jpg&name=4096x4096)](https://x.com/alexellisuk/status/1975276011941150963/)
+> This image shows an example of nested virtualization setup running on my Intel N100.
+
 ## Slicer within Slicer
 
 ![Nested Virtualization](/images/slicer-in-slicer.png)
