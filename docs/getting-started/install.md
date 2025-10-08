@@ -2,7 +2,9 @@
 
 Don't wait for the perfect system. Slicer can run practically anywhere.
 
-You'll get a Discord invite at the end of the installation, once you successfully complete the `slicer activate` command.
+To activate Slicer, you'll need a Hobbyist or Pro [subscription](https://slicervm.com/pricing) - pick according to your needs. These run month by month, so there's very little commitment or risk involved.
+
+After the installation, when you run `slicer activate` you'll get an invite link to the Discord server. We highly recommend joining.
 
 ## System requirements
 
