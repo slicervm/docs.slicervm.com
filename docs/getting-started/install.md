@@ -73,13 +73,15 @@ sudo -E arkade oci install ghcr.io/openfaasltd/slicer:latest \
 
 The same command can be repeated to update Slicer to future versions.
 
-Activate Slicer to obtain a license key:
+For Home Edition/Hobbyist users, activate Slicer with your GitHub account to obtain a license key:
 
 ```bash
 slicer activate --help
 
 slicer activate
 ```
+
+Pro/Commercial should save their license key (received by email after checking out) to `~/.slicer/LICENSE` without running any additional commands.
 
 Next, start your first VM with the [walk through](/getting-started/walkthrough).
 
