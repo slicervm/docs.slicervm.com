@@ -128,6 +128,26 @@ Add a host with a custom GitHub user to override the SSH keys:
 }
 ```
 
+## Get serial console logs from a VM
+
+HTTP GET
+
+`GET /vm/{hostname}/logs?lines=<n>`
+
+When `n` is empty, a default of 20 lines will be read from the end of the log.
+
+When `n` is `0`, the whole contents will be returned.
+
+Response 200:
+
+```
+[  OK  ] Started slicer-ssh-agent.
+[  OK  ] Started slicer-vmmeter.
+[  OK  ] Reached target Multi-User System.
+         Starting Record Runlevel Change in UTMP...
+[  OK  ] Finished Record Runlevel Change in UTMP.
+```
+
 ## Delete a host within a Host Group
 
 HTTP DELETE

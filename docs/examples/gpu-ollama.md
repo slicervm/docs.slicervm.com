@@ -53,6 +53,8 @@ Boot the VM(s) with:
 sudo -E slicer up ./ollama-gpu.yaml
 ```
 
+Note: adding PCI devices will add a boot delay of a few seconds vs. microVMs without any PCI devices. To monitor this, run `ping` in the background or `sudo fstail /var/log/slicer/` to see when the dmesg messages start appearing. 
+
 Then, as usual, add the route on your workstation so you can connect via SSH.
 
 ```bash

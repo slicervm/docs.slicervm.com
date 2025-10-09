@@ -1,10 +1,30 @@
-# Monitoring
+# Logs & Monitoring
+
+## Logs
+
+The output of the serial console which contains boot-up messages and output from the init system is available at `/var/log/slicer`.
+
+So for the quickstart, with 1x VM in a hostgroup named vm, you can view the log with:
+
+```bash
+sudo tail -f /var/log/slicer/vm-1.txt
+```
+
+These logs are also available via the [REST API](/reference/api) or the CLI:
+
+```bash
+sudo -E slicer logs vm-1               # Tail the last 20 lines (default)
+sudo -E slicer logs vm-1 --lines 50    # Tail the last 50 lines
+sudo -E slicer logs vm-1 --lines 0     # Print the whole file
+```
+
+## Monitoring
 
 When the `slicer-vmmeter.service` is loaded and running, then system utilization data can be collected via the `slicer vm top` command.
 
 If you need more monitoring that is available, feel free to let us know what you're looking for.
 
-## Viewing `slicer vm top`
+### View utilization via `slicer vm top`
 
 ```bash
 $ slicer vm top
@@ -49,7 +69,7 @@ When slicer is running locally, and authentication is enabled, use `sudo -E` and
 $ sudo slicer vm top
 ```
 
-## Automated monitoring with `node_exporter`
+### Automated monitoring with `node_exporter`
 
 The Open Source [node_exporter](https://github.com/prometheus/node_exporter) project from the Prometheus project can be used to collect system metrics from each VM, you can install the agent as a systemd unit file through userdata, or a custom base image.
 

@@ -113,7 +113,7 @@ nav:
   - Tasks:
       - Customise with userdata: tasks/userdata.md
       - Build a custom root filesystem: tasks/custom-image.md
-      - Monitoring: tasks/monitoring.md
+      - Logs & Monitoring: tasks/monitoring.md
       - Share files with NFS: tasks/share-files-with-nfs.md
       - Nested Virtualization: tasks/nested-virtualization.md
   - Storage:
