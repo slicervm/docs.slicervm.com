@@ -29,7 +29,22 @@ config:
   image: "ghcr.io/openfaasltd/slicer-systemd:5.10.240-x86_64-latest"
 
   hypervisor: firecracker
+
+  api:
+    port: 8080
+    bind_address: "127.0.0.1"
+  ssh:
+    port: 2222
+    bind_address: "0.0.0.0"
 ```
+
+The HTTP API is enabled by default and can be disabled with `enabled: false`.
+
+The SSH server is disabled by default and can be enabled by providing a port.
+
+The default `bind_address` for both the API and SSH is `127.0.0.1` - loopback on the host system.
+
+There's no need to provide the HTTP API section unless you plan to run Slicer more than once on the same host, in that case, it's useful to include it so you can change it to a different port on another slicer instance.
 
 **Configuration for an Arm64 Slicer installation**
 
