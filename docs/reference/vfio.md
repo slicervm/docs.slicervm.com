@@ -8,6 +8,8 @@ Slicer supports VFIO passthrough for Nvidia GPUs when using Cloud Hypervisor as 
 
 Support for NICs for router appliances will be coming shortly.
 
+VFIO is limited to x86_64 systems with hardware support for IOMMU (Intel VT-d or AMD-Vi).
+
 ## Enable VFIO on start-up
 
 You must edit the `cmdline` argument of your bootloader to include the following parameters.
