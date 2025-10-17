@@ -123,5 +123,5 @@ sudo -E slicer pci bind 0000:0b:00.1 --driver=snd_hda_intel
 
 After checking all of the above, if you find your devices are all mixed into the same IOMMU group, that means your system is not designed for VFIO.
 
-As an alternative, you can deploy/run the so called "[ACS patches](https://github.com/benbaker76/linux-acs-override)", but they may also have certain security or stability implications. Use at your own risk.
+As an alternative, you can deploy/run the so called "[ACS patches](https://wiki.archlinux.org/title/PCI_passthrough_via_OVMF#Bypassing_the_IOMMU_groups_(ACS_override_patch))", but they may also have certain security or stability implications. Use at your own risk.
 
