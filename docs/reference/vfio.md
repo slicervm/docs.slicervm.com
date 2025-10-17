@@ -36,15 +36,29 @@ Then update Grub:
 sudo update-grub
 ```
 
-Finally, reboot the system to apply the changes.
+Then update your initramfs:
 
-You can also permanently bind a device to VFIO by adding its vendor and device ID to the `cmdline` argument. For example, to bind an Nvidia GPU - it needs to be bound along with its associated audio device, otherwise it will not work.
+```bash
+sudo update-initramfs -c -k $(uname -r)
+```
+
+Now reboot your system.
+
+### Optional: Bind devices to VFIO on start-up
+
+We recommend unbinding and rebinding devices to VFIO using the `slicer pci` commands either as and when they're required, or via a systemd unit on start-up.
+
+But, you can also bind devices to VFIO via the `cmdline` argument in your bootloader configuration.
+
+Note: That this method only works at the vendor/device ID level, so if you have multiple GPUs, or multiple NICs of the same time, it's very unlikely that you'll want to bind them all to VFIO because they will not be accessible to the host.
+
+Use `sudo -E slicer pci list` to find the vendor and device IDs of the devices you want to bind to VFIO.
+
+Then add them to the `cmdline` argument as follows, replacing the example IDs below with your own:
 
 ```
 vfio-pci.ids=10de:2204,10de:1aef
 ```
-
-Note: if you have two GPUs, it will not be possible to bind only one in this way, so we recommend using the `slicer pci bind` command instead via a systemd unit on start-up.
 
 ## View PCI Devices and their IOMMU Groups
 
@@ -64,8 +78,6 @@ ADDRESS      CLASS    VENDOR   DEVICE   DESCRIPTION                             
 0000:0c:00.0 0300     10de     2204     VGA compatible controller: NVIDIA Cor... 29           29           vfio-pci
 0000:0c:00.1 0403     10de     1aef     Audio device: NVIDIA Corporation GA10... 29           29           vfio-pci
 ```
-
-If you see an error such as `Warning: Could not get VFIO information: no vfio device found` then your system may not be compatible with VFIO. Ensure that your CPU and motherboard support IOMMU and that it is enabled in the BIOS/UEFI settings. Also double-check your bootloader i.e. Grub configuration for the command line that's passed to the Linux Kernel.
 
 ## Bind a device to VFIO
 
@@ -98,4 +110,16 @@ In the case of the GPU example above, you may want to allocate one of the bound 
 sudo -E slicer pci bind 0000:0b:00.0 --driver=nvidia
 sudo -E slicer pci bind 0000:0b:00.1 --driver=snd_hda_intel
 ```
+
+## Troubleshooting
+
+1. Ensure that your CPU and motherboard support IOMMU and that it is enabled in the BIOS/UEFI settings.
+2. Also double-check your bootloader i.e. Grub configuration for the command line that's passed to the Linux Kernel. Did you skip `update-grub` or `update-initramfs`?
+3. Check the output of `sudo dmesg | grep -e DMAR -e IOMMU` for any errors related to IOMMU initialization.
+4. Ensure that the device you are trying to passthrough is not being used by the host system and that it's not already bound to a specific driver.
+5. Verify that the device is in its own IOMMU group using `sudo -E slicer pci list` - you typically have to bind every device within an IOMMU group otherwise they cannot be used in a VM.
+
+After checking all of the above, if you find your devices are all mixed into the same IOMMU group, that means your system is not designed for VFIO.
+
+As an alternative, you can deploy/run the so called "[ACS patches](https://github.com/benbaker76/linux-acs-override)", but they may also have certain security or stability implications. Use at your own risk.
 
