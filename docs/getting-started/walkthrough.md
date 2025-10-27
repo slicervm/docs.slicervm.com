@@ -139,12 +139,12 @@ The API is used by the `slicer vm` commands, and can also be used directly via `
       enabled: true
 ```
 
-The auth token will be created at `/var/lib/slicer/token` and can be used via a `Authorization: Bearer` header.
+The auth token will be created at `/var/lib/slicer/auth/token` and can be used via a `Authorization: Bearer` header.
 
 i.e.
 
 ```bash
-curl -s http://127.0.0.1:8080/nodes/ -H "Authorization: Bearer $(sudo cat /var/lib/slicer/token)" | jq
+curl -s http://127.0.0.1:8080/nodes -H "Authorization: Bearer $(sudo cat /var/lib/slicer/auth/token)" | jq
 ```
 
 ## Enable the Serial Over SSH Console

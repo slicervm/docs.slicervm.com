@@ -2,6 +2,8 @@
 
 This page documents the HTTP API exposed by Slicer for managing micro-VMs, images, disks, and operations.
 
+Some endpoints will fail if a trailing slash is given, i.e. `/nodes` is documented, however `/nodes/` may return an error.
+
 ## Authentication
 
 No authentication, ideal for local/dev work:

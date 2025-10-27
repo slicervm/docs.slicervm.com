@@ -63,7 +63,7 @@ $ slicer vm top --api http://192.168.1.114:8080 --token TOKEN_VALUE
 $ slicer vm top --api http://192.168.1.114:8080 --token-file TOKEN_VALUE
 ```
 
-When slicer is running locally, and authentication is enabled, use `sudo -E` and slicer will attempt to read the auth token from the default location of `/var/lib/slicer/token`.
+When slicer is running locally, and authentication is enabled, use `sudo -E` and slicer will attempt to read the auth token from the default location of `/var/lib/slicer/auth/token`.
 
 ```bash
 $ sudo slicer vm top
