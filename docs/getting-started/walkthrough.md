@@ -6,9 +6,15 @@ The `/dev/kvm` device must exist and be available to continue.
 
 ## Create the VM configuration
 
-Slicer is a long lived process that can be run in the foreground or daemonised with systemd.
+Slicer is a long lived process that can be run in the foreground or as a daemon with systemd.
 
-To create a VM using a Linux bridge, and a disk file for storage create the following `./vm-image.yaml` file:
+Config files can be copy and pasted from the docs, or you can generate one from a template by running the below, where `vm` is the name of the hostgroup.
+
+```bash
+slicer new vm > vm-image.yaml
+```
+
+The default configuration uses a Linux bridge for networking, a disk image for storage, and the Firecracker hypervisor.
 
 ```yaml
 config:
@@ -37,6 +43,13 @@ config:
     port: 2222
     bind_address: "0.0.0.0"
 ```
+
+* `count` - the number of VMs to create - the default is `1` - you can set this to `0` to [create VMs via API instead](/reference/api)
+* `vcpu` - the number of virtual CPUs to allocate to each VM
+* `ram_gb` - the amount of RAM in GB to allocate to each VM
+* `storage` - image is the simplest option to get started
+* `storage_size` - for storage backends which support it, you can specify the size of the disk
+* `github_user` - your GitHub username, used to fetch your public SSH keys from your profile - additional SSH keys can be added via the [ssh_keys](/docs/reference/ssh) API.
 
 The HTTP API is enabled by default and can be disabled with `enabled: false`.
 
