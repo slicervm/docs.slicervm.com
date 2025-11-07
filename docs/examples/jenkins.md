@@ -1,7 +1,13 @@
 ## Jenkins
 
-1. Run a Jenkins master
-2. Add ephemeral Jenkins build slaves to an existing or new Jenkins master (inside or outside of Slicer)
+Jenkins is a popular CI/CD tool with a rich history in the industry. Compared to newer products like GitHub Actions, it has much less complexity, and when used with Slicer, jobs launch almost instantly.
+
+There are two use-cases for Jenkins with Slicer:
+
+1. Run a Jenkins master and add build-slaves separately or via a public cloud plugin (EC2, GCE, etc)
+2. Add ephemeral build slaves to a Jenkins master (existing, or hosted in Slicer)
+
+Read about [Jenkins and Slicer](https://actuated.com/blog/bringing-firecracker-to-jenkins) including a demo video showing how fast builds can start.
 
 ## Run a Jenkins master
 
