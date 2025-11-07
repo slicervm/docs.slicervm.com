@@ -374,6 +374,8 @@ cat /etc/hostname
 }
 ```
 
+If you see the VM launch, and the runner get created in Jenkins, but it's not able to connect, check the log file for the VM itself under `/var/log/slicer/`. It should be called `slave-1.txt` if it's the first launch so far.
+
 Here's an example that runs a container via Docker:
 
 ```
