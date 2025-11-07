@@ -190,6 +190,28 @@ http://192.168.137.2:8080
 
 Add any plugins you want, and create jobs as needed.
 
+At a minimum, you should install the Pipeline plugin to allow pipeline jobs to run.
+
+Go to "Manage Jenkins" -> "Manage Plugins" and install the "Pipeline" plugin.
+
+Then, make sure the URL is set for Jenkins itself:
+
+1. Go to "Manage Jenkins" -> "Configure System"
+2. Scroll down to "Jenkins Location"
+3. Set the "Jenkins URL" to the same URL you used to access Jenkins in your browser
+4. Save the configuration.
+
+If you're able, it's also worth disabling the built-in system executors:
+
+1. Go to "Manage Jenkins" -> "Configure System"
+2. Scroll down to "Number of executors"
+3. Set it to `0`
+4. Add a label of "system"
+5. Under "Usage" select "Only build jobs with label expressions matching this node"
+6. Save the configuration.
+
+This ensures that no jobs run on the master itself, which is a best practice for Jenkins installations.
+
 ## Run ephemeral Jenkins build slaves in Slicer via API
 
 In Jenkins, a "Cloud" is simply an API that can add and remove build agents (slaves) on demand.
