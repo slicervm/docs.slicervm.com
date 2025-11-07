@@ -44,7 +44,7 @@ if command -v apt-get >/dev/null 2>&1; then
   apt-get update
   apt-get install -y jenkins
 else
-  echo "This quick script targets Debian/Ubuntu (apt).
+  echo "This quick script targets Debian/Ubuntu (apt)."
   exit 1
 fi
 
@@ -134,7 +134,7 @@ Now create a jenkins-master.yaml file:
 config:
   host_groups:
   - name: jenkins-master
-    userdata: ./setup-master.sh
+    userdata_file: ./setup-master.sh
     storage: image
     storage_size: 25G
     count: 1
@@ -177,7 +177,7 @@ sudo -E slicer up ./jenkins-master.yaml
 Once booted, you'll be able to fetch the password from the VM's boot log:
 
 ```bash
-sudo grep "Jenkins URL" -A 3 /var/log/slicer/jenkins-master-1.log
+sudo grep "Jenkins is up at:" -A 3 /var/log/slicer/jenkins-master-1.txt
 ```
 
 This will show you the URL, username and password for the Jenkins admin user.
