@@ -182,6 +182,20 @@ sudo grep "Jenkins is up at:" -A 3 /var/log/slicer/jenkins-master-1.txt
 
 This will show you the URL, username and password for the Jenkins admin user.
 
+Alternatively, you can run an interactive shell into the VM and read the file directly:
+
+```bash
+sudo -E ./bin/slicer vm exec vm-1
+Connecting to VM: vm-1
+Connected! Press Ctrl+] to exit.
+Welcome to Ubuntu 22.04.5 LTS (GNU/Linux 5.10.240 x86_64)
+
+root@vm-1:/root# cat jenkins-admin.txt 
+Jenkins URL: http://192.168.137.2:8080/
+Username:    admin
+Password:    ......
+```
+
 You can then navigate to the Jenkins URL in your web browser to access the Jenkins master using the IP address from the YAML file i.e.
 
 ```
