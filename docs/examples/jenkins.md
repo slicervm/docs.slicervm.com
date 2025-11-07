@@ -38,7 +38,7 @@ if command -v apt-get >/dev/null 2>&1; then
   apt-get update
   apt-get install -y jenkins
 else
-  echo "This quick script targets Debian/Ubuntu (apt). If you need RHEL/Alma/Rocky, shout and I’ll give you a dnf/yum variant."
+  echo "This quick script targets Debian/Ubuntu (apt).
   exit 1
 fi
 
@@ -192,17 +192,11 @@ We built one that can talk to a slicer API endpoint to create and destroy VMs as
 
 Set up another Slicer instance, ideally on another machine on the same network, or with access via an overlay network like a VPN (Wireguard/OpenVPN).
 
-We recommend that you use ZFS-backed storage for the slaves because with ZFS, a snapshot is unpacked when Slicer starts up and it can be cloned instantly.
-
-If you don't have time to set up ZFS and are only experimenting, then you can still use `storage: image` but the startup time for each slave will be longer.
-
 ```yaml
 config:
   host_groups:
     - name: slave
-      storage: image
-      storage_size: 20G
-#     storage: zfs
+      storage: zfs
       count: 0
       vcpu: 2
       ram_gb: 8
@@ -227,7 +221,16 @@ config:
   ssh:
     bind_address: "127.0.0.1:"
     port: 2222
+```
 
+We recommend that you use [ZFS-backed storage](/docs/storage/zfs) for the slaves because with ZFS, a snapshot is unpacked when Slicer starts up and it can be cloned instantly.
+
+If you don't have time to set up ZFS and are only experimenting, then you can make the following change (but it may add a few seconds to each launch time):
+
+```diff
+-      storage: zfs
++      storage: image
++      storage_size: 20G
 ```
 
 If you're running on the same host as the Jenkins master, ensure that the API and SSH ports don't conflict with the master instance.
@@ -248,28 +251,8 @@ If you're running on the same host as the Jenkins master, ensure that the API an
 * `ssh_keys` - add any public keys you want to be able to SSH into the slave VMs - we recommend this over `github_user` since it's much faster than querying GitHub for every launch
 * `graceful_shutdown: false` - slaves are ephemeral so we don't need to wait for a graceful shutdown - it will be destroyed immediately when the job is done
 
-Create the Slicer instance for the slaves:
+### Create a custom image for the Jenkins slaves
 
-```bash
-sudo -E slicer up ./jenkins-slaves.yaml
-```
-
-If your master and slave are running on different hosts, make sure you run the routing commands that are printed out on start up.
-
-* Master range: 192.168.131.0/24 (255 IP addresses, only one is needed)
-* Slave range: 192.168.138.0/24 (255 IP addresses)
-
-### Add the Slicer Cloud to Jenkins
-
-Add the "Slicer VM Cloud" plugin to your Jenkins master via the plugins page.
-
-Upload the `slicer-vm-cloud.hpi` file you received from our team.
-
-Then go to "Manage Jenkins" -> "Configure System" and scroll down to the "Cloud" section.
-
-Add a new Cloud, pick "Slicer VM Cloud".
-
-Enter all the details including the API endpoint for the Slicer instance running the slaves, and its API token (the location is printed upon start-up).
 
 ### Create a custom image with pre-installed software
 
@@ -315,6 +298,33 @@ Edit your `jenkins-slaves.yaml` file to use your custom image:
 
 Then you only need to relaunch the Slicer slave instance for the new packages to be available.
 
+### Start up the Slicer slave instance
+
+Create the Slicer instance for the slaves:
+
+```bash
+sudo -E slicer up ./jenkins-slaves.yaml
+```
+
+If your master and slave are running on different hosts, make sure you run the routing commands (`ip route add`) that are printed out on start up.
+
+* Master range: 192.168.131.0/24 (255 IP addresses, only one is needed)
+* Slave range: 192.168.138.0/24 (255 IP addresses)
+
+If they are both on the same host, then you must not run those commands.
+
+### Add the Slicer Cloud to Jenkins
+
+Add the "Slicer VM Cloud" plugin to your Jenkins master via the plugins page.
+
+Upload the `slicer-vm-cloud.hpi` file you received from our team.
+
+Then go to "Manage Jenkins" -> "Configure System" and scroll down to the "Cloud" section.
+
+Add a new Cloud, pick "Slicer VM Cloud".
+
+Enter all the details including the API endpoint for the Slicer instance running the slaves, and its API token (the location is printed upon start-up).
+
 ### Example Pipeline jobs
 
 For every `pipeline` job you create, you need the following directive:
@@ -325,9 +335,21 @@ pipeline {
   options { timeout(time: 2, unit: 'MINUTES') }
 ```
 
-The rest is up to you.
+Now run a quick test job:
 
-Here's an example that installs Docker and runs a container:
+```
+pipeline {
+  agent { label 'slicer'}
+  options { timeout(time: 2, unit: 'MINUTES') }
+    stages {
+    stage('Build') { steps { sh '''
+cat /etc/hostname
+    ''' } }
+  }
+}
+```
+
+Here's an example that runs a container via Docker:
 
 ```
 pipeline {
@@ -336,7 +358,6 @@ pipeline {
   
   stages {
     stage('Build') { steps { sh '''
-curl -fSL https://get.docker.com/ | sudo sh
 sudo systemctl start docker
 docker run -i alpine:latest ping -c 4 google.com
     ''' } }
@@ -373,3 +394,9 @@ kubectl get deploy -n openfaas -o wide
 
 }
 ```
+
+The rest is up to you.
+
+### Questions and support
+
+If you have any questions or notice anything unexpected, reach out to us via your support channels. Discord for Home Edition, email for Commercial, and Slack/Email for Enterprise.
