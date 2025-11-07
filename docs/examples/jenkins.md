@@ -174,15 +174,7 @@ Now create the VM:
 sudo -E slicer up ./jenkins-master.yaml
 ```
 
-Once booted, you'll be able to fetch the password from the VM's boot log:
-
-```bash
-sudo grep "Jenkins is up at:" -A 3 /var/log/slicer/jenkins-master-1.txt
-```
-
-This will show you the URL, username and password for the Jenkins admin user, but only on the first boot.
-
-Alternatively, you can run an interactive shell into the VM and read the file directly:
+You can run an interactive shell into the VM and read the password file directly:
 
 ```bash
 $ sudo -E ./bin/slicer vm exec vm-1
@@ -201,8 +193,10 @@ Password:    ......
 You can then navigate to the Jenkins URL in your web browser to access the Jenkins master using the IP address from the YAML file i.e.
 
 ```
-http://192.168.137.2:8080
+http://192.168.137.2:8080/
 ```
+
+Even if you already see this string, re-enter it and hit Save. Otherwise Jenkins won't be able to generate correct links later on for build slaves.
 
 Add any plugins you want, and create jobs as needed.
 
@@ -306,6 +300,10 @@ FROM ghcr.io/openfaasltd/slicer-systemd:5.10.240-x86_64-latest
 
 RUN apt-get update -qy && \
   apt-get install -qy curl ca-certificates openjdk-17-jre-headless
+
+RUN useradd -m -s /bin/bash jenkins && \
+  echo 'jenkins ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/jenkins && \
+  chmod 440 /etc/sudoers.d/jenkins
 ```
 
 If you also wanted Docker, and basic Kubernetes tooling, you could extend the Dockerfile as follows:
@@ -313,10 +311,11 @@ If you also wanted Docker, and basic Kubernetes tooling, you could extend the Do
 ```Dockerfile
 RUN arkade get k3sup kubectl helm kubectx --path=/usr/local/bin/
 
-RUN curl -sLS https://get.docker.com | sh && \
-  useradd -m -s /bin/bash jenkins && \
+RUN useradd -m -s /bin/bash jenkins && \
   echo 'jenkins ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/jenkins && \
-  chmod 440 /etc/sudoers.d/jenkins && \
+  chmod 440 /etc/sudoers.d/jenkins
+  
+RUN curl -sLS https://get.docker.com | sh && \
   usermod -aG docker jenkins && \
   chmod +x /usr/local/bin/*
 
