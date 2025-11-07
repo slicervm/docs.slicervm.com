@@ -1,6 +1,6 @@
 ## Jenkins
 
-Jenkins is a popular CI/CD tool with a rich history in the industry. Compared to newer products like GitHub Actions, it has much less complexity, and when used with Slicer, jobs launch almost instantly.
+[Jenkins](https://www.jenkins.io/) is a popular CI/CD tool with a rich history in the industry. Compared to newer products like GitHub Actions, it has much less complexity, and when used with Slicer, jobs launch almost instantly.
 
 There are two use-cases for Jenkins with Slicer:
 
