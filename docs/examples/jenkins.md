@@ -259,12 +259,9 @@ If you're running on the same host as the Jenkins master, ensure that the API an
 
 ### Create a custom image for the Jenkins slaves
 
-
-### Create a custom image with pre-installed software
-
 If you want to pre-install any software on the slave images, you can create your own Dockerfile that extends the base Slicer image.
 
-By pre-loading the JRE, we can speed up Jenkins slave startup times by skipping an installation of Java on every boot.
+By pre-loading the JRE, we can speed up Jenkins slave startup times by skipping an installation of Java on every boot. We may produce an image with the JRE pre-installed in a future release, but most teams tend to want to add something like Docker or Terraform into their slave images.
 
 ```Dockerfile
 FROM ghcr.io/openfaasltd/slicer-systemd:5.10.240-x86_64-latest
