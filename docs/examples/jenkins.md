@@ -7,9 +7,15 @@ There are two use-cases for Jenkins with Slicer:
 1. Run a Jenkins master and add build-slaves separately or via a public cloud plugin (EC2, GCE, etc)
 2. Add ephemeral build slaves to a Jenkins master (existing, or hosted in Slicer)
 
-Read about [Jenkins and Slicer](https://actuated.com/blog/bringing-firecracker-to-jenkins) including a demo video showing how fast builds can start.
+## Learn more
 
-## Run a Jenkins master
+Read how Slicer works and compares to the Docker( Docker In Docker / Docker Socket), Kubernetes (privileged Pod), or EC2 (long start-up times), in our announcement on the [Actuated blog](https://actuated.com/blog/bringing-firecracker-to-jenkins
+
+Watch a video walkthrough on our [YouTube channel](https://www.youtube.com/watch?v=LSUVBGfzf3s).
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/5RjtVM4bvp0?si=LSUVBGfzf3s" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+## 1. Run a Jenkins master
 
 You can run a Jenkins master within a Slicer microVM, and have everything set up for you automatically via a userdata script.
 
@@ -229,7 +235,7 @@ If you're able, it's also worth disabling the built-in system executors:
 
 This ensures that no jobs run on the master itself, which is a best practice for Jenkins installations.
 
-## Run ephemeral Jenkins build slaves in Slicer via API
+## 2. Run ephemeral Jenkins build slaves in Slicer via API
 
 In Jenkins, a "Cloud" is simply an API that can add and remove build agents (slaves) on demand.
 
@@ -296,7 +302,7 @@ If you're running on the same host as the Jenkins master, ensure that the API an
 * `ssh_keys` - add any public keys you want to be able to SSH into the slave VMs - we recommend this over `github_user` since it's much faster than querying GitHub for every launch
 * `graceful_shutdown: false` - slaves are ephemeral so we don't need to wait for a graceful shutdown - it will be destroyed immediately when the job is done
 
-### Create a custom image for the Jenkins slaves
+### 2.1 Create a custom image for the Jenkins slaves
 
 If you want to pre-install any software on the slave images, you can create your own Dockerfile that extends the base Slicer image.
 
@@ -313,14 +319,10 @@ RUN useradd -m -s /bin/bash jenkins && \
   chmod 440 /etc/sudoers.d/jenkins
 ```
 
-If you also wanted Docker, and basic Kubernetes tooling, you could extend the Dockerfile as follows:
+If you also wanted Docker, and basic Kubernetes tooling, you can add the following *extra* lines:
 
 ```Dockerfile
 RUN arkade get k3sup kubectl helm kubectx --path=/usr/local/bin/
-
-RUN useradd -m -s /bin/bash jenkins && \
-  echo 'jenkins ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/jenkins && \
-  chmod 440 /etc/sudoers.d/jenkins
 
 RUN curl -sLS https://get.docker.com | sh && \
   usermod -aG docker jenkins && \
@@ -345,7 +347,7 @@ Edit your `jenkins-slaves.yaml` file to use your custom image:
 
 Then you only need to relaunch the Slicer slave instance for the new packages to be available.
 
-### Start up the Slicer slave instance
+### 2.2 Start up the Slicer slave instance
 
 Create the Slicer instance for the slaves:
 
@@ -360,7 +362,7 @@ If your master and slave are running on different hosts, make sure you run the r
 
 If they are both on the same host, then you must not run those commands.
 
-### Add the Slicer Cloud to Jenkins
+### 2.3 Add the Slicer Cloud to Jenkins
 
 Add the "Slicer VM Cloud" plugin to your Jenkins master via the plugins page.
 
@@ -372,7 +374,7 @@ Add a new Cloud, pick "Slicer VM Cloud".
 
 Enter all the details including the API endpoint for the Slicer instance running the slaves, and its API token (the location is printed upon start-up).
 
-### Example Pipeline jobs
+### 2.4 Example Pipeline jobs
 
 For every `pipeline` job you create, you need the following directive:
 
@@ -446,11 +448,11 @@ kubectl get deploy -n openfaas -o wide
 
 The rest is up to you.
 
-### Questions and support
+### 3. Questions and support
 
 If you have any questions or notice anything unexpected, reach out to us via your support channels. Discord for Home Edition, email for Commercial, and Slack/Email for Enterprise.
 
-Is the Jenkins URL empty or nil?
+**Is the Jenkins URL empty or nil?**
 
 You can then navigate to the Jenkins URL in your web browser to access the Jenkins master using the IP address from the YAML file i.e.
 
@@ -459,3 +461,32 @@ http://192.168.137.2:8080/
 ```
 
 Even if you already see this string, re-enter it and hit Save. Otherwise Jenkins won't be able to generate correct links later on for build slaves.
+
+**Are you having issues with the build slaves?**
+
+Find out whether there are networking or other issues with the following
+
+* Check the logs of the jenkins server on the master
+
+```bash
+sudo -E slicer vm exec vm-1
+sudo journalctl -u jenkins.service -f
+```
+
+* Check the logs of the slave VM if it is booting
+
+```bash
+sudo cat /var/log/slicer/slave-1.txt
+```
+
+**Check networking/routing**
+
+If your two Slicer instances are running on different machines, make sure you ran the `ip route` commands as directed.
+
+To verify the routes on either machine use `ping` between the two `.1` IP addresses i.e. `ping 192.168.138.1` from the master host, and `ping 192.168.137.1` from the slave host.
+
+**Check the proper Slicer URL was given for the Slicer Cloud**
+
+So long as you haven't changed anything in the tutorial, the Slicer URL should be `http://192.168.141.1:8082`.
+
+The token is read from `/var/slicer/auth/token`.
