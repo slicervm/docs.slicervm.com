@@ -32,8 +32,9 @@ export DEBIAN_FRONTEND=noninteractive
 
 if command -v apt-get >/dev/null 2>&1; then
   # ----- Ubuntu/Debian path -----
-  apt-get update
-  apt-get install -y curl gnupg ca-certificates openjdk-17-jdk git
+  apt-get update && \
+    apt-get install -qy --no-install-recommends \
+      curl gnupg ca-certificates openjdk-17-jdk git
 
   # Add Jenkins apt repo
   install -m 0755 -d /etc/apt/keyrings
@@ -41,23 +42,36 @@ if command -v apt-get >/dev/null 2>&1; then
   chmod a+r /etc/apt/keyrings/jenkins-keyring.asc
   echo "deb [signed-by=/etc/apt/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/" > /etc/apt/sources.list.d/jenkins.list
 
-  apt-get update
-  apt-get install -y jenkins
+  apt-get update && \
+    apt-get install -qy --no-install-recommends \
+      jenkins
 else
-  echo "This quick script targets Debian/Ubuntu (apt)."
+  echo "This setup script targets Debian/Ubuntu (apt). If you need RHEL/Alma/Oracle/Rocky Linux, reach out to us via Discord."
   exit 1
 fi
+
+# ----- Plugins configuration -----
+
+# List of plugins to install (name[:version], one per line)
+cat > /var/lib/jenkins/plugins.txt <<'EOF'
+configuration-as-code
+git
+workflow-aggregator
+credentials
+ssh-credentials
+EOF
 
 # ----- JCasC config -----
 CCFG_DIR="/var/lib/jenkins/casc_configs"
 mkdir -p "$CCFG_DIR"
 cat > "${CCFG_DIR}/jenkins.yaml" <<'YAML'
 jenkins:
-  systemMessage: "🎛️ Jenkins bootstrapped by Slicer user-data.\n"
-  mode: NORMAL
+  systemMessage: "Jenkins bootstrapped by SlicerVM.com\n"
+  mode: EXCLUSIVE
   numExecutors: 0
   remotingSecurity:
     enabled: true
+  labelString: "system"
   securityRealm:
     local:
       allowsSignup: false
@@ -69,6 +83,7 @@ jenkins:
       allowAnonymousRead: false
 unclassified:
   location:
+    adminAddress: "address not configured yet <nobody@nowhere>"
     url: "${JENKINS_URL}"
 YAML
 
@@ -81,24 +96,21 @@ sed -i "s|\${JENKINS_URL}|${JENKINS_URL}|g" "${CCFG_DIR}/jenkins.yaml"
 install -d -m 0755 /etc/systemd/system/jenkins.service.d
 cat > /etc/systemd/system/jenkins.service.d/override.conf <<EOF
 [Service]
+Environment=JENKINS_HOME=/var/lib/jenkins
 Environment=CASC_JENKINS_CONFIG=${CCFG_DIR}/jenkins.yaml
 Environment=JAVA_OPTS=-Djenkins.install.runSetupWizard=false
 Environment=JENKINS_PORT=${JENKINS_HTTP_PORT}
 EOF
 
-# Pre-install a few core plugins so pipelines work out-of-the-box
-# (configuration-as-code, pipeline, git, github, credentials, matrix-auth, ws-cleanup)
-if command -v jenkins-plugin-cli >/dev/null 2>&1; then
-  jenkins-plugin-cli --verbose --plugins \
-    configuration-as-code \
-    workflow-aggregator \
-    git \
-    github \
-    credentials \
-    ssh-credentials \
-    matrix-auth \
-    ws-cleanup
-fi
+# Download and use Jenkins Plugin Manager
+PLUGIN_MANAGER_JAR="/tmp/jenkins-plugin-manager.jar"
+curl -L -o "$PLUGIN_MANAGER_JAR" "https://github.com/jenkinsci/plugin-installation-manager-tool/releases/download/2.13.2/jenkins-plugin-manager-2.13.2.jar"
+
+# Install plugins using the plugin manager
+java -jar "$PLUGIN_MANAGER_JAR" -d /var/lib/jenkins/plugins --plugin-file /var/lib/jenkins/plugins.txt --verbose
+
+# Clean up
+rm -f "$PLUGIN_MANAGER_JAR"
 
 # Permissions & start
 chown -R jenkins:jenkins /var/lib/jenkins
@@ -112,17 +124,18 @@ until curl -fsS "http://127.0.0.1:${JENKINS_HTTP_PORT}/login" >/dev/null 2>&1 ||
 done
 
 # Save creds somewhere easy to grab
-cat > /root/jenkins-admin.txt <<CREDS
+cat > /home/ubuntu/jenkins-admin.txt <<CREDS
 Jenkins URL: ${JENKINS_URL}
 Username:    ${ADMIN_USER}
 Password:    ${ADMIN_PASS}
 
 (saved by user-data at $(date -u +"%Y-%m-%dT%H:%M:%SZ"))
 CREDS
+sudo chown ubuntu:ubuntu /home/ubuntu/jenkins-admin.txt
 
 echo "======================================================"
 echo " Jenkins is up at: ${JENKINS_URL}"
-echo " Admin credentials are in: /root/jenkins-admin.txt"
+echo " Admin credentials are in: /home/ubuntu/jenkins-admin.txt"
 echo "======================================================"
 ```
 
@@ -174,7 +187,7 @@ Now create the VM:
 sudo -E slicer up ./jenkins-master.yaml
 ```
 
-You can run an interactive shell into the VM and read the password file directly:
+You can run an interactive shell into the VM and read the password file directly from `/home/ubuntu/jenkins-admin.txt`:
 
 ```bash
 $ sudo -E ./bin/slicer vm exec vm-1
@@ -183,20 +196,14 @@ Connecting to VM: vm-1
 Connected! Press Ctrl+] to exit.
 Welcome to Ubuntu 22.04.5 LTS (GNU/Linux 5.10.240 x86_64)
 
-root@vm-1:/root# cat jenkins-admin.txt 
+root@vm-1:/root# cat /home/ubuntu/jenkins-admin.txt
 
 Jenkins URL: http://192.168.137.2:8080/
 Username:    admin
 Password:    ......
 ```
 
-You can then navigate to the Jenkins URL in your web browser to access the Jenkins master using the IP address from the YAML file i.e.
-
-```
-http://192.168.137.2:8080/
-```
-
-Even if you already see this string, re-enter it and hit Save. Otherwise Jenkins won't be able to generate correct links later on for build slaves.
+Open the URL in a browser and go to the Settings page.
 
 Add any plugins you want, and create jobs as needed.
 
@@ -314,7 +321,7 @@ RUN arkade get k3sup kubectl helm kubectx --path=/usr/local/bin/
 RUN useradd -m -s /bin/bash jenkins && \
   echo 'jenkins ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/jenkins && \
   chmod 440 /etc/sudoers.d/jenkins
-  
+
 RUN curl -sLS https://get.docker.com | sh && \
   usermod -aG docker jenkins && \
   chmod +x /usr/local/bin/*
@@ -397,7 +404,7 @@ Here's an example that runs a container via Docker:
 pipeline {
   agent { label 'slicer'}
   options { timeout(time: 2, unit: 'MINUTES') }
-  
+
   stages {
     stage('Build') { steps { sh '''
 sudo systemctl start docker
@@ -413,7 +420,7 @@ Another example that installs Kubernetes via K3s and installs OpenFaaS Community
 pipeline {
   agent { label 'slicer'}
   options { timeout(time: 2, unit: 'MINUTES') }
-  
+
   stages {
     stage('Build') { steps { sh '''
 export PATH=$PATH:$HOME/.arkade/bin
@@ -442,3 +449,13 @@ The rest is up to you.
 ### Questions and support
 
 If you have any questions or notice anything unexpected, reach out to us via your support channels. Discord for Home Edition, email for Commercial, and Slack/Email for Enterprise.
+
+Is the Jenkins URL empty or nil?
+
+You can then navigate to the Jenkins URL in your web browser to access the Jenkins master using the IP address from the YAML file i.e.
+
+```
+http://192.168.137.2:8080/
+```
+
+Even if you already see this string, re-enter it and hit Save. Otherwise Jenkins won't be able to generate correct links later on for build slaves.
