@@ -308,21 +308,33 @@ If you want to pre-install any software on the slave images, you can create your
 
 By pre-loading the JRE, we can speed up Jenkins slave startup times by skipping an installation of Java on every boot. We may produce an image with the JRE pre-installed in a future release, but most teams tend to want to add something like Docker or Terraform into their slave images.
 
+This image is available via CI/CD as: [`ghcr.io/openfaasltd/slicer-slave:latest`](https://ghcr.io/openfaasltd/slicer-slave:latest)
+
 ```Dockerfile
 FROM ghcr.io/openfaasltd/slicer-systemd:5.10.240-x86_64-latest
 
 RUN apt-get update -qy && \
-  apt-get install -qy curl ca-certificates openjdk-17-jre-headless
+  apt-get install -qy  --no-install-recommends \
+  curl \
+  ca-certificates \
+  openjdk-17-jre-headless
 
 RUN useradd -m -s /bin/bash jenkins && \
   echo 'jenkins ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/jenkins && \
   chmod 440 /etc/sudoers.d/jenkins
 ```
 
-If you also wanted Docker, and basic Kubernetes tooling, you can add the following *extra* lines:
+If you also wanted Docker, and basic Kubernetes tooling, you can add the following *extra* lines, which is also available via CI/CD as: [`ghcr.io/openfaasltd/slicer-slave-docker:latest`](https://ghcr.io/openfaasltd/slicer-slave-docker:latest)
 
 ```Dockerfile
-RUN arkade get k3sup kubectl helm kubectx --path=/usr/local/bin/
+RUN arkade get \
+  --path=/usr/local/bin/ \
+  --quiet \
+  k3sup \
+  kubectl \
+  helm \
+  kubectx \
+  kind
 
 RUN curl -sLS https://get.docker.com | sh && \
   usermod -aG docker jenkins && \
@@ -332,6 +344,7 @@ RUN systemctl disable regen-ssh-host-keys && \
     systemctl disable ssh && \
     systemctl disable sshd && \
     systemctl disable docker
+
 ```
 
 We disable docker in order to make the slave start faster, however Docker can still be activated via systemd's socket activation when needed.
@@ -342,7 +355,7 @@ Edit your `jenkins-slaves.yaml` file to use your custom image:
 
 ```diff
 -  image: "ghcr.io/openfaasltd/slicer-systemd:5.10.240-x86_64-latest"
-+  image: "docker.io/alexellis2/slicer-slave-with-docker:0.0.1"
++  image: "ghcr.io/openfaasltd/slicer-slave-docker:latest"
 ```
 
 Then you only need to relaunch the Slicer slave instance for the new packages to be available.
