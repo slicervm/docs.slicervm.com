@@ -196,13 +196,13 @@ sudo -E slicer up ./jenkins-master.yaml
 You can run an interactive shell into the VM and read the password file directly from `/home/ubuntu/jenkins-admin.txt`:
 
 ```bash
-$ sudo -E ./bin/slicer vm exec vm-1
+$ sudo -E ./bin/slicer vm exec jenkins-master-1
 
-Connecting to VM: vm-1
+Connecting to VM: jenkins-master-1
 Connected! Press Ctrl+] to exit.
 Welcome to Ubuntu 22.04.5 LTS (GNU/Linux 5.10.240 x86_64)
 
-root@vm-1:/root# cat /home/ubuntu/jenkins-admin.txt
+root@jenkins-master-1:/root# cat /home/ubuntu/jenkins-admin.txt
 
 Jenkins URL: http://192.168.137.2:8080/
 Username:    admin
@@ -482,7 +482,7 @@ Find out whether there are networking or other issues with the following
 * Check the logs of the jenkins server on the master
 
 ```bash
-sudo -E slicer vm exec vm-1
+sudo -E slicer vm exec jenkins-master-1
 sudo journalctl -u jenkins.service -f
 ```
 
