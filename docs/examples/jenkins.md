@@ -9,7 +9,7 @@ There are two use-cases for Jenkins with Slicer:
 
 ## Learn more
 
-Read how Slicer works and compares to the Docker( Docker In Docker / Docker Socket), Kubernetes (privileged Pod), or EC2 (long start-up times), in our announcement on the [Actuated blog](https://actuated.com/blog/bringing-firecracker-to-jenkins
+Read how Slicer works and compares to the Docker( Docker In Docker / Docker Socket), Kubernetes (privileged Pod), or EC2 (long start-up times), in our announcement on the [Actuated blog](https://actuated.com/blog/bringing-firecracker-to-jenkins)
 
 Watch a video walkthrough on our [YouTube channel](https://www.youtube.com/watch?v=LSUVBGfzf3s).
 
