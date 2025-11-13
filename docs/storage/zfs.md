@@ -60,8 +60,9 @@ sudo ctr -n slicer leases ls -q | xargs -n1 sudo ctr -n slicer leases rm
 ## Install packages for ZFS
 
 ```bash
-sudo apt update
-sudo apt install -y zfsutils-linux
+sudo apt update -qqy && \
+  sudo apt install -qqy --no-install-recommends \
+  zfsutils-linux
 ```
 
 The two commands you are likely to need are:
