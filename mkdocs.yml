@@ -97,11 +97,11 @@ nav:
       - Run a one-shot task via API: examples/run-a-task.md
       - Kubernetes:
           - HA Kubernetes: examples/ha-k3s.md
+          - Autoscaling Kubernetes: examples/autoscaling-k3s.md
           - Large scale Kubernetes: examples/large-scale-k3s.md
           - Multiple machine Kubernetes: examples/multiple-machine-k3s.md
           - K3s with a GPU: examples/k3s-gpu.md
           - OpenFaaS on K3s: examples/openfaas.md
-          - Cluster Autoscaler: examples/cluster-autoscaler.md
       - AI/LLMs:
           - Ollama with a GPU: examples/gpu-ollama.md
           - Headless OpenCode AI Agent: examples/opencode-ai-agent.md
