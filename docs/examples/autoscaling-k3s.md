@@ -12,6 +12,9 @@ With Slicer it launches Firecracker microVMs on one or more Slicer hosts. So you
 
 ## Conceptual Overview
 
+[![Slicer Autoscaler Conceptual Overview](/images/slicer-autoscaler-conceptual.png)](/images/slicer-autoscaler-conceptual.png)
+> Slicer Autoscaler Conceptual Overview running across two separate machines.
+
 **Control Plane**
 
 The Control Plane nodes will be setup statically via YAML configuration on one Slicer host. The default is 3, but you could increase that if you wished.
