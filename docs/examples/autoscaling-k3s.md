@@ -240,6 +240,8 @@ slicer-token=$(cat ~/slicer-token-1.txt)
 EOF
 ```
 
+Note that the setting of `default-max-size` will affect how many nodes can be added to a node group.
+
 If you were to have had two Slicer instances running worker nodes, the config would look like this:
 
 ```bash
@@ -284,7 +286,7 @@ Overview of all available configuration options:
 | `global/k3s-url`           | K3s control plane API server URL | Yes | - |
 | `global/k3s-token`         | K3s join token for new nodes | Yes | - |
 | `global/default-min-size`  | Default minimum nodes per group | No | 1 |
-| `global/default-max-size`  | Default maximum nodes per group | No | 8 |
+| `global/default-max-size`  | Default maximum nodes per group | No | 8  |
 | `nodegroup/slicer-url`     | Slicer API server URL | Yes | - |
 | `nodegroup/slicer-token`   | Slicer API authentication token | Yes | - |
 | `nodegroup/min-size`       | Group-specific minimum size | No | global default |
@@ -299,14 +301,17 @@ If you don't have Helm, you can install it via [arkade](https://arkade.dev) with
 First, create a Kubernetes secret containing the cloud configuration file:
 
 ```bash
-kubectl create secret generic cluster-autoscaler-cloud-config \
-  --from-file=cloud-config=./cloud-config.toml \
-  -n kube-system
+kubectl create secret generic \
+  -n kube-system \
+  cluster-autoscaler-cloud-config \
+  --from-file=cloud-config=./cloud-config.toml
 ```
 
 Create a `values-slicer.yaml` file to configure the Cluster Autoscaler Helm chart. This configuration specifies the Slicer-compatible autoscaler image, mounts the cloud config secret, and sets appropriate scaling parameters:
 
 ```yaml
+fullnameOverride: slicer-cluster-autoscaler
+
 image:
   repository: docker.io/openfaasltd/cluster-autoscaler-slicer
   tag: latest
@@ -336,12 +341,15 @@ extraArgs:
   expander: random
 ```
 
+You can find other settings for the Cluster Autoscaler in the [official Kubernetes autoscaler Helm chart](https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler/charts).
+
 Deploy the autoscaler using the official Kubernetes autoscaler Helm chart:
 
 ```bash
 helm repo add autoscaler https://kubernetes.github.io/autoscaler
-helm upgrade --install \
-  cluster-autoscaler-slicer autoscaler/cluster-autoscaler \
+helm upgrade \
+  --install \
+  slicer-cluster-autoscaler autoscaler/cluster-autoscaler \
   --namespace=kube-system \
   --values=./values-slicer.yaml
 ```
@@ -358,11 +366,15 @@ If you need to update the configuration, then do the following:
 * Restart the Cluster Autoscaler
 
 ```bash
-kubectl delete secret cluster-autoscaler-cloud-config -n kube-system
-kubectl create secret generic cluster-autoscaler-cloud-config \
-  --from-file=cloud-config=./cloud-config.toml \
-  -n kube-system
-kubectl rollout restart deployment cluster-autoscaler-slicer-slicer-cluster-autoscaler -n kube-system
+kubectl delete secret -n kube-system \
+cluster-autoscaler-cloud-config 
+kubectl create secret generic -n kube-system \
+cluster-autoscaler-cloud-config \
+  --from-file=cloud-config=./cloud-config.toml
+
+kubectl rollout restart deployment \
+  -n kube-system \
+  slicer-cluster-autoscaler
 ```
 
 ## Setting the Expander mode
@@ -399,8 +411,9 @@ You can watch the logs of the autoscaler to understand what it's doing:
 
 ```bash
 # Watch autoscaler logs
-kubectl logs -f deployment/slicer-autoscaler \
-  -n kube-system
+kubectl logs -n kube-system \
+  deployment/slicer-cluster-autoscaler \
+  -f
 ```
 
 In another terminal, ideally a split tmux pane set up the below:
