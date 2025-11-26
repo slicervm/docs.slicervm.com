@@ -12,102 +12,88 @@ You can use that address directly on the VM during an SSH session, but you'll al
 
 Get instructions to fetch the password via `arkade info openfaas`.
 
-For SSH access, customise the `github_user` field, or set the keys as a list via `ssh_keys`. Learn more about [SSH in Slicer](/reference/ssh).
-
 A multi-node setup is possible, but in that case, it's better to set up K3s using K3sup Pro from outside the VMs, and to follow the [HA K3s example](/examples/ha-k3s) followed by the [OpenFaaS for Kubernetes instructions](https://docs.openfaas.com/deployment/).
 
 ## OpenFaaS Pro
 
-Just copy your license key into the YAML file below and run `sudo slicer up -f openfaas-pro.yaml`.
+Create a user data file `openfaas-pro.sh` to setup an OpenFaaS Pro cluster.
 
-Create `openfaas-pro.yaml` with the following content:
+This command assumes you have a valid license key in your home directory at `~/.openfaas/LICENSE`. Create it if it does not exist yet.
 
-```yaml
-config:
+```bash
+cat > openfaas-pro.sh <<EOF
+#!/bin/bash
 
-  host_groups:
-  - name: openfaas-pro
-    userdata: |
-              export LICENSE=""
-              export HOME=/home/ubuntu
-              export USER=ubuntu
+export LICENSE=$(cat ~/.openfaas/LICENSE)
+export HOME=/home/ubuntu
+export USER=ubuntu
 
-              cd /home/ubuntu/
+cd /home/ubuntu/
 
-              (
-              arkade get kubectl kubectx helm faas-cli k3sup stern --path /usr/local/bin
-              chown $USER /usr/local/bin/*
+(
+arkade get kubectl kubectx helm faas-cli k3sup stern --path /usr/local/bin
+chown \$USER /usr/local/bin/*
 
-              mkdir -p .kube
-              mkdir -p .openfaas
+mkdir -p .kube
+mkdir -p .openfaas
 
-              echo -n $LICENSE > ./.openfaas/LICENSE
-              )
+echo -n \$LICENSE > ./.openfaas/LICENSE
+)
 
-              (
-              k3sup install --local
-              mv ./kubeconfig ./.kube/config
-              chown $USER .kube/config
-              )
+(
+k3sup install --local
+mv ./kubeconfig ./.kube/config
+chown \$USER .kube/config
+)
 
-              (
-              kubectl apply -f https://raw.githubusercontent.com/openfaas/faas-netes/master/namespaces.yml
+(
+kubectl apply -f https://raw.githubusercontent.com/openfaas/faas-netes/master/namespaces.yml
 
-              kubectl create secret generic \
-                -n openfaas \
-                openfaas-license \
-                --from-file license=$HOME/.openfaas/LICENSE
+kubectl create secret generic \
+  -n openfaas \
+  openfaas-license \
+  --from-file license=\$HOME/.openfaas/LICENSE
 
-              helm repo add openfaas https://openfaas.github.io/faas-netes/
-              helm repo update && \
-                helm upgrade --install openfaas \
-                --install openfaas/openfaas \
-                --namespace openfaas \
-                -f https://raw.githubusercontent.com/openfaas/faas-netes/refs/heads/master/chart/openfaas/values-pro.yaml
+helm repo add openfaas https://openfaas.github.io/faas-netes/
+helm repo update && \
+  helm upgrade --install openfaas \
+  --install openfaas/openfaas \
+  --namespace openfaas \
+  -f https://raw.githubusercontent.com/openfaas/faas-netes/refs/heads/master/chart/openfaas/values-pro.yaml
 
-              chown -R $USER $HOME
+chown -R \$USER \$HOME
 
-              echo "export OPENFAAS_URL=http://127.0.0.1:31112" >> $HOME/.bashrc
+echo "export OPENFAAS_URL=http://127.0.0.1:31112" >> \$HOME/.bashrc
 
-              )
-
-    storage: image
-    storage_size: 25G
-    count: 1
-    vcpu: 2
-    ram_gb: 4
-    network:
-      bridge: brvm0
-      tap_prefix: vmtap
-      gateway: 192.168.137.1/24
-      addresses:
-      - 192.168.137.2/24
-  github_user: alexellis
-
-  image: "ghcr.io/openfaasltd/slicer-systemd:5.10.240-x86_64-latest"
-
-  api:
-    port: 8080
-    bind_address: "127.0.0.1:"
-    auth:
-      enabled: true
-
-  ssh:
-    port: 2222
-    bind_address: "0.0.0.0:"
-
-  hypervisor: firecracker
+)
+EOF
 ```
 
-Edit `export LICENSE=""`
+Use `slicer new` to generate a configuration file:
 
-Then start it up:
+```bash
+slicer new openfaas-pro \
+  --userdata-file openfaas-pro.sh \
+  >  openfaas-pro.yaml
+```
+
+For SSH access, use the `--github` flag to specify a GitHub username to import SSH keys from or set the `--ssh-key` flag to add publis SSH keys to the VM . Learn more about [SSH in Slicer](/reference/ssh).
+
+Then start up slicer with the generated config:
 
 ```bash
 sudo -E slicer up -f openfaas-pro.yaml
 ```
 
-You can login with:
+Connect to the slicer VM over SSH:
+
+```bash
+ssh ubuntu@192.168.137.2
+```
+
+Run the follwing commands to deploy and invoke a function.
+
+Login to OpenFaaS:
 
 ```bash
 PASSWORD=$(kubectl get secret -n openfaas basic-auth -o jsonpath="{.data.basic-auth-password}" | base64 --decode; echo)
@@ -118,7 +104,7 @@ Deploy a function:
 
 ```bash
 faas-cli store deploy figlet
-
+```
 
 Describe, then invoke the function:
 
@@ -133,72 +119,48 @@ OpenFaaS CE is licensed for personal, non-commercial use or a single 60 day comm
 
 The above userdata script can be re-used, with a few options removed.
 
-Create `openfaas-ce.yaml` with the following content:
+```sh
+cat > openfaas-ce.sh <<EOF
+export HOME=/home/ubuntu
+export USER=ubuntu
 
-```yaml
-config:
+cd /home/ubuntu/
 
-  host_groups:
-  - name: openfaas-ce
-    userdata: |
-              export HOME=/home/ubuntu
-              export USER=ubuntu
+(
+arkade get kubectl kubectx helm faas-cli k3sup stern --path /usr/local/bin
+chown \$USER /usr/local/bin/*
 
-              cd /home/ubuntu/
+mkdir -p .kube
+mkdir -p .openfaas
+)
 
-              (
-              arkade get kubectl kubectx helm faas-cli k3sup stern --path /usr/local/bin
-              chown $USER /usr/local/bin/*
+(
+k3sup install --local
+mv ./kubeconfig ./.kube/config
+chown \$USER .kube/config
+)
 
-              mkdir -p .kube
-              mkdir -p .openfaas
-              )
+(
+kubectl apply -f https://raw.githubusercontent.com/openfaas/faas-netes/master/namespaces.yml
 
-              (
-              k3sup install --local
-              mv ./kubeconfig ./.kube/config
-              chown $USER .kube/config
-              )
+helm repo add openfaas https://openfaas.github.io/faas-netes/
+helm repo update && \
+  helm upgrade --install openfaas \
+  --install openfaas/openfaas \
+  --namespace openfaas \
 
-              (
-              kubectl apply -f https://raw.githubusercontent.com/openfaas/faas-netes/master/namespaces.yml
+chown -R \$USER \$HOME
 
-              helm repo add openfaas https://openfaas.github.io/faas-netes/
-              helm repo update && \
-                helm upgrade --install openfaas \
-                --install openfaas/openfaas \
-                --namespace openfaas \
+echo "export OPENFAAS_URL=http://127.0.0.1:31112" >> \$HOME/.bashrc
 
-              chown -R $USER $HOME
+)
+EOF
+```
 
-              echo "export OPENFAAS_URL=http://127.0.0.1:31112" >> $HOME/.bashrc
+Create `openfaas-ce.yaml` clicer configuration file:
 
-              )
-
-    storage: image
-    storage_size: 25G
-    count: 1
-    vcpu: 2
-    ram_gb: 4
-    network:
-      bridge: brvm0
-      tap_prefix: vmtap
-      gateway: 192.168.137.1/24
-      addresses:
-      - 192.168.137.2/24
-  github_user: alexellis
-
-  image: "ghcr.io/openfaasltd/slicer-systemd:5.10.240-x86_64-latest"
-
-  api:
-    port: 8080
-    bind_address: "127.0.0.1:"
-    auth:
-      enabled: true
-
-  ssh:
-    port: 2222
-    bind_address: "0.0.0.0:"
-
-  hypervisor: firecracker
+```bash
+slicer new openfaas-pro \
+  --userdata-file openfaas-pro.sh \
+  >  openfaas-ce.yaml
 ```

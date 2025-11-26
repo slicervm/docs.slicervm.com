@@ -26,44 +26,25 @@ Then, you should ideally change the `name:` prefix of the host group, so that th
 
 The first machine could use:
 
-```yaml
-config:
-  host_groups:
-  - name: k3s-a
-    storage: image
-    storage_size: 25G
-    count: 3
-    vcpu: 2
-    ram_gb: 4
-    network:
-      bridge: brk3s0
-      tap_prefix: k3stap
-      gateway: 192.168.137.1/24
-
-  github_user: alexellis
-
-  api:
-    port: 8080
-    bind_address: "127.0.0.1:"
-
-  image: "ghcr.io/openfaasltd/slicer-systemd:5.10.240-x86_64-latest"
-
-  hypervisor: firecracker
+```bash
+slicer new k3s-a \
+  --cpu 2 \
+  --ram 4 \
+  --count=3 \
+  --cidr 192.168.137.0/24 \
+  > k3s-a.yaml
 ```
 
 Then the second would have a different `name:` prefix, and a different network section.
 
-```yaml
-config:
-  host_groups:
-  - name: k3s-b
-    network:
-      bridge: brk3s0
-      tap_prefix: k3stap
-      gateway: 192.168.138.1/24
+```bash
+slicer new k3s-b \
+  --cpu 2 \
+  --ram 4 \
+  --count=3 \
+  --cidr 192.168.138.0/24 \
+  > k3s-b.yaml
 ```
-
-(Note the above is a partial snippet to show the differences only.)
 
 ## Start Slicer on each machine
 

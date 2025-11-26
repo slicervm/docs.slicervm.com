@@ -6,33 +6,13 @@ If you would like to try out a smaller cluster first, you can simply change the 
 
 Create `k3s-ha.yaml`:
 
-```yaml
-config:
-  host_groups:
-  - name: k3s
-    storage: image
-    storage_size: 25G
-    count: 3
-    vcpu: 2
-    ram_gb: 4
-    network:
-      bridge: brk3s0
-      tap_prefix: k3stap
-      gateway: 192.168.137.1/24
-
-  github_user: alexellis
-
-  api:
-    port: 8080
-    bind_address: "127.0.0.1:"
-
-
-# Comment out the image depending on your system's architecture
-
-  # image: "ghcr.io/openfaasltd/slicer-systemd-arm64:6.1.90-aarch64-latest"
-  image: "ghcr.io/openfaasltd/slicer-systemd:5.10.240-x86_64-latest"
-
-  hypervisor: firecracker
+```bash
+slicer new k3s \
+  --cpu 2 \
+  --ram 4 \
+  --count=3 \
+  --cidr 192.168.137.0/24 \
+  > k3s-ha.yaml
 ```
 
 The IP addresses of the VMs will be as follows:
