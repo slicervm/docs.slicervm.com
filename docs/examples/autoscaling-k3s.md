@@ -378,6 +378,60 @@ kubectl get pods --watch --output wide --all-namespaces
 
 Keep another eye out on Slicer's output on the worker node host. You should see VMs being booted up and / or shutting down.
 
+**Simplest option: scale to hundreds of Pods**
+
+Create a deployment for busybox's sleep image, and give it fairly big resource requests.
+
+```bash
+kubectl apply -f - <<EOF
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sleep
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sleep
+  template:
+    metadata:
+      labels:
+        app: sleep
+    spec:
+      terminationGracePeriodSeconds: 0
+      containers:
+        - name: sleep
+          image: docker.io/library/busybox:latest
+          command: ["sleep", "infinity"]
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              cpu: 100m
+              memory: 100Mi
+EOF
+```
+
+Once the Deployment is created, you can scale it to a moderate or massive number of Pods. Remember that by default, Kubernetes limits each node so it can only run 100 Pods.
+
+Try running the below, and give the system a minute or two to catch up between each.
+```bash
+kubectl scale deployment sleep --replicas=100
+kubectl scale deployment sleep --replicas=200
+```
+
+You'll see the a new Node being added to the cluster, and the Pods being scheduled to run on it.
+
+```bash
+# Watch each Pod coming online, and see which node it gets scheduled to
+kubectl get pods --watch --output wide
+
+# Watch nodes coming online to support the new Pods
+kubectl get nodes --watch --output wide
+```
+
+[![Scaling to 100 Pods](/images/scaling-100-pods.png)](/images/scaling-100-pods.png)
+> Example showing 100 Pods running across a Ryzen 9 and a Raspberry Pi 5.
+
 **Taints and tolerations**
 
 You can use a label to prevent new Pods from running on the Control Plane, and simulate autoscaling.
@@ -403,7 +457,7 @@ metadata:
 spec:
   containers:
     - name: sleep
-      image: busybox:latest
+      image: docker.io/library/busybox:latest
       command: ["sleep", "infinity"]
   tolerations:
     - key: slicer-cp
