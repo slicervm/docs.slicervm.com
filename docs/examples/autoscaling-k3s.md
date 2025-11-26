@@ -258,6 +258,14 @@ slicer-token=$(cat ~/slicer-token-2.txt)
 EOF
 ```
 
+In the above example, the Slicer host may be a Raspberry Pi 5, and you should limit how many nodes can run there with an extra setting under the `[nodegroup]` section:
+
+I set this to `4` (4x4=16) since the Raspberry Pi 5 has 4 physical cores and 16GB of RAM.
+
+```toml
+max-size=4
+```
+
 * The `nodegroup` name comes from the the hostgroup name of the Slicer instance
 * The `slicer-url` is the API URL of the Slicer instance
 * The `slicer-token` is the API token of the Slicer instance
@@ -323,6 +331,7 @@ extraArgs:
   scale-down-delay-after-add: "30s"
   scale-down-unneeded-time: "30s"
   expendable-pods-priority-cutoff: -10
+  expander: random
 ```
 
 Deploy the autoscaler using the official Kubernetes autoscaler Helm chart:
@@ -458,6 +467,12 @@ kubectl get nodes --watch --output wide
 [![Scaling to 100 Pods](/images/scaling-100-pods.png)](/images/scaling-100-pods.png)
 > Example showing 100 Pods running across a Ryzen 9 and a Raspberry Pi 5.
 
+These Pods run a simple `sleep infinity` command, so they are not doing anything that taxes the system, however you can view Node usage across the cluster with:
+
+```bash
+watch "kubectl top nodes"
+```
+
 **Taints and tolerations**
 
 You can use a label to prevent new Pods from running on the Control Plane, and simulate autoscaling.
@@ -503,6 +518,34 @@ kubectl taint nodes slicer-cp-1:NoSchedule-
 kubectl taint nodes slicer-cp-2:NoSchedule-
 kubectl taint nodes slicer-cp-3:NoSchedule-
 ```
+
+## Troubleshooting
+
+**Node says as NotReady**
+
+Check connectivity and routes. Remember these do not survive an interface going down/up or a reboot.
+
+Remove the mode manually via `kubectl delete node/NAME`.
+
+Check the Slicer output for the node, perhaps it failed to boot or the network didn't come up in time.
+
+**Left over nodes**
+
+Delete all nodes that are not part of the control plane, assuming they are all listed as NotReady:
+
+```bash
+kubectl delete node -l k3sup.dev/node-type=agent
+```
+
+**Only one Slicer instance is getting used**
+
+The `expander` setting in values.yaml should be changed to `random` or `most-pods` to ensure that all Slicer instances are used.
+
+The default is `price` and meant for the cloud, where the smallest node types are always picked first.
+
+**The Cluster Autoscaler is not picking up new configuration**
+
+If you have tainted any nodes, it may mean that the new Pod for the autoscaler cannot be scheduled, so remove the taints.
 
 ## Next steps
 
