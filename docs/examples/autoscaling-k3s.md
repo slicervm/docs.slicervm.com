@@ -111,7 +111,7 @@ slicer new k3s-agents-1 \
   --tap-prefix="k3sa1"
   --api-bind="0.0.0.0" \
   --api-port=8081 \
-  --ssh-port=2223 \
+  --ssh-port=0 \
   > k3s-agents-1.yaml
 
 # Deploy worker host group
@@ -137,7 +137,14 @@ If you have additional machines that could run Slicer and provide Kubernetes nod
 
 This could be an Arm64 machine (Ampere, Raspberry Pi, etc) or an x86_64 (Intel, AMD, etc) machine.
 
-For each, make sure you change the CIDR block, and the tap-prefix.
+For each, make sure you change:
+
+* the CIDR block
+* the tap-prefix
+* the API port
+* the name of the host group
+
+The API port doesn't strictly need to be changed if you run every Slicer instance on a different physical machine, however we've changed it since you may wish to try this out all on one computer.
 
 I.e. to add `k3s-agents-2`:
 
@@ -150,7 +157,7 @@ slicer new k3s-agents-2 \
   --tap-prefix="k3sa2"
   --api-bind="0.0.0.0" \
   --api-port=8082 \
-  --ssh-port=2224 \
+  --ssh-port=0 \
   > k3s-agents-2.yaml
 ```
 
