@@ -357,6 +357,16 @@ helm upgrade \
   --values=./values-slicer.yaml
 ```
 
+Next, a minor patch is required to the ClusterRole so that it can remove nodes from the cluster.
+
+```bash
+kubectl patch clusterrole/slicer-cluster-autoscaler \
+  --type='json' \
+  -p='[{"op": "add", "path": "/rules/4/verbs/-", "value": "delete"}]'
+```
+
+If our fork gets merged into upstream, then this patch will no longer be needed.
+
 ## How to update the configuration
 
 If you got something wrong like a token, URL, or Slicer host group name, or perhaps want to add a new Slicer instance, you'll need to update the TOML file.
