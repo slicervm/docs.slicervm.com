@@ -456,8 +456,8 @@ spec:
           imagePullPolicy: IfNotPresent
           resources:
             requests:
-              cpu: 100m
-              memory: 100Mi
+              cpu: 50m
+              memory: 50Mi
 EOF
 ```
 
@@ -483,8 +483,8 @@ kubectl get pods --watch --output wide
 kubectl get nodes --watch --output wide
 ```
 
-[![Scaling to 100 Pods](/images/scaling-100-pods.png)](/images/scaling-100-pods.png)
-> Example showing 100 Pods running across a Ryzen 9 and a Raspberry Pi 5.
+[![Scaling to 600 Pods](/images/scaling-600-pods.png)](/images/scaling-600-pods.png)
+> Example showing 600 Pods running across two Slicer hosts running worker nodes - a Ryzen 9 and a Raspberry Pi 5. The Control Plane is running on a separate N100 fanless mini PC.
 
 These Pods run a simple `sleep infinity` command, so they are not doing anything that taxes the system, however you can view Node usage across the cluster with:
 
