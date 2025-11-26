@@ -330,7 +330,7 @@ Deploy the autoscaler using the official Kubernetes autoscaler Helm chart:
 ```bash
 helm repo add autoscaler https://kubernetes.github.io/autoscaler
 helm upgrade --install \
-  slicer-autoscaler autoscaler/cluster-autoscaler \
+  cluster-autoscaler-slicer autoscaler/cluster-autoscaler \
   --namespace=kube-system \
   --values=./values-slicer.yaml
 ```
@@ -352,6 +352,25 @@ kubectl create secret generic cluster-autoscaler-cloud-config \
   --from-file=cloud-config=./cloud-config.toml \
   -n kube-system
 kubectl rollout restart deployment cluster-autoscaler-slicer-slicer-cluster-autoscaler -n kube-system
+```
+
+## Setting the Expander mode
+
+Check what expander you’re using in the Cluster Autoscaler deployment:
+
+* `--expander=price` or `--expander=least-waste` - will strongly bias towards any group with less RAM/CPU per node
+
+* `--expander=random` - will randomly pick between suitable groups
+
+* `--expander=most-pods` - picks the group that fits the most pending pods
+
+If you just want both groups to see some traffic, switching to random or most-pods is usually the simplest.
+
+The expander flag can be set in values.yaml:
+
+```yaml
+extraArgs:
+  expander: random
 ```
 
 ## Test the Cluster Autoscaler
