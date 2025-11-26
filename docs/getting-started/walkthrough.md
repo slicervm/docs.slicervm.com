@@ -61,7 +61,7 @@ There's no need to provide the HTTP API section unless you plan to run Slicer mo
 
 **Configuration for an Arm64 Slicer installation**
 
-If you're deploying to an Arm64 host, then the only changes needed is to select a different `image` in the `vm.yaml` file:
+`slicer new` will generate a configuration file for the correct image for Arm or x86_64, but if you create one manually, you'll need to edit the `image` field.
 
 ```diff
 -  image: "ghcr.io/openfaasltd/slicer-systemd:5.10.240-x86_64-latest"
@@ -80,7 +80,11 @@ Having customised the `github_user` to your own username, your SSH keys will hav
 
 On your workstation, add any routes that are specified so you can access the VMs on their own network.
 
-Connect with:
+If you need to get the route output back again, you can use the `slicer vm route` command on the host itself, specifying the config file as the argument.
+
+Never run any route commands outputted by Slicer on the host itself. It's not required and will break the networking.
+
+Then, you can connect with SSH:
 
 ```bash
 ssh ubuntu@192.168.137.2
