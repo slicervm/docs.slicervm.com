@@ -111,6 +111,7 @@ slicer new k3s-agents-1 \
   --tap-prefix="k3sa1"
   --api-bind="0.0.0.0" \
   --api-port=8081 \
+  --find-ssh-keys=false \
   --ssh-port=0 \
   > k3s-agents-1.yaml
 
@@ -157,6 +158,7 @@ slicer new k3s-agents-2 \
   --tap-prefix="k3sa2"
   --api-bind="0.0.0.0" \
   --api-port=8082 \
+  --find-ssh-keys=false \
   --ssh-port=0 \
   > k3s-agents-2.yaml
 ```
@@ -550,6 +552,18 @@ The default is `price` and meant for the cloud, where the smallest node types ar
 **The Cluster Autoscaler is not picking up new configuration**
 
 If you have tainted any nodes, it may mean that the new Pod for the autoscaler cannot be scheduled, so remove the taints.
+
+**The Cluster Autoscaler says a node group is not ready**
+
+This error was observed during testing, restarting the deployment resolved the issue. We assume the autoscaler has a bug where it doesn't properly check readiness once it decides it's unhealthy.
+
+Message observed: "Readiness for node group k3s-agents-2 not found"
+
+**Why are many Pods stuck as Pending?**
+
+The logs of the autoscaler are set to a verbose level which will explain most issues.
+
+Look out to see if you've exceeded the maximum number of nodes for a node group i.e. "Skipping node group k3s-agents-1 - max size reached".
 
 **Diagnose an issue within a worker node**
 
