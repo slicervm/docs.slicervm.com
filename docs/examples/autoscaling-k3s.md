@@ -365,6 +365,8 @@ kubectl patch clusterrole/slicer-cluster-autoscaler \
   -p='[{"op": "add", "path": "/rules/4/verbs/-", "value": "delete"}]'
 ```
 
+You could also edit this manually via `kubectl edit clusterrole/slicer-cluster-autoscaler`, then add `delete` to the array of verbs under `resources` and `nodes`.
+
 If our fork gets merged into upstream, then this patch will no longer be needed.
 
 ## How to update the configuration
