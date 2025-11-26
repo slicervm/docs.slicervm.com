@@ -111,7 +111,7 @@ slicer new k3s-agents-1 \
   --ram 4 \
   --cidr 192.168.138.0/24 \
   --count=0 \
-  --tap-prefix="k3sa1"
+  --tap-prefix="k3sa1" \
   --api-bind="0.0.0.0" \
   --api-port=8081 \
   --find-ssh-keys=false \
@@ -158,7 +158,7 @@ slicer new k3s-agents-2 \
   --ram 4 \
   --cidr 192.168.139.0/24 \
   --count=0 \
-  --tap-prefix="k3sa2"
+  --tap-prefix="k3sa2" \
   --api-bind="0.0.0.0" \
   --api-port=8082 \
   --find-ssh-keys=false \
@@ -381,10 +381,13 @@ If you need to update the configuration, then do the following:
 * Restart the Cluster Autoscaler
 
 ```bash
-kubectl delete secret -n kube-system \
-cluster-autoscaler-cloud-config 
-kubectl create secret generic -n kube-system \
-cluster-autoscaler-cloud-config \
+kubectl delete secret \
+  -n kube-system \
+  cluster-autoscaler-cloud-config
+
+kubectl create secret generic \
+  -n kube-system \
+  cluster-autoscaler-cloud-config \
   --from-file=cloud-config=./cloud-config.toml
 
 kubectl rollout restart deployment \
