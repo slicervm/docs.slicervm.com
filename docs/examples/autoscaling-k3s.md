@@ -158,6 +158,10 @@ Remember to save each Slicer API token to your workstation as `~/slicer-token-2.
 
 ## Step 3: Configure Networking
 
+In a Kubernetes cluster, every Node and Pod must be able to communicate with every other Node and Pod.
+
+That means you must configure a number of routes.
+
 **Your workstation**
 
 On your workstation, you can get away with only adding a route to the Control Plane Slicer instance.
@@ -169,6 +173,44 @@ Each worker host must have a route to:
 * The Control Plane Slicer instance
 * Every other worker node Slicer instance (other than its own)
 
+**Making it permanent**
+
+Routes added with `ip route` are not permanent, so if your network link goes down, you may have to run them again. If you reboot the machine, you'll need to run them again.
+
+When we run long-term K3s clusters with Slicer this way, we'll create a one-shot systemd unit that adds the correct routes on every boot.
+
+Alternatively, if running at home, you could add these routes via your ISP's router.
+
+For instance, this may be what runs on the control-plane for two separate worker nodes.
+
+Create a file called `slicer-routes.service`:
+```bash
+[Unit]
+Description=Add slicer routes
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/root/add-routes.sh
+RemainAfterExit=true
+User=root
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Then enable the service to run on every boot:
+
+```bash
+sudo cp ./slicer-routes.service /etc/systemd/system/
+sudo systemctl enable slicer-routes.service
+```
+
+Then create the `add-routes.sh` script at `/root/add-routes.sh`.
+
+Copy and paste in the `ip route` commands that you were given when starting up all your worker nodeSlicer instances.
+
 ## Step 4: Configure Cluster Autoscaler
 
 Create the cloud configuration file that tells the Cluster Autoscaler how to connect to your K3s cluster and Slicer APIs.
@@ -176,7 +218,7 @@ Create the cloud configuration file that tells the Cluster Autoscaler how to con
 This TOML file defines the node groups and their scaling parameters:
 
 ```bash
-cat > cloud-config.ini <<EOF
+cat > ./cloud-config.toml <<EOF
 [global]
 k3s-url=https://192.168.137.2:6443
 k3s-token=$(cat ~/k3s-join-token.txt)
@@ -192,7 +234,7 @@ EOF
 If you were to have had two Slicer instances running worker nodes, the config would look like this:
 
 ```bash
-cat > cloud-config.ini <<EOF
+cat > cloud-config.toml <<EOF
 [global]
 k3s-url=https://192.168.137.2:6443
 k3s-token=$(cat ~/k3s-join-token.txt)
@@ -241,7 +283,7 @@ First, create a Kubernetes secret containing the cloud configuration file:
 
 ```bash
 kubectl create secret generic cluster-autoscaler-cloud-config \
-  --from-file=cloud-config=cloud-config.ini \
+  --from-file=cloud-config=./cloud-config.toml \
   -n kube-system
 ```
 
@@ -286,6 +328,25 @@ helm upgrade --install \
   --values=./values-slicer.yaml
 ```
 
+## How to update the configuration
+
+If you got something wrong like a token, URL, or Slicer host group name, or perhaps want to add a new Slicer instance, you'll need to update the TOML file.
+
+If you need to update the configuration, then do the following:
+
+* Update your local TOML file
+* Delete the secret for the Cluster Autoscaler
+* Re-create the secret
+* Restart the Cluster Autoscaler
+
+```bash
+kubectl delete secret cluster-autoscaler-cloud-config -n kube-system
+kubectl create secret generic cluster-autoscaler-cloud-config \
+  --from-file=cloud-config=./cloud-config.toml \
+  -n kube-system
+kubectl rollout restart deployment cluster-autoscaler-slicer-slicer-cluster-autoscaler -n kube-system
+```
+
 ## Test the Cluster Autoscaler
 
 The autoscaler works by detecting unschedulable Pods and automatically provisioning new Worker Nodes through Slicer's REST API. Once workloads are removed or reduced, it will scale down unneeded nodes after the configured cooldown period.
@@ -315,5 +376,64 @@ kubectl get nodes --watch --output wide
 kubectl get pods --watch --output wide --all-namespaces
 ```
 
-Keep another eye out on Slicer's output on the worker node host. You should see VMs being booted up and / or shutting down. 
+Keep another eye out on Slicer's output on the worker node host. You should see VMs being booted up and / or shutting down.
 
+**Taints and tolerations**
+
+You can use a label to prevent new Pods from running on the Control Plane, and simulate autoscaling.
+
+In production, OpenFaaS customers tend to run their functions on spot instances rather than on their control plane nodes.
+
+```bash
+kubectl taint nodes slicer-cp-1:NoSchedule
+kubectl taint nodes slicer-cp-2:NoSchedule
+kubectl taint nodes slicer-cp-3:NoSchedule
+```
+
+Now, newly created or restarted Pods will not be scheduled to run on the Control Plane nodes.
+
+Next, you can create a Pod that tolerates the taint, and will be scheduled to run on the Control Plane nodes.
+
+```bash
+kubectl apply -f - <<EOF
+apiVersion: v1
+kind: Pod
+metadata:
+  name: sleep-pod
+spec:
+  containers:
+    - name: sleep
+      image: busybox:latest
+      command: ["sleep", "infinity"]
+  tolerations:
+    - key: slicer-cp
+      operator: Equal
+      value: "true"
+      effect: NoSchedule
+EOF
+```
+
+You'll see the a new Node being added to the cluster, and the Pod being scheduled to run on it.
+
+Finally, remove the Pod and untaint the Control Plane nodes:
+
+```bash
+kubectl delete pod sleep-pod
+kubectl taint nodes slicer-cp-1:NoSchedule-
+kubectl taint nodes slicer-cp-2:NoSchedule-
+kubectl taint nodes slicer-cp-3:NoSchedule-
+```
+
+## Next steps
+
+Now you have a Kubernetes cluster that can scale its capacity up and down with demand.
+
+Why not try out something that scales Pods?
+
+**OpenFaaS which scales Pods**
+
+[OpenFaaS Community Edition (CE)](https://docs.openfaas.com/deployment/kubernetes/) is a version of OpenFaaS that can be used for free for personal use, or a limited commercial trial.
+
+Once you've deployed a function you can use something like the [hey tool](https://github.com/rakyll/hey) via (`arkade get hey`) to stress a function, and cause it to scale up.
+
+Learn more about [OpenFaaS Autoscaling](https://docs.openfaas.com/architecture/autoscaling/).
