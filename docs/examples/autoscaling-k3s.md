@@ -449,9 +449,13 @@ EOF
 Once the Deployment is created, you can scale it to a moderate or massive number of Pods. Remember that by default, Kubernetes limits each node so it can only run 100 Pods.
 
 Try running the below, and give the system a minute or two to catch up between each.
+
+The below will full up the Control Plane nodes, and worker nodes will be needed to support the excess.
+
 ```bash
 kubectl scale deployment sleep --replicas=100
-kubectl scale deployment sleep --replicas=200
+kubectl scale deployment sleep --replicas=300
+kubectl scale deployment sleep --replicas=400
 ```
 
 You'll see the a new Node being added to the cluster, and the Pods being scheduled to run on it.
@@ -546,6 +550,22 @@ The default is `price` and meant for the cloud, where the smallest node types ar
 **The Cluster Autoscaler is not picking up new configuration**
 
 If you have tainted any nodes, it may mean that the new Pod for the autoscaler cannot be scheduled, so remove the taints.
+
+**Diagnose an issue within a worker node**
+
+The `slicer vm exec` command will give you a root shell directly into any worker node.
+
+On the host managing `k3s-agents-1`, you would run:
+
+```bash
+# Show the available nodes
+sudo -E slicer vm list --url http://127.0.0.1:8081/nodes
+
+# Get a root shell into node 1
+sudo -E slicer vm exec --url http://127.0.0.1:8081/nodes k3s-agents-1-1
+```
+
+From there you can check the logs of the `k3s` service via `sudo journalctl -u k3s -f`.
 
 ## Next steps
 
