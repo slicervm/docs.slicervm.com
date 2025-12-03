@@ -127,6 +127,7 @@ nav:
       - Slicer REST API: reference/api.md
       - Images for microVMs: reference/images.md
       - SSH access to VMs: reference/ssh.md
+      - Secret management: reference/secrets.md
       - Serial Over SSH (SOS): reference/sos.md
       - VFIO Passthrough: reference/vfio.md
       - Troubleshooting: reference/troubleshooting.md
