@@ -210,3 +210,57 @@ This is an internal endpoint used by `slicer vm exec` to obtain a shell. It requ
 
 `/vm/{hostname}/exec`
 
+## Manage secrets
+
+HTTP GET
+
+`/secrets`
+
+```json
+[
+  {
+    "name": "my-secret",
+    "size": 1024,
+    "permissions": "0600",
+    "uid": 1000,
+    "gid": 1000
+  }
+]
+```
+
+HTTP POST
+
+`/secrets`
+
+Create a secret with base64-encoded data:
+
+```json
+{
+  "name": "my-secret",
+  "data": "base64-encoded-content",
+  "permissions": "0600",
+  "uid": 1000,
+  "gid": 1000
+}
+```
+
+HTTP PUT
+
+`/secrets/{name}`
+
+Update an existing secret:
+
+```json
+{
+  "data": "base64-encoded-content",
+  "permissions": "0644",
+  "uid": 1001,
+  "gid": 1001
+}
+```
+
+HTTP DELETE
+
+`/secrets/{name}`
+
+Response 200: No content
