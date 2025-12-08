@@ -1,6 +1,6 @@
 # Autoscaling Kubernetes (k3s) with Cluster Autoscaler
 
-The Cluster Autoscaler is a controller offered by the Kubernetes community to add and remove nodes to a a Kubernetes cluster based upon demand.
+The Cluster Autoscaler is a controller offered by the Kubernetes community to add and remove nodes to a Kubernetes cluster based upon demand.
 
 When run in the cloud such as AWS, Azure, GCP, etc, the autoscaler provisions nodes using the cloud provider's VM primitive, so EC2 for AWS, Google Compute Engine for GCP, etc.
 
@@ -227,10 +227,10 @@ Copy and paste in the `ip route` commands that you were given when starting up a
 
 Create the cloud configuration file that tells the Cluster Autoscaler how to connect to your K3s cluster and Slicer APIs.
 
-This TOML file defines the node groups and their scaling parameters:
+This INI file defines the node groups and their scaling parameters:
 
 ```bash
-cat > ./cloud-config.toml <<EOF
+cat > ./cloud-config.ini <<EOF
 [global]
 k3s-url=https://192.168.137.2:6443
 k3s-token=$(cat ~/k3s-join-token.txt)
@@ -248,7 +248,7 @@ Note that the setting of `default-max-size` will affect how many nodes can be ad
 If you were to have had two Slicer instances running worker nodes, the config would look like this:
 
 ```bash
-cat > cloud-config.toml <<EOF
+cat > cloud-config.ini <<EOF
 [global]
 k3s-url=https://192.168.137.2:6443
 k3s-token=$(cat ~/k3s-join-token.txt)
@@ -269,7 +269,7 @@ In the above example, the Slicer host may be a Raspberry Pi 5, and you should li
 
 I set this to `4` (4x4=16) since the Raspberry Pi 5 has 4 physical cores and 16GB of RAM.
 
-```toml
+```ini
 max-size=4
 ```
 
@@ -288,6 +288,7 @@ Overview of all available configuration options:
 | `global`                   | Global configuration options | No | - |
 | `global/k3s-url`           | K3s control plane API server URL | Yes | - |
 | `global/k3s-token`         | K3s join token for new nodes | Yes | - |
+| `global/ca-bundle`         | Path to custom CA bundle file for Slicer API calls | No | - |
 | `global/default-min-size`  | Default minimum nodes per group | No | 1 |
 | `global/default-max-size`  | Default maximum nodes per group | No | 8  |
 | `nodegroup/slicer-url`     | Slicer API server URL | Yes | - |
@@ -307,7 +308,7 @@ First, create a Kubernetes secret containing the cloud configuration file:
 kubectl create secret generic \
   -n kube-system \
   cluster-autoscaler-cloud-config \
-  --from-file=cloud-config=./cloud-config.toml
+  --from-file=cloud-config=./cloud-config.ini
 ```
 
 Create a `values-slicer.yaml` file to configure the Cluster Autoscaler Helm chart. This configuration specifies the Slicer-compatible autoscaler image, mounts the cloud config secret, and sets appropriate scaling parameters:
@@ -371,11 +372,11 @@ If our fork gets merged into upstream, then this patch will no longer be needed.
 
 ## How to update the configuration
 
-If you got something wrong like a token, URL, or Slicer host group name, or perhaps want to add a new Slicer instance, you'll need to update the TOML file.
+If you got something wrong like a token, URL, or Slicer host group name, or perhaps want to add a new Slicer instance, you'll need to update the INI file.
 
 If you need to update the configuration, then do the following:
 
-* Update your local TOML file
+* Update your local INI file
 * Delete the secret for the Cluster Autoscaler
 * Re-create the secret
 * Restart the Cluster Autoscaler
@@ -388,7 +389,7 @@ kubectl delete secret \
 kubectl create secret generic \
   -n kube-system \
   cluster-autoscaler-cloud-config \
-  --from-file=cloud-config=./cloud-config.toml
+  --from-file=cloud-config=./cloud-config.ini
 
 kubectl rollout restart deployment \
   -n kube-system \
@@ -412,6 +413,42 @@ The expander flag can be set in values.yaml:
 ```yaml
 extraArgs:
   expander: random
+```
+
+## Custom CA Bundle for Slicer API
+
+If your Slicer API endpoints use self-signed certificates or certificates signed by a custom Certificate Authority, you can specify a custom CA bundle.
+
+The path the the CA bandle can be configured in the `[global]` section in the `cloud-config.ini`:
+
+```ini
+[global]
+ca-bundle = /etc/ssl/certs/slicer-ca-bundle.pem
+```
+
+The CA bundle file should contain one or more PEM-encoded certificates. This configuration applies globally to all Slicer API calls across all node groups.
+
+When deploying with Helm, you can mount your CA bundle using `extraVolumeSecrets`.
+
+Create a secret for the CA bundle:
+
+```bash
+kubectl create secret generic \
+  -n kube-system \
+  slicer-ca-bundle \
+  --from-file=ca-bundle=./ca-bundle.pem
+```
+
+Update your values.yaml file:
+
+```yaml
+extraVolumeSecrets:
+  slicer-ca-bundle:
+    name: slicer-ca-bundle
+    mountPath: /etc/ssl/certs/slicer-ca-bundle.pem
+    items:
+      - key: ca-bundle
+        path: ca-bundle
 ```
 
 ## Test the Cluster Autoscaler
