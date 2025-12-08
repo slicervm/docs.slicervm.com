@@ -16,15 +16,23 @@ A multi-node setup is possible, but in that case, it's better to set up K3s usin
 
 ## OpenFaaS Pro
 
-Create a user data file `openfaas-pro.sh` to setup an OpenFaaS Pro cluster.
+Create a [slicer secret](/reference/secrets) for your OpenFaaS Pro license key. This let's you securely pass the license to the slicer VM.
 
-This command assumes you have a valid license key in your home directory at `~/.openfaas/LICENSE`. Create it if it does not exist yet.
+Any secrets the VM or user data script need access to should be added to the `.secrets` folder.
 
 ```bash
-cat > openfaas-pro.sh <<EOF
+sudo mkdir .secrets
+# Ensure only root can read/write to the secrets folder.
+sudo chmod 700 .secrets
+
+sudo cp ~/.openfaas/LICENSE .secrets/openfaas-license
+```
+
+Create a user data file, `openfaas-pro.sh`, to setup an OpenFaaS Pro cluster.
+
+```bash
 #!/bin/bash
 
-export LICENSE=$(cat ~/.openfaas/LICENSE)
 export HOME=/home/ubuntu
 export USER=ubuntu
 
@@ -32,18 +40,15 @@ cd /home/ubuntu/
 
 (
 arkade get kubectl kubectx helm faas-cli k3sup stern --path /usr/local/bin
-chown \$USER /usr/local/bin/*
+chown $USER /usr/local/bin/*
 
 mkdir -p .kube
-mkdir -p .openfaas
-
-echo -n \$LICENSE > ./.openfaas/LICENSE
 )
 
 (
 k3sup install --local
 mv ./kubeconfig ./.kube/config
-chown \$USER .kube/config
+chown $USER .kube/config
 )
 
 (
@@ -52,7 +57,7 @@ kubectl apply -f https://raw.githubusercontent.com/openfaas/faas-netes/master/na
 kubectl create secret generic \
   -n openfaas \
   openfaas-license \
-  --from-file license=\$HOME/.openfaas/LICENSE
+  --from-file license=/run/slicer/secrets/openfaas-license
 
 helm repo add openfaas https://openfaas.github.io/faas-netes/
 helm repo update && \
@@ -61,12 +66,11 @@ helm repo update && \
   --namespace openfaas \
   -f https://raw.githubusercontent.com/openfaas/faas-netes/refs/heads/master/chart/openfaas/values-pro.yaml
 
-chown -R \$USER \$HOME
+chown -R $USER $HOME
 
-echo "export OPENFAAS_URL=http://127.0.0.1:31112" >> \$HOME/.bashrc
+echo "export OPENFAAS_URL=http://127.0.0.1:31112" >> $HOME/.bashrc
 
 )
-EOF
 ```
 
 Use `slicer new` to generate a configuration file:
@@ -117,10 +121,9 @@ faas-cli invoke <<< "SlicerVM.com"
 
 OpenFaaS CE is licensed for personal, non-commercial use or a single 60 day commercial trial per company.
 
-The above userdata script can be re-used, with a few options removed.
+The above userdata script can be re-used, with a few options removed. Create the `openfaas-ce.sh` userdata script:
 
-```sh
-cat > openfaas-ce.sh <<EOF
+```bash
 export HOME=/home/ubuntu
 export USER=ubuntu
 
@@ -128,7 +131,7 @@ cd /home/ubuntu/
 
 (
 arkade get kubectl kubectx helm faas-cli k3sup stern --path /usr/local/bin
-chown \$USER /usr/local/bin/*
+chown $USER /usr/local/bin/*
 
 mkdir -p .kube
 mkdir -p .openfaas
@@ -137,7 +140,7 @@ mkdir -p .openfaas
 (
 k3sup install --local
 mv ./kubeconfig ./.kube/config
-chown \$USER .kube/config
+chown $USER .kube/config
 )
 
 (
@@ -149,18 +152,17 @@ helm repo update && \
   --install openfaas/openfaas \
   --namespace openfaas \
 
-chown -R \$USER \$HOME
+chown -R $USER $HOME
 
-echo "export OPENFAAS_URL=http://127.0.0.1:31112" >> \$HOME/.bashrc
+echo "export OPENFAAS_URL=http://127.0.0.1:31112" >> $HOME/.bashrc
 
 )
-EOF
 ```
 
 Create `openfaas-ce.yaml` clicer configuration file:
 
 ```bash
-slicer new openfaas-pro \
-  --userdata-file openfaas-pro.sh \
+slicer new openfaas-ce \
+  --userdata-file openfaas-ce.sh \
   >  openfaas-ce.yaml
 ```
