@@ -6,7 +6,7 @@ You can use a regular PC like an N100 or a Raspberry Pi.
 
 ## Userdata
 
-The automated installation of PiHole users a custom userdata script.
+The automated installation of PiHole uses a custom userdata script.
 
 Save this as `setup-pihole.sh`:
 
@@ -17,7 +17,6 @@ set -euxo pipefail
 # ---------- Tunables ----------
 UPSTREAMS=("1.1.1.1" "9.9.9.9")   # change if you like
 ENABLE_DNSSEC="true"              # "true" or "false"
-ADMIN_PASS=""                     # leave empty to auto-generate
 # -------------------------------
 
 retry() { i=0; while true; do if "$@"; then return 0; fi; i=$((i+1)); [ "$i" -ge 30 ] && return 1; sleep 2; done; }
@@ -99,8 +98,7 @@ PIHOLE_SKIP_OS_CHECK=true /bin/bash /tmp/pihole-install.sh --unattended || :
 
 # 8) CLI path + admin password
 PIHOLE_BIN="/usr/local/bin/pihole"; [ -x "$PIHOLE_BIN" ] || PIHOLE_BIN="/usr/bin/pihole"
-if [ -z "${ADMIN_PASS}" ]; then ADMIN_PASS="$(/usr/bin/openssl rand -base64 18)"; fi
-"${PIHOLE_BIN}" setpassword  "${ADMIN_PASS}" || :
+"${PIHOLE_BIN}" setpassword  "$(cat "/run/slicer/secrets/pihole-admin-pass")" || :
 "${PIHOLE_BIN}" -g || :
 
 # 9) Ensure service enabled & started
@@ -109,21 +107,35 @@ if [ -z "${ADMIN_PASS}" ]; then ADMIN_PASS="$(/usr/bin/openssl rand -base64 18)"
 
 # 10) Output & quick hints
 /usr/bin/printf "Pi-hole admin: http://%s/admin\n" "${VM_IP}"
-/usr/bin/printf "Pi-hole admin password: %s\n" "${ADMIN_PASS}" > /root/pihole-admin-pass.txt
-/usr/bin/printf "Saved admin password to /root/pihole-admin-pass.txt\n"
 echo "Test locally: dig +short openfaas.com @127.0.0.1 || true"
 ```
 
+Generate an admin password for PiHole and save it in the `.secrets`. Slicer will copy the secret into the VM, see: [slicer secrets](/reference/secrets) for more information.
+
+```bash
+sudo mkdir .secrets
+# Ensure only root can read/write to the secrets folder.
+sudo chmod 700 .secrets
+
+sudo /usr/bin/openssl rand -base64 18 > .secrets/pihole-admin-pass
+```
+
+The secret will be available on the VM at `/run/slicer/secrets/pihole-admin-pass`
+
 ## VM configuration file
 
-Next, set up a modest VM configuration file - use the example given in the [walkthrough](/getting-started/walkthrough).
+Next, set up a modest VM configuration file with `slicer new`:
 
-Then under `host_groups`, add the following, and update the hostgroup name to avoid clashes.
+```bash
+slicer new pihole \
+  --userdata-file setup-pihole.sh \
+  > pihole.yaml
+```
 
-```yaml
-  host_groups:
-  - name: pihole
-    userdata_file: ./setup-pihole.sh
+Start the VM with the following command:
+
+```bash
+sudo -E slicer up ./pihole.yaml
 ```
 
 ## Accessing PiHole
@@ -137,9 +149,7 @@ sudo fstail /var/log/slicer/
 
 Next, the PiHole admin interface will be available on port 80 of the VM's IP address.
 
-This is typically `http://192.168.137.2/admin` and the admin password will have been printed to the logs found above.
-
-Failing that, you can log into the VM using the SOS console or regular SSH and read the file at `/root/pihole-admin-pass.txt`.
+This is typically `http://192.168.137.2/admin` and the admin password we generated can be found at `.secrets/pihole-admin-pass`.
 
 Example DNS query:
 

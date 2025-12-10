@@ -149,43 +149,24 @@ You can customise the script as you wish, and the admin password will be printed
 
 Now create a jenkins-master.yaml file:
 
-```yaml
-config:
-  host_groups:
-  - name: jenkins-master
-    userdata_file: ./setup-master.sh
-    storage: image
-    storage_size: 25G
-    count: 1
-    vcpu: 2
-    ram_gb: 4
-    network:
-      bridge: brvm0
-      tap_prefix: vmtap
-      gateway: 192.168.137.1/24
-
-  api:
-    enabled: true
-    port: 8080
-    bind_address: "0.0.0.0:"
-
-  ssh:
-    bind_address: "127.0.0.1:"
-    port: 2222
-
-  github_user: alexellis
-
-  image: "ghcr.io/openfaasltd/slicer-systemd:5.10.240-x86_64-latest"
-
-  hypervisor: firecracker
+```bash
+slicer new jenkins-master \
+  --storage image \
+  --storage-size 25G \
+  --count 1 \
+  --cpu 2 \
+  --ram 4 \
+  --api-bind 0.0.0.0 \
+  --userdata-file setup-master.sh \
+  > jenkins-master.yaml
 ```
 
 The disk size, vCPU and RAM can be adjusted as needed.
 
-You can provide one or more SSH keys via
+You can provide one or more SSH keys via:
 
-* `github_user` - your GitHub username, used to fetch your public SSH keys from your profile
-* `ssh_keys` - an array of public keys one per line
+* `--github` - Your GitHub username, used to fetch your public SSH keys from your profile
+* `--ssh-key` - One or more SSH public ssh keys (all on one line) to add to the VM
 
 Now create the VM:
 
@@ -243,36 +224,24 @@ We built one that can talk to a slicer API endpoint to create and destroy VMs as
 
 Set up another Slicer instance, ideally on another machine on the same network, or with access via an overlay network like a VPN (Wireguard/OpenVPN).
 
-```yaml
-config:
-  host_groups:
-    - name: slave
-      storage: zfs
-      count: 0
-      vcpu: 2
-      ram_gb: 8
-      network:
-        bridge: sbrvm0
-        tap_prefix: svmtap
-        gateway: 192.168.138.1/24
-
-  ssh_keys:
-    - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCxtkOu6f/UwZP1ITq7dvXUNCX1gZLuf/ReNXEUXFuPumVGuCWVVLQf5zGDKK+BEi0lPBP6F5Pr2XjF84JlQXELkhbp2WczXGzWdZN0EvYcCD3jHk3saeHPK21ndc/on8/FHVZgF5IO444UP1vwpi3jzuNwbxxM3VH1xqH1F/71Zc7VzU+qcsHqA+rWbQX6vFIVhbS9NQKa/OXgxnyTNstTobLMYIy310tDg1/nzhfXK1gmxFTTDlMT2RFi8Gfo/t2pHzKDZCqZnltrcXtrRy9wqKnA6nqJ6dsT3V04IlG+LGTbBGtIxO+x5LQfw0kKnF31uudkL5wgBEgOSK5nwsTp alex@alex-nuc8
-
-  image: "ghcr.io/openfaasltd/slicer-systemd:5.10.240-x86_64-latest"
-
-  hypervisor: firecracker
-  graceful_shutdown: false
-
-  api:
-    enabled: true
-    port: 8080
-    bind_address: "0.0.0.0:"
-
-  ssh:
-    bind_address: "127.0.0.1:"
-    port: 2222
+```bash
+slicer new slave \
+  --storage zfs \
+  --persistent false \
+  --count 0 \
+  --cpu 2 \
+  --ram 8 \
+  --cidr 192.168.138.1/24 \
+  --api-bind 0.0.0.0 \
+  --userdata-file setup-master.sh \
+  --graceful-shutdown  false \
+  > jenkins-slave.yaml
 ```
+
+* `--count` - set to `0` because slaves are added via the Java Plugin as required
+* `--storage` - use `zfs` for best performance when starting up new slaves, or `image` for quick experimentation
+* `--ssh-keys` - add any public keys you want to be able to SSH into the slave VMs - we recommend this over `--github` since it's much faster than querying GitHub for every launch
+* `--graceful-shutdown false` - slaves are ephemeral so we don't need to wait for a graceful shutdown - it will be destroyed immediately when the job is done
 
 We recommend that you use [ZFS-backed storage](/docs/storage/zfs) for the slaves because with ZFS, a snapshot is unpacked when Slicer starts up and it can be cloned instantly.
 
@@ -296,11 +265,6 @@ If you're running on the same host as the Jenkins master, ensure that the API an
     bind_address: "127.0.0.1:"
 +   port: 2223
 ```
-
-* `count` - set to `0` because slaves are added via the Java Plugin as required
-* `storage` - use `zfs` for best performance when starting up new slaves, or `image` for quick experimentation
-* `ssh_keys` - add any public keys you want to be able to SSH into the slave VMs - we recommend this over `github_user` since it's much faster than querying GitHub for every launch
-* `graceful_shutdown: false` - slaves are ephemeral so we don't need to wait for a graceful shutdown - it will be destroyed immediately when the job is done
 
 ### 2.1 Create a custom image for the Jenkins slaves
 

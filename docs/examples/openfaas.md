@@ -25,7 +25,7 @@ sudo mkdir .secrets
 # Ensure only root can read/write to the secrets folder.
 sudo chmod 700 .secrets
 
-sudo cp ~/.openfaas/LICENSE .secrets/openfaas-license
+sudo -E cp ~/.openfaas/LICENSE .secrets/openfaas-license
 ```
 
 Create a user data file, `openfaas-pro.sh`, to setup an OpenFaaS Pro cluster.

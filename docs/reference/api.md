@@ -244,7 +244,7 @@ Create a secret with base64-encoded data:
 }
 ```
 
-HTTP PUT
+HTTP PATCH
 
 `/secrets/{name}`
 

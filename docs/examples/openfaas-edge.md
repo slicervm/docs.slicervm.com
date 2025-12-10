@@ -4,24 +4,6 @@ Follow this guide to setup a pre-configured microVM with [OpenFaas Edge](https:/
 
 After following the steps in this example you will be able to build and deploy functions to faasd directly from the VM or access the gateway and function builder from other machines by using the VM's IP.
 
-## VM config
-
-The slicer config will be adapted from the [walkthrough](/getting-started/walkthrough). When you create the YAML, name it `openfaas-edge.yaml`.
-
-Change the hostsgroup name to e.g. `openfaas-edge` and add the `userdata_file` in and the hostgroup section.
-
-```diff
-config:
-  host_groups:
-- - name: vm
-+ - name: openfaas-edge
-+   userdata_file: ./openfaas-edge.sh
-```
-
-Customise the `ssh_keys` or `github_user` fields so you can connect via SSH to deploy functions, review the logs, and access check the status of the faasd services.
-
-The userdate script provided in this guide can be used on both ubuntu and rocky. You can change the `image` to switch to the your preferred OS. An overview of the available images can be found [here](/reference/images/).
-
 ## Userdata
 
 Create `openfaas-edge.sh`.
@@ -317,6 +299,24 @@ if [ "${INSTALL_BUILDER}" = "true" ]; then
     echo "5. Pro-builder service available at http://localhost:8088"
 fi
 ```
+
+## VM config
+
+Use `slicer new` to generate a configuration file:
+
+```bash
+slicer new openfaas-edge \
+  --userdata-file ./openfaas-edge.sh \
+  > openfaas-edge.yaml
+```
+The slicer config will be adapted from the [walkthrough](/getting-started/walkthrough). When you create the YAML, name it `openfaas-edge.yaml`.
+
+
+Optionally use  the `--ssh-key` or `--github` flags to add an additional ssh key so you can connect via SSH to deploy functions, review the logs, and access check the status of the faasd services.
+
+The userdate script provided in this guide can be used on both ubuntu and rocky. You can change user the `--image` flag to swith the image to your preferred OS. An overview of the available images can be found [here](/reference/images/).
+
+## Run OpenFaaS Edge
 
 Start the VM:
 

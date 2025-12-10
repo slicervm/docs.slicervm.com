@@ -13,38 +13,50 @@ Alex recently migrated his blog from Ghost 1.x which had a built-in markdown edi
 
 ## Set up your initial VM
 
-Use the [walkthrough](/getting-started/walkthrough) to get a basic VM with the specs you want, with your SSH keys pre-installed, and use a disk image as backing to make it persistent.
+Use `slicer new` to get a basic VM config with the specs you want, with your SSH keys pre-installed, and use a disk image as backing to make it persistent.
 
 When you create your config, you can [add userdata](/tasks/userdata) to install the VSCode server, so it's already there by the time you get in.
 
-The below is based upon the [Official VSCode Documentation](https://code.visualstudio.com/docs/setup/linux).
+The below userdata script is based upon the [Official VSCode Documentation](https://code.visualstudio.com/docs/setup/linux), save it as `vscode.sh`.
 
-```yaml
-config:
-  host_groups:
-  - name: vscode
-    userdata: |
-        #!/bin/bash
+```bash
+#!/bin/bash
 
-        (
-        sudo apt-get install -qy curl gpg apt-transport-https
+(
+sudo apt-get install -qy curl gpg apt-transport-https
 
-        curl -sLS -o - https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg
-        sudo install -D -o root -g root -m 644 microsoft.gpg /usr/share/keyrings/microsoft.gpg
+curl -sLS -o - https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg
+sudo install -D -o root -g root -m 644 microsoft.gpg /usr/share/keyrings/microsoft.gpg
 
-        cat > /etc/apt/sources.list.d/vscode.sources << EOF
-        Types: deb
-        URIs: https://packages.microsoft.com/repos/code
-        Suites: stable
-        Components: main
-        Architectures: amd64,arm64,armhf
-        Signed-By: /usr/share/keyrings/microsoft.gpg
-        EOF
+cat > /etc/apt/sources.list.d/vscode.sources << EOF
+Types: deb
+URIs: https://packages.microsoft.com/repos/code
+Suites: stable
+Components: main
+Architectures: amd64,arm64,armhf
+Signed-By: /usr/share/keyrings/microsoft.gpg
+EOF
 
-        sudo apt install -qy apt-transport-https
-        sudo apt update
-        sudo apt install -qy code --no-install-recommends
-        )
+sudo apt install -qy apt-transport-https
+sudo apt update
+sudo apt install -qy code --no-install-recommends
+)
+```
+
+Generate a slicer configuration file:
+
+```bash
+slicer new vscode \
+  --userdata-file vscode.sh \
+  > vscode.yaml
+```
+
+Use the `--ssh-key` or `--github` flags to add your ssh keys so you can connect to the VSCode remote instance over SSH. 
+
+Start the VM with the following command:
+
+```bash
+sudo -E slicer up ./vscode.yaml
 ```
 
 You can watch the installation by adding the [fstail](https://github.com/alexellis/fstail) tool via `arkade get fstail`.
