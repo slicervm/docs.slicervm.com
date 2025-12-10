@@ -23,35 +23,22 @@ Create an empty hostgroup configuration.
 
 For the fastest possible boot times, [use ZFS for storage](/storage/zfs).
 
-If you don't have ZFS set up yet, you can simply replace the storage option with something like:
+If you don't have ZFS set up yet, you can simply replace the storage flags with something like:
 
-```yaml
-storage: image
-storage_size: 20G
+```bash
+--storage: image
 ```
 
-Create `tasks.yaml`:
+Create `tasks.yaml` slicer config:
 
-```yaml
-config:
-  host_groups:
-  - name: task
-    storage: zfs
-    count: 0
-    vcpu: 1
-    ram_gb: 2
-    network:
-      bridge: brtsk0
-      tap_prefix: tsktap
-      gateway: 192.168.138.1/24
-
-  api:
-    bind_address: 127.0.0.1
-    port: 8081
-
-  image: "ghcr.io/openfaasltd/slicer-systemd:5.10.240-x86_64-latest"
-
-  hypervisor: firecracker
+```bash
+slicer new buildkit \
+  --cpu 1 \
+  --ram 2 \
+  --count 0 \
+  --storage zfs \
+  --persistent false \
+  > tasks.yaml
 ```
 
 Now start up slicer:

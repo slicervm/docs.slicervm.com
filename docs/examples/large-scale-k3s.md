@@ -38,35 +38,17 @@ Let's go for the mid-ground with 24 nodes.
 
 Create `k3s-scale.yaml`:
 
-```yaml
-config:
-  host_groups:
-  - name: k3s
-    storage: zfs
-    persistent: true
-    count: 24
-    vcpu: 4
-    ram_gb: 8
-    network:
-      bridge: brscale0
-      tap_prefix: sctap
-      gateway: 192.168.137.1/24
-
-  github_user: alexellis
-
-  api:
-    port: 8080
-    bind_address: "127.0.0.1:"
-
-# Comment out the image depending on your system's architecture
-
-  image: "ghcr.io/openfaasltd/slicer-systemd-arm64:6.1.90-aarch64-latest"
-  # image: "ghcr.io/openfaasltd/slicer-systemd:5.10.240-x86_64-latest"
-
-  hypervisor: firecracker
+```bash
+slicer new k3s \
+  --storage zfs \
+  --persistent true \
+  --count 24 \
+  --vcpu 4 \
+  --ram_gb 8 \
+  > k3s-scale.yaml
 ```
 
-If you need to run the same test with a fresh cluster over and over again, you can change the `persistent: true` configuration to `persistent: false`. Then the snapshots will be discarded when Slicer exits. Otherwise, they are retained indefinitely.
+If you need to run the same test with a fresh cluster over and over again, you can change the `--persistent true` configuration to `--persistent false`. Then the snapshots will be discarded when Slicer exits. Otherwise, they are retained indefinitely.
 
 Now launch Slicer in a tmux window, so you can come back to it later:
 

@@ -21,21 +21,26 @@ This example is one-shot, so it's designed to run to completion once, without an
 
 ## Example config
 
-The slicer config will be adapted from the [walkthrough](/getting-started/walkthrough). When you create the YAML, name it `opencode.yaml`.
-
-Now, just add the `userdata_file` in the hostgroup section.
-
-`userdata_file: ./opencode.sh`
-
-And customise the `ssh_keys` or `github_user` fields so you can connect via SSH to review the logs, and/or scp to pull out any generated code.
-
-On a computer where you've pre-installed and authenticated opencode, create a base64 representation of the auth file:
+Use `slicer new` to generate a configuration file:
 
 ```bash
-# MacOS
-base64 --wrap 9999 ~/.local/share/opencode/auth.json
-# Linux
-base64 --cols 9999 ~/.local/share/opencode/auth.json
+slicer new opencode \
+  --userdata-file opencode.sh \
+  >  opencode.yaml
+```
+
+And the `--ssh-keys` or `--github` flag to add additional ssh keys so you can connect via SSH to review the logs, and/or scp to pull out any generated code.
+
+On a computer where you've pre-installed and authenticated opencode, copy the opencode auth config file `~/.local/share/opencode/auth.json`.
+
+On host create a slicer secret for the opencode auth config file.
+
+```bash
+sudo mkdir .secrets
+# Ensure only root can read/write to the secrets folder.
+sudo chmod 700 .secrets
+
+sudo -E cp ~/.local/share/opencode/auth.json .secrets/opencode-auth.json
 ```
 
 Then, create opencode.sh:
@@ -47,11 +52,6 @@ Then, create opencode.sh:
 
 set -euo pipefail
 
-# === set this ===
-# set base64 of ~/.local/share/opencode/auth.json}
-export OPENCODE_AUTH_JSON_B64=""
-# =================
-
 # Install opencode -> /usr/local/bin
 arkade get opencode --path /usr/local/bin >/dev/null
 chown ubuntu /usr/local/bin/opencode
@@ -62,7 +62,7 @@ for d in /home/ubuntu/workdir /home/ubuntu/.local/share/opencode /home/ubuntu/.l
   mkdir -p "$d"
   chown ubuntu "$d"
 done
-echo "$OPENCODE_AUTH_JSON_B64" | base64 -d > /home/ubuntu/.local/share/opencode/auth.json
+cp /run/slicer/secrets/opencode-auth.json /home/ubuntu/.local/share/opencode/auth.json
 chown ubuntu /home/ubuntu/.local/share/opencode/auth.json
 chmod 600 /home/ubuntu/.local/share/opencode/auth.json
 
@@ -185,4 +185,3 @@ scp -r ubuntu@192.168.137.2:/home/ubuntu/workdir .
 This was a very basic example to get you thinking - you could write your own program and use that to drive the whole interaction, rather than using systemd and bash.
 
 SSH could also be a better way to interact with the agent, rather than passing an initial prompt and token via the userdata file.
-

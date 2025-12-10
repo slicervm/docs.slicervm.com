@@ -30,7 +30,7 @@ Running within a microVM means you can run the agent in a secure, isolated envir
 
 ## Userdata script
 
-Populate the prompt section, and the API key with your own inputs.
+Populate the prompt section with your own inputs.
 
 Save as cursor.sh:
 
@@ -65,8 +65,8 @@ mkdir -p ~/.cursor/
 
 echo 'export PATH="$HOME/.local/bin:$PATH"' >> ./.bashrc
 
-# Set your CURSOR_API_KEY below - obtained from: https://cursor.com/dashboard?tab=background-agents
-echo "export CURSOR_API_KEY=" | tee -a ~/.bashrc
+# Add cursor CURSOR_API_KEY env variable
+echo "export CURSOR_API_KEY=$(cat /run/slicer/secrets/cursor-api-key)" | tee -a ~/.bashrc
 
 # Install playwright mcp tool for browsing web / fetching content
 # These steps could be built into a custom Slicer image to speed up boot time.
@@ -138,17 +138,25 @@ The approval file is not required if you do not use MCP tools.
 
 ## Config file
 
-Save the config file from the [walkthrough](/getting-started/walkthrough).
+Create a slicer VM secret for your Cursor API key (Obtained from: https://cursor.com/dashboard?tab=background-agents)
 
-Then add the userdata field within the hostgroup:
+Run the following, then paste in your API key, hit enter once, then Control + D to save the file.
 
-```diff
-config:
-  hostgroups:
-    - name: vm
-+     userdata: ./cursor.sh
+```bash
+sudo mkdir .secrets
+# Ensure only root can read/write to the secrets folder.
+sudo chmod 700 .secrets
+
+sudo cat > .secrets/cursor-api-key
 ```
 
+Use `slicer new` to generate a configuration file:
+
+```bash
+slicer new cursor \
+  --userdata-file cursor.sh \
+  > cursor.yaml
+```
 Save the resulting file as `cursor.yaml`.
 
 ## Give it a test run

@@ -20,31 +20,6 @@ This example is very minimal and covers the basic setup. You can expand it accor
 - Install and configure BuildKit automatically on first boot with a userdate script.
 - Set up Docker buildx to use the remote BuildKit instance.
 
-## VM configuration
-
-The Slicer configuration is adapted from the [walkthrough](/getting-started/walkthrough).
-When you create the YAML file, name it `buildkit.yaml`.
-
-We are going to use a userdata script to install and configure BuildKit on the first VM boot.
-
-Add the `userdata_file` to the hostgroup section:
-
-```yaml
-  host_groups:
-  - name: buildkit
-    userdata_file: ./buildkit.sh
-```
-
-For better build performance, consider increasing the VM resources:
-
-```yaml
-    vcpu: 4
-    ram_gb: 8
-    storage_size: 25G
-```
-
-Customize the `ssh_keys` or `github_user` fields so you can connect to the BuildKit instance over SSH. The [Docker buildx remote driver](https://docs.docker.com/build/builders/drivers/remote/) supports connection to a remote BuildKit instance over SSH.
-
 ## BuildKit installation script
 
 Create the `buildkit.sh` userdata script that will automatically install and configure BuildKit:
@@ -84,6 +59,26 @@ EOF
 
 sudo systemctl daemon-reload
 sudo systemctl enable --now buildkitd
+```
+
+## VM configuration
+
+Use `slicer new` to generate a configuration file:
+
+```bash
+slicer new buildkit \
+  --userdata-file buildkit.sh \
+  > buildkit.yaml
+```
+
+Use the `--ssh-key` or `--github` flags to add ssh keys so you can connect to the BuildKit instance over SSH. The [Docker buildx remote driver](https://docs.docker.com/build/builders/drivers/remote/) supports connection to a remote BuildKit instance over SSH.
+
+For better build performance, consider increasing the VM resources:
+
+```yaml
+    vcpu: 4
+    ram_gb: 8
+    storage_size: 25G
 ```
 
 ## Start the VM
