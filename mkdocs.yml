@@ -131,6 +131,7 @@ nav:
       - Serial Over SSH (SOS): reference/sos.md
       - VFIO Passthrough: reference/vfio.md
       - Troubleshooting: reference/troubleshooting.md
+      - VM Operations: reference/vm-operations.md
 # extra:
 #   analytics:
 #     provider: google
