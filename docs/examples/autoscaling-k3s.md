@@ -635,7 +635,7 @@ Look out to see if you've exceeded the maximum number of nodes for a node group 
 
 **Diagnose an issue within a worker node**
 
-The `slicer vm exec` command will give you a root shell directly into any worker node.
+The `slicer vm shell` command will give you a root shell directly into any worker node.
 
 On the host managing `k3s-agents-1`, you would run:
 

@@ -138,9 +138,9 @@ RUN systemctl disable regen-ssh-host-keys &&
     systemctl disable slicer-vmmeter
 ```
 
-After SSH is disabled, the only way to debug a machine is via the Slicer agent using `slicer vm exec` to get a shell.
+After SSH is disabled, the only way to debug a machine is via the Slicer agent using `slicer vm shell` to get a shell.
 
-You can also disable `slicer-ssh-agent` (not actually a full SSH daemon), however the `slicer vm` commands will no longer work.
+You can also disable `slicer-agent` (not actually a full SSH daemon), however the `slicer vm` commands will no longer work.
 
 If you publish an image to the Docker Hub, make sure you include its prefix i.e. `docker.io/owner/repo:tag`.
 

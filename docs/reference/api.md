@@ -206,9 +206,62 @@ HTTP GET
 
 HTTP GET
 
-This is an internal endpoint used by `slicer vm exec` to obtain a shell. It requires the `slicer-ssh-agent` service to be running within the guest microVM.
+This is an internal endpoint used by `slicer vm shell` to obtain a shell. It requires the `slicer-agent` service to be running within the guest microVM.
+
+`/vm/{hostname}/shell`
+
+## Copy files
+
+HTTP POST/GET
+
+`/vm/{hostname}/cp`
+
+Copy files to/from a VM. Requires the `slicer-agent` service running in the guest VM and `tar` utility available.
+
+**Copy to VM (POST):**
+- Content-Type: `application/x-tar`
+- Body: tar stream of files to copy
+- Query parameters:
+  - `path` (required): destination path in VM
+  - `uid` (optional): user ID for file ownership
+  - `gid` (optional): group ID for file ownership
+
+**Copy from VM (GET):**
+- Query parameters:
+  - `path` (required): source path in VM
+- Response: tar stream of requested files
+
+## Execute commands
+
+HTTP POST
 
 `/vm/{hostname}/exec`
+
+Execute commands on a VM. Requires the `slicer-agent` service running in the guest VM.
+
+Query parameters:
+- `cmd` (required): command to execute
+- `args` (optional, multiple): command arguments
+- `uid` (optional): user ID to run command as (default: 0)
+- `gid` (optional): group ID to run command as (default: 0)
+- `cwd` (optional): working directory
+- `shell` (optional): shell interpreter (default: /bin/bash)
+- `stdin` (optional): enable stdin pipe (true/false)
+- `permissions` (optional): file permissions for output
+
+Body: stdin data (if `stdin=true`)
+
+Response: streaming newline-delimited JSON with stdout/stderr/exit_code
+
+Example response stream:
+
+```json
+{"stdout":"Hello from VM\n","stderr":"","exit_code":0}
+{"stdout":"","stderr":"some error\n","exit_code":0}
+{"stdout":"","stderr":"","exit_code":0}
+```
+
+Each JSON object is separated by a newline character.
 
 ## Manage secrets
 
