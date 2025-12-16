@@ -115,6 +115,8 @@ nav:
       - OpenFaaS Edge (All-In-One): examples/openfaas-edge.md
   - Tasks:
       - Customise with userdata: tasks/userdata.md
+      - Copy files to/from a VM: tasks/copy-files.md
+      - Execute commands in a VM: tasks/execute-commands.md
       - Build a custom root filesystem: tasks/custom-image.md
       - Logs & Monitoring: tasks/monitoring.md
       - Share files with NFS: tasks/share-files-with-nfs.md
@@ -131,7 +133,6 @@ nav:
       - Serial Over SSH (SOS): reference/sos.md
       - VFIO Passthrough: reference/vfio.md
       - Troubleshooting: reference/troubleshooting.md
-      - VM Operations: reference/vm-operations.md
 # extra:
 #   analytics:
 #     provider: google
