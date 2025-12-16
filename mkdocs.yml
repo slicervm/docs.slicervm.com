@@ -119,6 +119,7 @@ nav:
       - Logs & Monitoring: tasks/monitoring.md
       - Share files with NFS: tasks/share-files-with-nfs.md
       - Nested Virtualization: tasks/nested-virtualization.md
+      - Execute commands in VMs with the SDK: tasks/execute-commands-with-sdk.md
   - Storage:
       - Overview: storage/overview.md
       - ZFS: storage/zfs.md
