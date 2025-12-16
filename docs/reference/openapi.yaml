@@ -1,0 +1,676 @@
+openapi: 3.0.3
+info:
+  title: Slicer API
+  description: |
+    REST API for managing Slicer micro-VMs, host groups, and secrets.
+
+    ## Authentication
+
+    For production deployments with auth enabled, send an `Authorization: Bearer TOKEN` header.
+    The token is stored at `/var/lib/slicer/auth/token`.
+
+    ## Conventions
+
+    - Content-Type: application/json
+    - Timestamps: RFC3339 format
+    - IDs: opaque strings returned by the API
+    - Trailing slashes may cause errors (use `/nodes` not `/nodes/`)
+  version: 1.0.0
+  contact:
+    name: Slicer
+    url: https://slicervm.com
+  license:
+    name: Proprietary
+
+servers:
+  - url: http://127.0.0.1:8080
+    description: Local development server
+
+security:
+  - BearerAuth: []
+
+paths:
+  /healthz:
+    get:
+      summary: Health check
+      description: Check service liveness
+      operationId: healthCheck
+      tags:
+        - Health
+      security: []
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /nodes:
+    get:
+      summary: List all nodes
+      description: Returns a list of all VM nodes across all host groups
+      operationId: listNodes
+      tags:
+        - Nodes
+      responses:
+        '200':
+          description: List of nodes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Node'
+
+  /nodes/stats:
+    get:
+      summary: Get node statistics
+      description: |
+        Returns detailed consumption metrics for all nodes.
+        Requires the `slicer-vmmeter` service to be running in VMs.
+      operationId: getNodeStats
+      tags:
+        - Nodes
+      responses:
+        '200':
+          description: Node statistics
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/NodeStat'
+
+  /hostgroup:
+    get:
+      summary: List host groups
+      description: Returns all configured host groups
+      operationId: listHostGroups
+      tags:
+        - Host Groups
+      responses:
+        '200':
+          description: List of host groups
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HostGroup'
+
+  /hostgroup/{name}/nodes:
+    post:
+      summary: Create a node
+      description: Creates a new VM node within a host group
+      operationId: createNode
+      tags:
+        - Host Groups
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: Host group name
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateNodeRequest'
+      responses:
+        '201':
+          description: Node created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateNodeResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /hostgroup/{name}/nodes/{hostname}:
+    delete:
+      summary: Delete a node
+      description: Deletes a VM node from a host group
+      operationId: deleteNode
+      tags:
+        - Host Groups
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: Host group name
+          schema:
+            type: string
+        - name: hostname
+          in: path
+          required: true
+          description: VM hostname
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Node deleted successfully
+        '404':
+          description: Node not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /vm/{hostname}/logs:
+    get:
+      summary: Get VM logs
+      description: Returns serial console logs from a VM
+      operationId: getVMLogs
+      tags:
+        - VMs
+      parameters:
+        - name: hostname
+          in: path
+          required: true
+          description: VM hostname
+          schema:
+            type: string
+        - name: lines
+          in: query
+          required: false
+          description: |
+            Number of lines to return from the end of the log.
+            Default is 20. Use 0 to return all lines.
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: VM logs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogsResponse'
+        '404':
+          description: VM not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /vm/{hostname}/exec:
+    get:
+      summary: Execute shell (internal)
+      description: |
+        Internal endpoint used by `slicer vm exec` to obtain a shell.
+        Requires the `slicer-ssh-agent` service running in the guest VM.
+      operationId: execVM
+      tags:
+        - VMs
+      parameters:
+        - name: hostname
+          in: path
+          required: true
+          description: VM hostname
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Shell session established
+
+  /secrets:
+    get:
+      summary: List secrets
+      description: Returns all stored secrets (metadata only, not values)
+      operationId: listSecrets
+      tags:
+        - Secrets
+      responses:
+        '200':
+          description: List of secrets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Secret'
+    post:
+      summary: Create a secret
+      description: Creates a new secret with base64-encoded data
+      operationId: createSecret
+      tags:
+        - Secrets
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSecretRequest'
+      responses:
+        '201':
+          description: Secret created
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Secret already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /secrets/{name}:
+    patch:
+      summary: Update a secret
+      description: Updates an existing secret
+      operationId: updateSecret
+      tags:
+        - Secrets
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: Secret name
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSecretRequest'
+      responses:
+        '200':
+          description: Secret updated
+        '404':
+          description: Secret not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      summary: Delete a secret
+      description: Deletes a secret by name
+      operationId: deleteSecret
+      tags:
+        - Secrets
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: Secret name
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Secret deleted
+        '404':
+          description: Secret not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: Token from /var/lib/slicer/auth/token
+
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: ok
+      required:
+        - status
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
+        code:
+          type: string
+          description: Optional error code
+      required:
+        - error
+
+    Node:
+      type: object
+      properties:
+        hostname:
+          type: string
+          description: VM hostname
+          example: vm-1
+        ip:
+          type: string
+          description: VM IP address
+          example: 192.168.137.2
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp (RFC3339)
+        arch:
+          type: string
+          description: Architecture (x86_64, aarch64)
+          example: x86_64
+        tags:
+          type: array
+          items:
+            type: string
+          description: VM tags
+          example: ["buildkit", "dev"]
+      required:
+        - hostname
+        - ip
+        - created_at
+
+    HostGroup:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Host group name
+          example: api
+        count:
+          type: integer
+          description: Number of VMs in the group
+          example: 2
+        ram_gb:
+          type: integer
+          description: RAM allocated per VM in GB
+          example: 4
+        cpus:
+          type: integer
+          description: vCPUs allocated per VM
+          example: 2
+        arch:
+          type: string
+          description: Architecture
+          example: x86_64
+        gpu_count:
+          type: integer
+          description: Number of GPUs (if applicable)
+          example: 0
+      required:
+        - name
+        - count
+        - ram_gb
+        - cpus
+
+    CreateNodeRequest:
+      type: object
+      properties:
+        ram_gb:
+          type: integer
+          description: RAM in GB (overrides host group default)
+          example: 4
+        cpus:
+          type: integer
+          description: Number of vCPUs (overrides host group default)
+          example: 2
+        tags:
+          type: array
+          items:
+            type: string
+          description: Tags to apply to the VM
+          example: ["buildkit"]
+        import_user:
+          type: string
+          description: GitHub username to import SSH keys from
+          example: alexellis
+        userdata:
+          type: string
+          description: Bootstrap script (must be JSON-encoded)
+          example: "#!/bin/bash\napt update"
+        ssh_keys:
+          type: array
+          items:
+            type: string
+          description: SSH public keys to add
+        secrets:
+          type: array
+          items:
+            type: string
+          description: Secret names to mount in the VM
+
+    CreateNodeResponse:
+      type: object
+      properties:
+        hostname:
+          type: string
+          description: Assigned hostname
+          example: api-1
+        ip:
+          type: string
+          description: Assigned IP address
+          example: 192.168.137.2
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        arch:
+          type: string
+          description: Architecture
+          example: x86_64
+      required:
+        - hostname
+        - ip
+        - created_at
+
+    LogsResponse:
+      type: object
+      properties:
+        hostname:
+          type: string
+          description: VM hostname
+        lines:
+          type: integer
+          description: Number of lines returned
+        content:
+          type: string
+          description: Log content
+      required:
+        - hostname
+        - lines
+        - content
+
+    NodeStat:
+      type: object
+      properties:
+        hostname:
+          type: string
+        ip:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        snapshot:
+          $ref: '#/components/schemas/Snapshot'
+        error:
+          type: string
+          description: Error message if metrics unavailable
+      required:
+        - hostname
+        - ip
+        - created_at
+
+    Snapshot:
+      type: object
+      description: VM metrics snapshot from slicer-vmmeter
+      properties:
+        hostname:
+          type: string
+        arch:
+          type: string
+          example: x86_64
+        timestamp:
+          type: string
+          format: date-time
+        uptime:
+          type: string
+          example: 6m53s
+        totalCpus:
+          type: integer
+        totalMemory:
+          type: integer
+          format: int64
+          description: Total memory in bytes
+        memoryUsed:
+          type: integer
+          format: int64
+        memoryAvailable:
+          type: integer
+          format: int64
+        memoryUsedPercent:
+          type: number
+          format: double
+        loadAvg1:
+          type: number
+          format: double
+        loadAvg5:
+          type: number
+          format: double
+        loadAvg15:
+          type: number
+          format: double
+        diskReadTotal:
+          type: number
+          format: double
+        diskWriteTotal:
+          type: number
+          format: double
+        networkReadTotal:
+          type: number
+          format: double
+        networkWriteTotal:
+          type: number
+          format: double
+        diskIOInflight:
+          type: integer
+          format: int64
+        openConnections:
+          type: integer
+          format: int64
+        openFiles:
+          type: integer
+          format: int64
+        entropy:
+          type: integer
+          format: int64
+        diskSpaceTotal:
+          type: integer
+          format: int64
+        diskSpaceUsed:
+          type: integer
+          format: int64
+        diskSpaceFree:
+          type: integer
+          format: int64
+        diskSpaceUsedPercent:
+          type: number
+          format: double
+
+    Secret:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Unique secret name
+          example: my-secret
+        size:
+          type: integer
+          format: int64
+          description: Size in bytes
+          example: 1024
+        permissions:
+          type: string
+          description: File permissions
+          example: "0600"
+        uid:
+          type: integer
+          format: int32
+          description: Owner user ID
+          example: 1000
+        gid:
+          type: integer
+          format: int32
+          description: Owner group ID
+          example: 1000
+        modified_at:
+          type: string
+          format: date-time
+          description: Last modification timestamp
+      required:
+        - name
+        - size
+        - permissions
+
+    CreateSecretRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Unique secret name
+          example: my-secret
+        data:
+          type: string
+          description: Base64-encoded secret content
+        permissions:
+          type: string
+          description: File permissions (defaults to system default)
+          example: "0600"
+        uid:
+          type: integer
+          format: int32
+          description: Owner user ID (defaults to root)
+          example: 1000
+        gid:
+          type: integer
+          format: int32
+          description: Owner group ID (defaults to root)
+          example: 1000
+      required:
+        - name
+        - data
+
+    UpdateSecretRequest:
+      type: object
+      properties:
+        data:
+          type: string
+          description: Base64-encoded secret content
+        permissions:
+          type: string
+          description: File permissions
+          example: "0644"
+        uid:
+          type: integer
+          format: int32
+          description: Owner user ID
+        gid:
+          type: integer
+          format: int32
+          description: Owner group ID
+
+tags:
+  - name: Health
+    description: Health check endpoints
+  - name: Nodes
+    description: VM node management
+  - name: Host Groups
+    description: Host group and VM lifecycle management
+  - name: VMs
+    description: VM-specific operations
+  - name: Secrets
+    description: Secret management
