@@ -117,9 +117,10 @@ nav:
       - Customise with userdata: tasks/userdata.md
       - Copy files to/from a VM: tasks/copy-files.md
       - Execute commands in a VM: tasks/execute-commands.md
+      - Expose ports from a VM: tasks/expose-ports.md
       - Build a custom root filesystem: tasks/custom-image.md
       - Logs & Monitoring: tasks/monitoring.md
-      - Share files with NFS: tasks/share-files-with-nfs.md
+      - Share files over NFS: tasks/share-files-with-nfs.md
       - Nested Virtualization: tasks/nested-virtualization.md
   - Storage:
       - Overview: storage/overview.md

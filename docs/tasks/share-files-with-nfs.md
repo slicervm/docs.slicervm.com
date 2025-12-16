@@ -1,6 +1,10 @@
 # Share files between host and VM with NFS
 
-[NFS](https://wiki.archlinux.org/title/NFS) (Network File System) provides a simple way to share files between your host machine and Slicer VMs. This is particularly useful for development workflows, data processing, or when you need persistent storage that survives VM restarts.
+Neither Firecracker nor Cloud Hypervisor support "shared folders" natively, but it is on the immediate roadmap to add this capability to the `slicer-agent`.
+
+For the time being, one of the most convenient options is to use [NFS (Network File System)](https://en.wikipedia.org/wiki/Network_File_System) to share files between your host machine and Slicer VMs. This is particularly useful for development workflows, data processing, or when you need persistent storage that survives VM restarts.
+
+You should also consider [`slicer cp`](/tasks/copy-files) as an alternative to NFS, along with a self-hosted S3 server and SSH-based solutions like sshfs, sftp, scp and restic.
 
 This example shows you how to set up an NFS server on your host machine and mount it from within a Slicer VM.
 
