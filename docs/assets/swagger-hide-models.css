@@ -1,0 +1,4 @@
+/* Hide the info section (title, description, version) */
+.information-container {
+  display: none !important;
+}

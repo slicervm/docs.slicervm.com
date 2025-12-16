@@ -53,6 +53,9 @@ extra:
 
 plugins:
   - search
+  - swagger-ui-tag:
+      extra_css:
+        - assets/swagger-hide-models.css
 
 markdown_extensions:
   - attr_list
