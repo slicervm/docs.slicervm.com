@@ -1,6 +1,6 @@
 # Secrets Management
 
-Slicer provides a secure secrets management system that enables sharing of sensitive data between the host and guest VMs through a VSOCK-based secrets server. Secrets are stored on the host and synchronized to guest VMs via the slicer-agent service.
+Slicer provides a secure secrets management system that enables sharing of sensitive data between the host and guest VMs through a VSOCK-based secrets server. Secrets are stored on the host and synchronized to guest VMs via the `slicer-agent` service.
 
 ## Common Use Cases
 

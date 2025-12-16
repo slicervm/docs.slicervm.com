@@ -30,7 +30,7 @@ The token will be saved to: `/var/lib/slicer/auth/token`.
 
 Send an `Authorization: Bearer TOKEN` header for authenticated Slicer daemons.
 
-If you intend to expose the Slicer API over the Internet using something like a [self-hosted inlets tunnel](https://inlets.dev/), or [Inlets Cloud](https://cloud.inlets.dev), then make sure you use the TLS termination option.
+If you intend to expose the Slicer API over the Internet using something like a [self-hosted inlets tunnel](https://inlets.dev/), or [Inlets Cloud](https://cloud.inlets.dev), then make sure you use the "we terminate TLS for you" option.
 
 i.e.
 
@@ -77,6 +77,23 @@ Response 200:
 ```json
 { "status": "ok" }
 ```
+
+## Slicer Agent Health
+
+The VM Agent provides:
+
+* Serial console/Shell sessions
+* File copying
+* Remote command execution
+* Health check/readiness of the agent itself
+
+So before accessing any of these endpoints, it makes sense to first check whether the agent is healthy and accessible, especially if the VM is being booted up via code, then automated immediately afterwards.
+
+For automation, you can use the `HEAD` method to simply check if the agent is started.
+
+To get additional data like System Uptime, Agent Uptime and Agent Version, use a HTTP `GET` method.
+
+`/vm/{hostname}/health`
 
 ## List nodes
 
@@ -202,23 +219,34 @@ HTTP GET
 ]
 ```
 
-### Execute a shell
-
-HTTP GET
-
-This is an internal endpoint used by `slicer vm shell` to obtain a shell. It requires the `slicer-agent` service to be running within the guest microVM.
-
-`/vm/{hostname}/shell`
-
-## Copy files
+## Copy files to and from the microVM
 
 HTTP POST/GET
 
 `/vm/{hostname}/cp`
 
-Copy files to/from a VM. Requires the `slicer-agent` service running in the guest VM and `tar` utility available.
+Copy files to/from a VM. This endpoint requires the `slicer-agent` service to be running in the target VM.
 
-**Copy to VM (POST):**
+Files or directories are always streamed, and not buffered in memory or on disk.
+
+* Files are copied using `binary` mode, where the request or response body is the binary data of the file being copied.
+* Directories can be copied using `tar` without compression. When copying folders in either direction, very little metadata is preserved, so you may also want to combine additional options such as `uid` or `gid`, or run your own `chown` via the exec endpoint after the copy.
+
+For the highest level of fidelity, you can create your own tar and copy it as a file. 
+
+### Copy a file or folder to the VM
+
+**Copy a file to the VM**
+
+- Content-Type: `application/octet-stream`
+- Body: binary data of file to copy
+- Query parameters:
+  - `path` (required): destination path in VM
+  - `uid` (optional): user ID for file ownership
+  - `gid` (optional): group ID for file ownership
+
+**Copy a directory to the VM**
+
 - Content-Type: `application/x-tar`
 - Body: tar stream of files to copy
 - Query parameters:
@@ -226,10 +254,23 @@ Copy files to/from a VM. Requires the `slicer-agent` service running in the gues
   - `uid` (optional): user ID for file ownership
   - `gid` (optional): group ID for file ownership
 
-**Copy from VM (GET):**
+### Copy a file or folder from the microVM
+
+The same applies as copying a file to the VM, however it works in the reverse. Instead of sending a `Content-Type` header, an `Accept` header is used to indicate whether to use `tar` mode or `binary` mode.
+
+**Copy a file to the client**
+
+- Accept: `application/octet-stream`
 - Query parameters:
-  - `path` (required): source path in VM
-- Response: tar stream of requested files
+  - `path` (required): destination path in VM
+- Response: binary data of file
+
+**Copy a directory to the client**
+
+- Accept: `application/octet-stream`
+- Query parameters:
+  - `path` (required): destination path in VM
+- Response: binary data of directory
 
 ## Execute commands
 
@@ -247,7 +288,6 @@ Query parameters:
 - `cwd` (optional): working directory
 - `shell` (optional): shell interpreter (default: /bin/bash)
 - `stdin` (optional): enable stdin pipe (true/false)
-- `permissions` (optional): file permissions for output
 
 Body: stdin data (if `stdin=true`)
 
@@ -262,6 +302,14 @@ Example response stream:
 ```
 
 Each JSON object is separated by a newline character.
+
+Note that the `exit_code` variable is an integer so will always be populated with `0`. This is a limitation of JSON serialisation, so to determine the actual exit code, wait until the TCP connection has been disconnected, and keep track of the final exit code value that is received.
+
+The `error` variable may also be populated if there was a problem running, starting, or finding the requested binary or shell to execute. For example:
+
+```json
+{"error": "Some error message", "exit_code": 1}
+```
 
 ## Manage secrets
 
@@ -317,3 +365,14 @@ HTTP DELETE
 `/secrets/{name}`
 
 Response 200: No content
+
+
+### Obtain an interactive shell / serial console
+
+HTTP GET
+
+This is endpoint is used by `slicer vm shell` to obtain a shell without needing SSH to be listening in the VM, or to be exposed on any network adapters. It replaces the concept of a serial console from a traditional headless server. No routable access to the VM or its subnet is required, only the REST API of Slicer.
+
+This endpoint is only available in a VM if the `slicer-agent` service is running. The CLI is the only official client compatible with this functionality.
+
+`/vm/{hostname}/shell`
