@@ -317,7 +317,7 @@ Create a `values-slicer.yaml` file to configure the Cluster Autoscaler Helm char
 fullnameOverride: slicer-cluster-autoscaler
 
 image:
-  repository: docker.io/openfaasltd/cluster-autoscaler-slicer
+  repository: ghcr.io/openfaasltd/cluster-autoscaler-slicer
   tag: latest
 
 cloudProvider: slicer
