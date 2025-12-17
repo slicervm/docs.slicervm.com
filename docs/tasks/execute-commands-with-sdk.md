@@ -80,7 +80,6 @@ func run() error {
 	createReq := sdk.SlicerCreateNodeRequest{
 		RamGB:    8, // 8GB RAM
 		CPUs:     4, // 4 CPU cores for video processing
-		Userdata: "apt update && apt install -y ffmpeg",
 	}
 
 	// Create VM in the 'sdk' host group
@@ -164,6 +163,8 @@ Use `Exec()` to install ffmpeg into the VM.
 		}
 	}
 ```
+
+To speed up the workflow, instead of installing required packages each time, you could derive a custom image with ffmpeg pre-installed. See [Build a custom image](/tasks/custom-image/) for more info.
 
 #### Step 4: Transfer files and run Exec
 
@@ -296,7 +297,6 @@ func run() error {
 	createReq := sdk.SlicerCreateNodeRequest{
 		RamGB:    8, // 8GB RAM
 		CPUs:     4, // 4 CPU cores for video processing
-		Userdata: "apt update && apt install -y ffmpeg",
 	}
 
 	// Create VM in the 'sdk' host group
