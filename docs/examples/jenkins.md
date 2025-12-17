@@ -13,7 +13,7 @@ Read how Slicer works and compares to the Docker( Docker In Docker / Docker Sock
 
 Watch a video walkthrough on our [YouTube channel](https://www.youtube.com/watch?v=LSUVBGfzf3s).
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/5RjtVM4bvp0?si=LSUVBGfzf3s" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/LSUVBGfzf3s?si=8bZhRXRVUT9RlEHW" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 ## 1. Run a Jenkins master
 
