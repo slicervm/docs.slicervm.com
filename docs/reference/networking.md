@@ -122,9 +122,9 @@ The `drop` list contains CIDR blocks that should be blocked for all microVMs in 
 
 ### Isolated Mode and Netplan
 
-Netplan can take over the veth pair that Slicer creates for the isolated network mode. NetworkManager doesn't tend to have this issue.
+On Ubuntu 22.04 (Server), netplan can take over the veth pair that Slicer creates for the isolated network mode. NetworkManager doesn't tend to have this issue and ships with Ubuntu Desktop.
 
-If you run into issues, run the following:
+If you run into issues (confirmed by `ip addr` showing no IP on the `ve-` interfaces), run the following:
 
 ```bash
 cat > /etc/systemd/network/00-veth-ignore.network <<EOF
