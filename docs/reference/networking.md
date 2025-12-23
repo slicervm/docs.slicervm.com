@@ -153,6 +153,6 @@ ManageForeignRoutes=no
 Then reload and restart Slicer and the isolated network mode microVMs:
 
 ```bash
-sudo chmod 644 /etc/systemd/network/10-veth-ignore.network
+sudo chmod 644 /etc/systemd/network/00-veth-ignore.network
 sudo systemctl restart systemd-networkd
 ```
