@@ -133,6 +133,7 @@ nav:
       - SSH access to VMs: reference/ssh.md
       - Secret management: reference/secrets.md
       - Serial Over SSH (SOS): reference/sos.md
+      - Networking: reference/networking.md
       - VFIO Passthrough: reference/vfio.md
       - Troubleshooting: reference/troubleshooting.md
 # extra:
