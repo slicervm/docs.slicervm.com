@@ -127,6 +127,8 @@ On Ubuntu 22.04 (Server), netplan can take over the veth pair that Slicer create
 If you run into issues (confirmed by `ip addr` showing no IP on the `ve-` interfaces), run the following:
 
 ```bash
+sudo -i # Elevate to a root shell
+
 cat > /etc/systemd/network/00-veth-ignore.network <<EOF
 [Match]
 Name=ve-* veth*
@@ -137,6 +139,7 @@ Unmanaged=yes
 
 [Network]
 KeepConfiguration=yes
+EOF
 ```
 
 Edit `/etc/systemd/networkd.conf`, then update the `[Network]` section:
