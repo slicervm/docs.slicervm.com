@@ -120,3 +120,22 @@ The range of `169.254.100.0/22` gives 127 usable IP address blocks, each contain
 
 The `drop` list contains CIDR blocks that should be blocked for all microVMs in this hostgroup. In the example above, all microVMs will have all traffic to the standard LAN network `192.168.1.0/24` dropped before it has a chance to leave the private network namespace.
 
+### Isolated Mode and Netplan
+
+Netplan can take over the veth pair that Slicer creates for the isolated network mode. NetworkManager doesn't tend to have this issue.
+
+If you run into issues, run the following:
+
+```bash
+cat > /etc/systemd/network/10-slicer-veth.network <<EOF
+[Match]
+Name=ve-*
+
+[Network]
+DHCP=no
+LinkLocalAddressing=no
+IPv6AcceptRA=no
+EOF
+```
+
+Followed by `sudo systemctl restart systemd-networkd`, then relaunch the Slicer daemon and microVMs.
