@@ -127,15 +127,18 @@ Netplan can take over the veth pair that Slicer creates for the isolated network
 If you run into issues, run the following:
 
 ```bash
-cat > /etc/systemd/network/10-slicer-veth.network <<EOF
+cat > /etc/systemd/network/10-veth-ignore.network <<EOF
 [Match]
-Name=ve-*
+Name=veth*
 
-[Network]
-DHCP=no
-LinkLocalAddressing=no
-IPv6AcceptRA=no
+[Link]
+Unmanaged=yes
 EOF
 ```
 
-Followed by `sudo systemctl restart systemd-networkd`, then relaunch the Slicer daemon and microVMs.
+Then reload and restart Slicer and the isolated network mode microVMs:
+
+```bash
+sudo chmod 644 /etc/systemd/network/10-veth-ignore.network
+sudo systemctl restart systemd-networkd
+```
