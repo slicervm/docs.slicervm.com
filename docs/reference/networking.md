@@ -102,6 +102,7 @@ Cons:
 
 * Newer mode, less tested than bridge or CNI modes
 * Additional complexity in managing the network namespaces and cleaning up all resources in error conditions or crashes
+* Maximum node group name including the suffix `-` and a number, can't be longer than 15 characters. I.e. `agents-1` up to `agents-1000` is fine, but `isolated-agents-1` would not fit.
 
 Example:
 
