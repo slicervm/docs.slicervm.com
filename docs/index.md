@@ -1,6 +1,10 @@
 # Introduction to Slicer
 
-Slicer turns any machine into your own private cloud from a Raspberry Pi to a mini PC to a cloud server in minutes.
+[Slicer](https://slicervm.com) (aka SlicerVM) turns any machine into your own private microVM cloud using [Firecracker](https://firecracker-microvm.github.io/) or [Cloud Hypervisor](https://cloud-hypervisor.org/). Not only can you run applications like websites, databases, APIs, or Kubernetes clusters, you can also launch a VM via API and control it programmatically.
+
+Slicer aims to be lightweight, easy to use, but also programmatic and scriptable - making it ideal for long or short lived jobs, AI agents, bots, and CI runners.
+
+You probably have what you need to try it out - a laptop, mini PC, old Intel NUC, or a Raspberry Pi 4/5 will do just fine. Bare-metal cloud from vendors like Hetzner make running Slicer in production, with a public IP, industrial-grade power, and reliable Internet connection a breeze.
 
 It's ideal for learning & experimentation - and powerful enough for R&D, customer support, and even production workloads
 
