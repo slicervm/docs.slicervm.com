@@ -49,7 +49,7 @@ config:
 * `ram_gb` - the amount of RAM in GB to allocate to each VM
 * `storage` - image is the simplest option to get started
 * `storage_size` - for storage backends which support it, you can specify the size of the disk
-* `github_user` - your GitHub username, used to fetch your public SSH keys from your profile - additional SSH keys can be added via the [ssh_keys](/docs/reference/ssh) API.
+* `github_user` - your GitHub username, used to fetch your public SSH keys from your profile - additional SSH keys can be added via the [ssh_keys](/reference/ssh) API.
 
 The HTTP API is enabled by default and can be disabled with `enabled: false`.
 
