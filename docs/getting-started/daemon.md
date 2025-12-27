@@ -2,9 +2,14 @@
 
 The term "daemon" is a well established phrase from UNIX meaning a process that runs in the background. Daemons are usually managed by an init system which can monitor and restart them.
 
+Do you need to run Slicer as a systemd service right off the bat? It bepends.
+
+> You may not need a systemd service if you're still in the development and testing phase.
+> It's easier and more convenient to start running Slicer in a `tmux`. You can attach and detach as you like, and it'll stay running in the background. A permanent service comes in useful when you need to run Slicer on boot-up and to ensure it gets restarted if it crashes for any reason. Learn how [Alex uses tmux to run processes in the background](https://www.youtube.com/watch?v=kOWlpUiYNlg).
+
 Not only can we monitor Slicer's logs via `journalctl`, but we can manage it with standard `systemctl` commands.
 
-Let's take the example from the [walkthrough](/getting-started/walkthrough) and create a systemd service for it:
+Let's take the example from the [walkthrough](/getting-started/walkthrough) and create a systemd service for it.
 
 Create a service named i.e. `vm-image.service`:
 
