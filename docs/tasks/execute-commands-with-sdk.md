@@ -437,4 +437,4 @@ Possible VM lifecycle strategies:
 ## Next Steps
 
 * Review the [SDK reference](https://github.com/slicervm/sdk)
-* Explore the [REST API documentation](/docs/api) for direct integrations
+* Explore the [REST API documentation](/reference/api/) for direct integrations

@@ -8,7 +8,7 @@ The secrets system is ideal for securely sharing database credentials, API keys 
 
 ## How it works
 
-1. Secrets are created manually or through the Slicer CLI or [API](https://docs.slicervm.com/docs/reference/api#manage-secrets). Secrets are stored securely on the host filesystem in the `.secrets` folder.
+1. Secrets are created manually or through the Slicer CLI or [API](/reference/api#manage-secrets). Secrets are stored securely on the host filesystem in the `.secrets` folder.
 
 2. A HTTP secrets server listing on the host VSOCK is started when launching each VM.
 

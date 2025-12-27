@@ -243,7 +243,7 @@ slicer new slave \
 * `--ssh-keys` - add any public keys you want to be able to SSH into the slave VMs - we recommend this over `--github` since it's much faster than querying GitHub for every launch
 * `--graceful-shutdown false` - slaves are ephemeral so we don't need to wait for a graceful shutdown - it will be destroyed immediately when the job is done
 
-We recommend that you use [ZFS-backed storage](/docs/storage/zfs) for the slaves because with ZFS, a snapshot is unpacked when Slicer starts up and it can be cloned instantly.
+We recommend that you use [ZFS-backed storage](/storage/zfs) for the slaves because with ZFS, a snapshot is unpacked when Slicer starts up and it can be cloned instantly.
 
 If you don't have time to set up ZFS and are only experimenting, then you can make the following change (but it may add a few seconds to each launch time):
 
