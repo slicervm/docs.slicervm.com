@@ -32,6 +32,19 @@ See initial customer interest via this [X/Twitter post](https://x.com/alexellisu
 [![Slicer running on a Raspberry Pi 5 with NVMe](images/rpi5.png)](https://youtu.be/f_YAbqI7YoQ)
 > Slicer running on a Raspberry Pi 5 with NVMe. Click above to watch the video.
 
+## Slicer Architecture
+
+You can run Slicer with a predefined count of VMs as set via its YAML configuration file, or launch it with a VM count of 0, and only create then on demand via the API.
+
+The Slicer binary itself contains a client for the API for managing the VMs, and SDK is also made available for Go.
+
+![Slicer Architecture](/images/slicer-arch.svg)
+> Slicer is run as a daemon, and VMs can be launched when it starts up, or on demand via the API.
+
+Before you can launch a microVM, you need to create a YAML configuration file and at least one host group. The host group sets the networking, and resources to be used by the VM. 
+
+The slicer-agent runs in the guest to provide: secrets syncing, port-forwarding, command execution, file copying and an interactive Shell Over SSH (SOS).
+
 ## Target users for Slicer
 
 ### The learner, the experimenter - let's make VMs fun again
