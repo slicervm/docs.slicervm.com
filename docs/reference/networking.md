@@ -1,5 +1,12 @@
 # Networking modes for Slicer microVMs
 
+Table of contents:
+
+* [Bridge Networking](#bridge-networking)
+* [CNI Networking](#cni-networking)
+* [Isolated Mode Networking](#isolated-mode-networking)
+* [Isolated Mode and Netplan](#isolated-mode-and-netplan)
+
 Both Firecracker and Cloud Hypervisor microVMs use TAP devices for networking. A Linux TAP operates at Layer 2 (Data Link Layer), one end is attached to the microVM, and the other end is attached to the host system.
 
 Slicer supports multiple networking modes for microVMs, each with their own pros and cons. Generally, you should use the default option (Bridge Networking) unless you have specific requirements that need a different mode.
@@ -111,7 +118,6 @@ config:
   host_groups:
     - name: isolated
       network:
-        tap_prefix: vmtap
         mode: "isolated"
         range: "169.254.100.0/22"
         drop: ["192.168.1.0/24"]
