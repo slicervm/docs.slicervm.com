@@ -84,7 +84,7 @@ Example:
 ```yaml
 config:
   host_groups:
-    - name: isolated
+    - name: vm
   network_name: "slicer"
 ```
 
@@ -97,6 +97,15 @@ The `slicer` network is defined at: `/etc/cni/net.d/51-slicer.conflist` and can 
 Isolated Mode networking is the newest option, and will come in a future release of Slicer.
 
 In this mode, each microVM's TAP is created in a private network namespace, then connected to the host via a veth pair.
+
+Any additional host groups should use the next consecutive subnet within the given range, i.e.
+
+* `169.254.100.0/22`
+* `169.254.104.0/22`
+* `169.254.108.0/22`
+* `169.254.112.0/22`
+
+When Slicer is running on various different hosts, you can re-use the same subnet ranges on different machines. If Slicer is running multiple times on the same host (or if one instance contains more than one host group), then you need to use non-overlapping subnets.
 
 Pros:
 
@@ -111,7 +120,7 @@ Cons:
 * Additional complexity in managing the network namespaces and cleaning up all resources in error conditions or crashes
 * Maximum node group name including the suffix `-` and a number, can't be longer than 15 characters. I.e. `agents-1` up to `agents-1000` is fine, but `isolated-agents-1` would not fit.
 
-Example:
+Example dropping requests to `192.168.1.0/24`, allowing all other traffic:
 
 ```yaml
 config:
@@ -127,7 +136,17 @@ The range of `169.254.100.0/22` gives 127 usable IP address blocks, each contain
 
 The `drop` list contains CIDR blocks that should be blocked for all microVMs in this hostgroup. In the example above, all microVMs will have all traffic to the standard LAN network `192.168.1.0/24` dropped before it has a chance to leave the private network namespace.
 
-### Isolated Mode and Netplan
+### Firewall
+
+There is both a `drop` and an `allow` list that can be given in the networking section.
+
+When only `drop` is given, all other traffic is allowed which hasn't been explicitly blocked.
+
+When only `allow` is given, all other traffic is blocked which hasn't been explicitly allowed.
+
+When neither `drop`, nor `allow` are given, then all traffic is allowed.
+
+### Additional configuration for Netplan
 
 On Ubuntu 22.04 (Server), netplan can take over the veth pair that Slicer creates for the isolated network mode. NetworkManager doesn't tend to have this issue and ships with Ubuntu Desktop.
 
