@@ -5,8 +5,8 @@ Table of contents:
 * [Bridge Networking](#bridge-networking)
 * [CNI Networking](#cni-networking)
 * [Isolated Mode Networking](#isolated-mode-networking)
-* [Firewall](#firewall)
-* [Additional configuration for Netplan](#additional-configuration-for-netplan)
+  * [Firewall](#firewall)
+  * [Additional configuration for Netplan](#additional-configuration-for-netplan)
 
 Both Firecracker and Cloud Hypervisor microVMs use TAP devices for networking. A Linux TAP operates at Layer 2 (Data Link Layer), one end is attached to the microVM, and the other end is attached to the host system.
 
