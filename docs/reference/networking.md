@@ -156,9 +156,7 @@ On Ubuntu 22.04 (Server), netplan can take over the veth pair that Slicer create
 If you run into issues (confirmed by `ip addr` showing no IP on the `ve-` interfaces), run the following:
 
 ```bash
-sudo -i # Elevate to a root shell
-
-cat > /etc/systemd/network/00-veth-ignore.network <<EOF
+cat <<EOF | sudo tee /etc/systemd/network/00-veth-ignore.network > /dev/null
 [Match]
 Name=ve-* veth*
 Driver=veth
@@ -171,12 +169,28 @@ KeepConfiguration=yes
 EOF
 ```
 
-Edit `/etc/systemd/networkd.conf`, then update the `[Network]` section:
+Update `/etc/systemd/networkd.conf` as per the following:
 
-```
+```bash
+cat <<EOF | sudo tee /etc/systemd/networkd.conf > /dev/null
 [Network]
 KeepConfiguration=yes
 ManageForeignRoutes=no
+#SpeedMeter=no
+#SpeedMeterIntervalSec=10sec
+#ManageForeignRoutingPolicyRules=yes
+#ManageForeignRoutes=yes
+#RouteTable=
+#IPv6PrivacyExtensions=no
+
+[DHCPv4]
+#DUIDType=vendor
+#DUIDRawData=
+
+[DHCPv6]
+#DUIDType=vendor
+#DUIDRawData=
+EOF
 ```
 
 Then reload and restart Slicer and the isolated network mode microVMs:
