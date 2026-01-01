@@ -121,6 +121,8 @@ Cons:
 * Additional complexity in managing the network namespaces and cleaning up all resources in error conditions or crashes
 * Maximum node group name including the suffix `-` and a number, can't be longer than 15 characters. I.e. `agents-1` up to `agents-1000` is fine, but `isolated-agents-1` would not fit.
 
+> The easiest way to try out Isolated Network Mode is to use the `slicer vm new` command, which will create a new YAML file for you, just pass in the `--net=isolated` flag. And optionally, specify a number of `--allow` and `--drop` flags, with IPs or CIDR blocks.
+
 Example dropping requests to `192.168.1.0/24`, allowing all other traffic:
 
 ```yaml
