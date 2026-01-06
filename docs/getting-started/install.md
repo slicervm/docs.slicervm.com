@@ -1,8 +1,8 @@
-# Installation
+# Installation for Slicer
 
 Don't wait for the perfect system. Slicer can run practically anywhere.
 
-To activate Slicer, you'll need a Hobbyist or Pro [subscription](https://slicervm.com/pricing) - pick according to your needs. These run month by month, so there's very little commitment or risk involved.
+To activate Slicer, you'll need a [Home Edition or Commercial subscription](https://slicervm.com/pricing) - pick according to your needs. Both are available on a monthly basis.
 
 After the installation, when you run `slicer activate` you'll get an invite link to the Discord server. We highly recommend joining.
 
@@ -13,16 +13,18 @@ Any reasonably modern computer can run Slicer, the requirements are very low - x
 Sustainably sourced:
 
 * Low powered N100 mini PC / Beelink / Minisforum
-* Ampere Altra / Raspberry Pi 5 (with NVMe)
-* Mac Mini M1 / M2 with Asahi Linux installed
-* Self-built ATX tower
+* Ampere Altra / Raspberry Pi 4 or 5 (an NVMe is better than SD card)
+* Mac Mini M1 or M2 (with Asahi Linux installed)
+* Self-built PC or server
 * Computer under your desk / old Thinkpad / Dell server from eBay
 
 Cloud-based bare-metal:
 
-* Hetzner Robot (cheapest, best value)
-* Phoenix NAP
-* Latitude.sh
+* [Hetzner bare-metal](https://www.hetzner.com/bare-metal-server) aka "robot" (cheapest, best value)
+* [Phoenix NAP](https://phoenixnap.com/bare-metal-cloud/instances)
+* [Latitude.sh](https://www.latitude.sh/features)
+
+Additional cloud-based options for KVM are [included on this page on our sister site (Actuated)](https://docs.actuated.com/provision-server/)
 
 Enterprise:
 
