@@ -88,7 +88,7 @@ Take note of this address and use it in the config file in the next step.
 
 Create a new Slicer config file, and add in the PCI address of the network adapter you bound to VFIO:
 
-```bash
+```yaml
 config:
   pci:
     router-1: ["0000:04:00.0"]
@@ -123,7 +123,7 @@ We now need to find out the stable name of the network adapter when it's passed 
 
 Create a userdata file for the initial boot which will log the network adapters to the serial console log file:
 
-```
+```bash
 cat >> userdata.sh << EOF
 #!/bin/bash
 
