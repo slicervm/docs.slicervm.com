@@ -105,7 +105,7 @@ config:
         bridge: brrouter0
         tap_prefix: router
         gateway: 192.168.130.1/24
-  image: "ghcr.io/openfaasltd/slicer-systemd-ch:5.10.240-x86_64-17d87310389bf8027aef505b86186da232be4e37"
+  image: "ghcr.io/openfaasltd/slicer-systemd-ch:x86_64-latest"
   hypervisor: cloud-hypervisor
 
   api:
