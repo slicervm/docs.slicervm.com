@@ -111,6 +111,7 @@ nav:
           - Remote VSCode: examples/remote-vscode.md
           - PiHole Adblocker: examples/pihole-adblock.md
       - Run Jenkins for CI/CD: examples/jenkins.md
+      - Create a Linux Router/Firewall: examples/router-firewall.md
       - Run containers with Docker: examples/docker.md
       - OpenFaaS Edge (All-In-One): examples/openfaas-edge.md
   - Tasks:
