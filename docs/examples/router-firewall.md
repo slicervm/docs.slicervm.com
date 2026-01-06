@@ -458,6 +458,55 @@ The document has moved
 ubuntu@router-1:~$ 
 ```
 
+## Block access to your main network
+
+By using iptables, you can block access to your main network (LAN1) from LAN2. This creates a Demilitarized Zone (DMZ) where devices on LAN2 can access the Internet and the router itself, but not the rest of your main network.
+
+For example, if your main network is `192.168.1.0/24` (different from the router's LAN1 interface subnet `192.168.130.0/24`), you can firewall it off so that LAN2 only has access to the Internet and the microVM router.
+
+Add this iptables rule to your userdata script **before** the existing FORWARD ACCEPT rules. Since iptables evaluates rules in order, the DROP rule must come before the ACCEPT rule:
+
+```bash
+# Block access to LAN1 network (192.168.1.0/24) from LAN2
+# IMPORTANT: This must be inserted BEFORE the existing ACCEPT rules
+# The -I flag inserts at position 1 (beginning of chain), so it's evaluated first
+iptables -I FORWARD -i "${LAN_IF}" -d 192.168.1.0/24 -j DROP
+```
+
+Here's what the full table ends up looking like on the microVM end:
+
+```bash
+root@router-1:~# iptables -L -n -v
+Chain INPUT (policy ACCEPT 0 packets, 0 bytes)
+ pkts bytes target     prot opt in     out     source               destination         
+    2   654 ACCEPT     udp  --  ens7   *       0.0.0.0/0            0.0.0.0/0            udp dpt:67
+    2   134 ACCEPT     udp  --  ens7   *       0.0.0.0/0            0.0.0.0/0            udp dpt:53
+    0     0 ACCEPT     tcp  --  ens7   *       0.0.0.0/0            0.0.0.0/0            tcp dpt:53
+
+Chain FORWARD (policy ACCEPT 0 packets, 0 bytes)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 DROP       all  --  ens7   *       0.0.0.0/0            192.168.1.0/24      
+    8   608 ACCEPT     all  --  ens7   eth0    10.88.0.0/24         0.0.0.0/0           
+    8   608 ACCEPT     all  --  eth0   ens7    0.0.0.0/0            10.88.0.0/24         ctstate RELATED,ESTABLISHED
+
+Chain OUTPUT (policy ACCEPT 0 packets, 0 bytes)
+ pkts bytes target     prot opt in     out     source               destination         
+root@router-1:~#
+```
+
+Place this rule in your userdata script before the existing FORWARD rules (around line 269-274). The `-I` flag inserts the rule at the beginning of the FORWARD chain, ensuring it's evaluated before the general ACCEPT rule that allows all LAN2 -> LAN1 traffic.
+
+The existing rules already handle:
+- Access to the router itself (INPUT rules allow DNS/DHCP on `${LAN_IF}`)
+- Established connections back from Internet (the existing FORWARD rule with `ESTABLISHED,RELATED`)
+
+With this rule in place, devices on LAN2 can:
+- Access the Internet (via NAT masquerade through `${WAN_IF}` which connects to LAN1)
+- Access the router/firewall microVM itself (10.88.0.1) for DNS and DHCP
+- **Not** access any devices on LAN1 (`192.168.1.0/24`)
+
+This setup is ideal for running servers, CI runners, and other services exposed to the Internet through tunnels such as [Inlets](https://inlets.dev).
+
 ## Wrapping up
 
 You've now created a lightweight Linux router/firewall which physically isolates LAN2 from LAN1.
@@ -469,7 +518,5 @@ In the screenshot, the top pane shows the PCI device being passed through to the
 
 LAN2 has its own IP range: `10.88.0.0/24` and all devices must pass through the microVM to access the Internet or LAN1.
 
-You can define additional iptables rules to further lock down any hosts on LAN2, for instance, they may only be allowed to access the Internet, but nothing at all on LAN1.
-
-That kind of setup would carve out a part of your network as a Demilitarized Zone (DMZ) ideal for running servers, CI runners, and other services exposed to the Internet through tunnels such as [Inlets](https://inlets.dev).
+See the [Block access to your main network](#block-access-to-your-main-network) section above for instructions on how to firewall off your main network from LAN2.
 
