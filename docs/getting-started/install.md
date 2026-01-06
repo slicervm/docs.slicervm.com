@@ -10,13 +10,12 @@ After the installation, when you run `slicer activate` you'll get an invite link
 
 Any reasonably modern computer can run Slicer, the requirements are very low - x86_64 or Arm64 (including the Raspberry Pi).
 
-Sustainably sourced:
+Ideal for labs and the home office:
 
-* Low powered N100 mini PC / Beelink / Minisforum
-* Ampere Altra / Raspberry Pi 4 or 5 (an NVMe is better than SD card)
-* Mac Mini M1 or M2 (with Asahi Linux installed)
-* Self-built PC or server
-* Computer under your desk / old Thinkpad / Dell server from eBay
+* Low powered mini PC i.e. [Intel N100](https://blog.alexellis.io/n100-mini-computer/), Beelink,  Minisforum,  Acemagic, etc
+* [Adlink Ampere Developer Platform](https://www.adlinktech.com/en/products/embedded-computing/adlink-ampere-developer-platform) / [Raspberry Pi 4 or 5](https://www.raspberrypi.com/products/raspberry-pi-5/) (an NVMe is better than SD card)
+* Mac Mini M1 or M2 (with [Asahi Linux](https://asahilinux.org/) installed)
+* PC, laptop, or used server from eBay - under your desk or in your basement.
 
 Cloud-based bare-metal:
 
@@ -28,7 +27,7 @@ Additional cloud-based options for KVM are [included on this page on our sister 
 
 Enterprise:
 
-* On-premises datacenter
+* On-premises datacenter with your own bare-metal servers
 * OpenStack / VMware (with nested virtualisation)
 * Azure, DigitalOcean, GCP VMs (with nested virtualisation)
 
