@@ -2,11 +2,29 @@
 
 ZFS is an advanced filesystem that was originally developed at [Sun Microsystems](https://en.wikipedia.org/wiki/Sun_Microsystems). The modern equivalent for Linux was ported as the [OpenZFS project](https://openzfs.org/wiki/Main_Page) and has a license that is incompatible with the Linux Kernel, for that reason, it is kept out of tree, and must be installed separately.
 
-Whilst ZFS can run on a loopback device, this is not recommended and may be unstable. Instead, dedicated either a partition or a drive to running ZFS.
+The containerd project already has a ZFS snapshotter, however it is unsuitable for use for VMs, therefore we implemented our own snapshotter plugin which can present ZFS volumes as block devices to a microVM.
+
+## Installation
+
+To setup ZFS you can run the installation script again, but this time, with additional flags.
+
+Install a drive, or make a partition available for zfs to use. The installation script will automatically creatre a loopback device if no device is provided.
+
+While using a loopback file is supported, it is absolutely not recommended to use a loopback file for ZFS with Slicer.
+
+Run the installation script again and set the `--zfs` flag:
+
+```sh
+curl -sLS https://get.slicervm.com | sudo bash -s -- \
+  --zfs /dev/nvme0n1 \
+  --overwrite # Destroy any existing content on the disk
+```
+
+Be very careful that you specify the correct drive or partition. This operation cannot be reversed and will destroy any existing contents.
+
+The default size for any unpacked VM disk is `30GB`. See [adjust the base snapshot size](#adjust-the-base-snapshot-size) to change this.
 
 ## Use ZFS for VM storage
-
-Before you can start using `zfs` storage for your VMs, you'll have to run through the installation steps below.
 
 Let's customise the [walkthrough](/getting-started/walkthrough) example for ZFS.
 
@@ -57,89 +75,9 @@ To delete all leases:
 sudo ctr -n slicer leases ls -q | xargs -n1 sudo ctr -n slicer leases rm
 ```
 
-## Install packages for ZFS
-
-```bash
-sudo apt update -qqy && \
-  sudo apt install -qqy --no-install-recommends \
-  zfsutils-linux
-```
-
-The two commands you are likely to need are:
-
-* `zpool` - create and explore pools to be used by ZFS
-* `zfs` - manage ZFS filesystems and snapshots
-
-## Create a pool for Slicer
-
-Let's say that you have a local NVMe i.e. `/dev/nvme1n1`.
-
-Within that device, you may have `/dev/nvme1n1p1` for your operating system, and some free space at `/dev/nvme1n1p2`.
-
-Use the following command to enroll that free space into ZFS:
-
-```bash
-sudo zpool create slicer /dev/nvme1n1p2
-```
-
-ZFS has many different options such as checksuming, compression, deduplication, encryption, and the ability to run in different RAID-like modes across multiple drives.
-
-We recommend that you do the simplest thing first, to get it working before tinkering further.
-
-## Create a filesystem for Slicer
-
-```bash
-sudo zfs create slicer/snapshots
-```
-
-## Install the zvol-snapshotter for containerd
-
-The containerd project already has a ZFS snapshotter, however it is unsuitable for use for VMs, therefore we needed to implement our own snapshotter which can present ZFS volumes as block devices to a microVM.
-
-The zvol-snapshotter can be installed using [arkade](https://github.com/alexellis/arkade):
-
-```bash
-arkade system install zvol-snapshotter \
-  --dataset slicer/snapshots
-```
-
-You can specify the size of any VM drive that will be created by the snapshotter using the `--size` flage, e.g. `--size=40G`. The default size is `20G`.
-
-Configure containerd to enable Zvol snapshotter, edit `/etc/containerd/config.toml` and add:
-
-```ini
-[proxy_plugins]
-  [proxy_plugins.zvol]
-    type = "snapshot"
-    address = "/run/containerd-zvol-grpc/containerd-zvol-grpc.sock"
-```
-
-Restart containerd:
-
-```bash
-sudo systemctl restart containerd
-```
-
-Check if the snapshotter is running OK:
-
-```bash
-sudo journalctl -u zvol-snapshotter -f
-```
-
-Now, test the Zvol snapshotter:
-
-```bash
-(
-sudo -E ctr images pull --snapshotter zvol docker.io/library/hello-world:latest
-sudo -E ctr run --snapshotter zvol docker.io/library/hello-world:latest test
-)
-```
-
 ## Adjust the base snapshot size
 
-The base snapshot size can be configured when installing or updating the snapshotter with `arkade system install` by including the `--size` flag.
-
-You can also manually edit the snapshotter configuration file.
+The base snapshot size can be changed by updating the snapshooter configuration file and restarting the zvol snapshotter service.
 
 Edit `/etc/containerd-zvol-grpc/config.toml` and replace the volume size with the desired value, e.g `40G`:
 
@@ -151,25 +89,8 @@ dataset="your-zpool/snapshots"
 fs_type="ext4"
 ```
 
-Finally reload and restart the service:
+Finally restart the zvol-snapshotter service:
 
 ```bash
 sudo systemctl restart zvol-snapshotter
-```
-
-## Footnote on ZFS on a loopback file
-
-It is absolutely not recommended to use a loopback file for ZFS for Slicer.
-
-```bash
-$ fallocate -l 250G zfs.img
-$ sudo zpool create slicer $HOME/zfs.img
-
-zpool list
-NAME     SIZE  ALLOC   FREE  CKPOINT  EXPANDSZ   FRAG    CAP  DEDUP    HEALTH  ALTROOT
-slicer   248G   105K   248G        -         -     0%     0%  1.00x    ONLINE  -
-
-$ zfs list
-NAME     USED  AVAIL     REFER  MOUNTPOINT
-slicer   105K   240G       24K  /slicer
 ```

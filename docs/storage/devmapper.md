@@ -8,7 +8,7 @@ That said, you can install Devmapper as an alternative, with a backing drive set
 
 ## Installation
 
-The setup for Devmapper is different to ZFS, you will need to run the installation script again, but this time, with additional arguments.
+To setup Devmapper you can run the installation script again, but this time, with additional flags.
 
 First, install a drive, or make a partition available for Devmapper to use.
 
@@ -27,18 +27,31 @@ nvme0n1                          259:4    0   1.8T  0 disk
 
 In this instance, you can see that my 2TB NVMe SSD is called nvme0n1 and is currently not allocated.
 
-Head over to the [installation page](/getting-started/install) and run the installation script again, this time include the `VM_DEV` environment variable.
+Run the installation script again and set the `--devmapper` flag:
 
-The default size for any unpacked VM is `30GB`, so if you want to alter that size do it now.
-
-```bash
-(
-cd agent
-BASE_SIZE=35GB VM_DEV=/dev/nvme0n1 sudo -E ./install.sh
-)
+```sh
+curl -sLS https://get.slicervm.com | sudo bash -s -- \
+  --devmapper /dev/nvme0n1 \
+  --overwrite # Destroy any existing content on the disk
 ```
 
-Be very careful that you specify the correct drive or partition. This operation cannot be reserved, and will destroy any existing contents.
+Be very careful that you specify the correct drive or partition. This operation cannot be reversed and will destroy any existing contents.
+
+The default size for any unpacked VM disk is `30GB`. To alter that size edit `/etc/containerd/config.toml` and restart containerd.
+
+```diff
+[plugins]
+  [plugins."io.containerd.snapshotter.v1.devmapper"]
+    pool_name = "slicer-thinpool"
+    root_path = "/var/lib/containerd/devmapper"
+-   base_image_size = "30GB"
++   base_image_size = "50GB"
+    discard_blocks = true
+```
+
+```sh
+sudo systemctl restart containerd
+```
 
 ## Configure Slicer to use Devmapper
 
@@ -52,4 +65,3 @@ config:
 ```
 
 The `storage_size` field cannot be specified for Devmapper. So whatever size was setup for snapshots during the installation will be the size used for all VMs.
-
