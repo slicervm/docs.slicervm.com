@@ -36,42 +36,19 @@ Ubuntu LTS is formally supported, whilst Arch Linux and RHEL-like Operating Syst
 
 Ideally, nothing else should be installed on a host that runs Slicer. It should be thought of as a basic appliance - a bare OS, with minimal packages.
 
-## Run these steps
+## Quick installation
 
-Slicer is evolving, and for the better. Today it uses part of the installation process for [actuated](https://actuated.com).
+The default slicer installation only enables support for [`image` storage](/storage/overview). Additional storage backends for [zfs](/storage/zfs) or [devmapper](/storage/devmapper) can be enabled using the `--zfs` and `--devmapper` flags. See [Snapshot-based storage](#snapshot-based-storage).
+
+```sh
+curl -sLS https://get.slicervm.com | sudo bash
+```
 
 The installer sets up [Firecracker](https://firecracker-microvm.github.io), [Cloud Hypervisor](https://github.com/cloud-hypervisor/cloud-hypervisor), [containerd](https://containerd.io/) for storage, and a few networking options.
 
-```bash
-# The installer usually looks for an actuated license, but you don't
-# need one to run the installation. We'll create a temporary file via touch.
-mkdir -p ~/.actuated
-touch ~/.actuated/LICENSE
+> Feel free to read/verify [the installation script](https://get.slicervm.com) before running it.
 
-(
-# Install arkade
-curl -sLS https://get.arkade.dev | sudo sh
-
-# Use arkade to extract the agent from its OCI container image
-arkade oci install ghcr.io/openfaasltd/actuated-agent:latest --path ./agent
-chmod +x ./agent/agent*
-sudo mv ./agent/agent* /usr/local/bin/
-)
-
-(
-cd agent
-sudo -E ./install.sh
-)
-```
-
-Then, get the Slicer binary:
-
-```bash
-sudo -E arkade oci install ghcr.io/openfaasltd/slicer:latest \
-  --path /usr/local/bin
-```
-
-The same command can be repeated to update Slicer to future versions.
+Additional storage backends can always be enabled later by running the installer again with the appropriate flags.
 
 For Home Edition/Hobbyist users, activate Slicer with your GitHub account to obtain a license key:
 
@@ -81,9 +58,45 @@ slicer activate --help
 slicer activate
 ```
 
-Pro/Commercial should save their license key (received by email after checking out) to `~/.slicer/LICENSE` without running any additional commands.
+Pro/Commercial users should save their license key (received by email after checking out) to `~/.slicer/LICENSE` without running any additional commands.
 
 Next, start your first VM with the [walk through](/getting-started/walkthrough).
+
+## Snapshot-based storage
+
+Snapshot-based storage enables much faster VM creation times. ZFS is the recommended option for Slicer, devmapper is also supported. See [storage for slicer](/storage/overview) for more info on the different storage backends.
+
+For best performance using a dedicated drive, volume or partition for the storage backend is recommended. If no disk is provided a loopback device will be created automatically.
+
+**ZFS (loopback)**
+
+```sh
+curl -sLS https://get.slicervm.com | sudo bash -s -- \
+  --zfs
+```
+
+**ZFS (dedicated drive)**
+
+```sh
+curl -sLS https://get.slicervm.com | sudo bash -s -- \
+  --zfs /dev/sdb
+```
+
+**Devmapper (loopback)**
+
+```sh
+curl -sLS https://get.slicervm.com | sudo bash -s -- \
+  --devmapper
+```
+
+**Devmapper (dedicated drive)**
+
+```sh
+curl -sLS https://get.slicervm.com | sudo bash -s -- \
+  --devmapper /dev/sdb
+```
+
+The `--devmapper` and `--zfs` flags can be used together to enable both storage backends.
 
 ## Updating slicer
 

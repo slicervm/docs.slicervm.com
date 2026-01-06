@@ -7,8 +7,6 @@ Disk images were not the first choice for Slicer, initially, only snapshotting f
 * Disk Images - static files allocated on start-up, can take a few seconds to clone the initial disk
 * Snapshotting / Copy On Write (CoW) - dynamic filesystems that only store changes and allow for instant cloning
 
-The current installation supports Disk Images only, and we will add the instructions for ZFS shortly.
-
 ## Disk images
 
 Disk images are similar to loopback filesystems which you may have created in the past via `fallocate` and `mkfs.ext4`.
