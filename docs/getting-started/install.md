@@ -13,7 +13,7 @@ Any reasonably modern computer can run Slicer, the requirements are very low - x
 Ideal for labs and the home office:
 
 * Low powered mini PC i.e. [Intel N100](https://blog.alexellis.io/n100-mini-computer/), Beelink,  Minisforum,  Acemagic, etc
-* [Adlink Ampere Developer Platform](https://www.adlinktech.com/en/products/embedded-computing/adlink-ampere-developer-platform) / [Raspberry Pi 4 or 5](https://www.raspberrypi.com/products/raspberry-pi-5/) (an NVMe is better than SD card)
+* [Adlink Ampere Developer Platform](https://www.adlinktech.com/Products/computer_on_modules/COM-HPC-Server-Carrier-and-Starter-Kit/Ampere_Altra_Developer_Platform?lang=en) / [system76 Thelio Astra](https://system76.com/desktops/thelio-astra-a1.1-n1/configure) / [Raspberry Pi 4 or 5](https://www.raspberrypi.com/products/raspberry-pi-5/) (an NVMe is better than SD card)
 * Mac Mini M1 or M2 (with [Asahi Linux](https://asahilinux.org/) installed)
 * PC, laptop, or used server from eBay - under your desk or in your basement.
 
