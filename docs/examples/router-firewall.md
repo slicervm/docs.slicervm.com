@@ -2,7 +2,7 @@
 
 In this example, we'll turn a regular PC into a router/firewall with standard Linux networking daemons such as dnsmasq and iptables.
 
-Why use a regular Linux VM over a product like pfSense, or OPNsense?
+**Why use a regular Linux VM over a product like pfSense, or OPNsense?**
 
 Whether it's based upon FreeBSD or Linux, these products are often extremely bloated, often closed source, and require a lot of resources to run. It's hard to know where to start when you need to customise these products to your own needs, and they often bundle far more than you need for a router/firewall.
 
@@ -10,7 +10,54 @@ Instead, we'll use a microVM that's easy to create from scratch, and can be cust
 
 Most importantly, you'll be in control, you'll know exactly what is and what is not running in your appliance, and how to troubleshoot it or customise it - an LLM agent can help you with that if you're not used to Linux networking.
 
-And why Slicer? Well instead of having to flash an ISO directly to your main drive, you can run as many microVMs as you want, each performing a different task or role. One common complaint with off the shelf router/firewall products is their poor support for Linux containers. With Slicer, you can simply run an extra microVM, you're not locked into one OS or product for the whole machine.
+**And why Slicer?**
+
+Well instead of having to flash an ISO directly to your main drive, you can run as many microVMs as you want, each performing a different task or role. One common complaint with off the shelf router/firewall products is their poor support for Linux containers. With Slicer, you can simply run an extra microVM, you're not locked into one OS or product for the whole machine.
+
+## Network Topology
+
+```
+                    ┌─────────────────────────────────┐
+                    │           Slicer Host           │
+                    │                                 │
+                    │  ┌──────────────────────────┐   │
+                    │  │  microVM Router/Firewall │   │
+                    │  │                          │   │
+                    │  │  eth0: 192.168.130.2/24  │   │
+                    │  │  ──────────────────────  │   │
+                    │  │                          │   │
+                    │  │  ens7: 10.88.0.1/24      │   │
+                    │  │  (PCI Passthrough/VFIO)  │   │
+                    │  └──────────────────────────┘   │
+                    │           │                     │
+                    │           │ PCI Passthrough     │
+                    │           │ (VFIO)              │
+                    └───────────┼─────────────────────┘
+                                │
+                    ┌───────────┴───────────┐
+                    │                       │
+                    │                       │
+         ┌──────────▼───────────┐ ┌─────────▼────────┐
+         │       LAN1           │ │       LAN2       │
+         │  (Main Network)      │ │  (Isolated)      │
+         │  192.168.130.0/24    │ │  10.88.0.0/24    │
+         │                      │ │                  │
+         │  ┌────────────────┐  │ │  ┌─────────────┐ │
+         │  │  Other Devices │  │ │  │ Raspberry Pi│ │
+         │  │  (LAN1)        │  │ │  │ (LAN2)      │ │
+         │  └────────────────┘  │ │  └─────────────┘ │
+         │                      │ │                  │
+         │  Internet Gateway    │ │  DHCP/DNS        │
+         │  Router              │ │  via dnsmasq     │
+         └──────────────────────┘ └──────────────────┘
+```
+
+The microVM router has two network interfaces:
+
+- **eth0**: Connected to LAN1 (192.168.130.0/24) via bridge networking
+- **ens7**: Connected to LAN2 (10.88.0.0/24) via PCI passthrough (VFIO)
+
+All traffic from LAN2 must pass through the microVM router to reach LAN1 or the Internet, providing physical Layer 1 separation between the networks.
 
 [![N100 mini PC routing/firewalling a separate Internal network](/images/router/n100-port4.jpg)](/images/router/n100-port4.jpg)
 > N100 mini PC routing/firewalling a separate Internal network
