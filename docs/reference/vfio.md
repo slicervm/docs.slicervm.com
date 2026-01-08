@@ -85,14 +85,16 @@ ADDRESS      CLASS    VENDOR   DEVICE   DESCRIPTION                             
 
 You can bind a device to VFIO in two ways:
 
-1. By specifying the device's vendor and device ID in the cmdline arguments for the Kernel.
+1. By specifying the device's vendor and device ID in the `cmdline` arguments for the Kernel.
 2. By using the `slicer pci` command to bind the device to VFIO.
 
 We recommend only using 2. because 1. is unable to differentiate between multiple devices of the same type such as two or more NICs or two or more GPUs. You often need at least one of these to be available for the host.
 
-View PCI devices via `sudo -E slicer pci list`.
+View PCI devices via `sudo -E slicer pci list` and note the `ADDRESS` column.
 
 Then run `sudo -E slicer pci bind <PCI_ADDRESS>` to bind the device to VFIO. Replace `<PCI_ADDRESS>` with the actual PCI address of the device you want to bind.
+
+By default, this command will attempt to unbind the device from the original driver on your host system, but if it doesn't work, unbind it manually with the steps below.
 
 ## Unbind a device from VFIO
 
@@ -115,11 +117,19 @@ sudo -E slicer pci bind 0000:0b:00.1 --driver=snd_hda_intel
 
 ## Troubleshooting
 
+It's unlikely that you'll need to load the modules for VFIO manually, but you can do so with:
+
+```bash
+sudo modprobe vfio
+sudo modprobe vfio-pci
+```
+
 1. Ensure that your CPU and motherboard support IOMMU and that it is enabled in the BIOS/UEFI settings.
 2. Also double-check your bootloader i.e. Grub configuration for the command line that's passed to the Linux Kernel. Did you skip `update-grub` or `update-initramfs`?
 3. Check the output of `sudo dmesg | grep -e DMAR -e IOMMU` for any errors related to IOMMU initialization.
 4. Ensure that the device you are trying to passthrough is not being used by the host system and that it's not already bound to a specific driver.
 5. Verify that the device is in its own IOMMU group using `sudo -E slicer pci list` - you typically have to bind every device within an IOMMU group otherwise they cannot be used in a VM.
+6. If you're having issues binding a device to VFIO, try explicitly unbinding it from the original driver with `sudo -E slicer pci unbind <PCI_ADDRESS>` first.
 
 After checking all of the above, if you find your devices are all mixed into the same IOMMU group, that means your system is not designed for VFIO.
 
