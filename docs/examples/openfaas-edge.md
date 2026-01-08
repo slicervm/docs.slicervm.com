@@ -69,7 +69,7 @@ if $(has_apt_get); then
     sudo apt install apache2-utils -y
   fi
 elif $(has_dnf); then
-  export HOME=/home/rocky
+  export HOME=/home/slicer
 
   arkade oci install --path . ghcr.io/openfaasltd/faasd-pro-rpm:latest
   sudo dnf install openfaas-edge-*.rpm -y
@@ -314,7 +314,7 @@ The slicer config will be adapted from the [walkthrough](/getting-started/walkth
 
 Optionally use  the `--ssh-key` or `--github` flags to add an additional ssh key so you can connect via SSH to deploy functions, review the logs, and access check the status of the faasd services.
 
-The userdate script provided in this guide can be used on both ubuntu and rocky. You can change user the `--image` flag to swith the image to your preferred OS. An overview of the available images can be found [here](/reference/images/).
+The userdate script provided in this guide can be used with both Ubuntu and Rocky Linux. You can change user the `--image` flag to swith the image to your preferred OS. An overview of the available images can be found [here](/reference/images/).
 
 ## Run OpenFaaS Edge
 

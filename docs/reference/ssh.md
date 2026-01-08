@@ -55,4 +55,4 @@ config:
 
 If you're running a different OS image such as Rocky Linux, make sure you change the home directory and user/group name accordingly.
 
-The `TARGET_USER` environment variable will also be set within the context of the `userdata` script, so you could use that instead of hard-coding `/home/ubuntu` or `/home/rocky`.
+The `TARGET_USER` environment variable will also be set within the context of the `userdata` script, so you could use that instead of hard-coding `/home/ubuntu` or `/home/slicer`.

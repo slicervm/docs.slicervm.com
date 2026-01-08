@@ -20,8 +20,8 @@ Ubuntu 22.04 is supported by Cannoncial is supported [until April 2027](https://
 
 Table of image tags:
 
-| Operating System | Firecracker (x86_64) | Firecracker (arm64) | Cloud Hypervisor (x86_64) | Cloud Hypervisor (arm64) |
-| ------------------ | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| Ubuntu 22.04       | `ghcr.io/openfaasltd/slicer-systemd:5.10.240-x86_64-latest`         | `ghcr.io/openfaasltd/slicer-systemd-arm64:6.1.90-aarch64-latest` | `ghcr.io/openfaasltd/slicer-systemd-ch:5.10.240-x86_64-latest` |  |
-| Ubuntu 24.04       | `ghcr.io/openfaasltd/slicer-systemd-2404:5.10.240-x86_64-latest`    |                                                                |                                                              |  |
-| Rocky Linux 9      | `ghcr.io/openfaasltd/slicer-systemd-rocky9:5.10.240-x86_64-latest`  |                                                                |                                                              |  |
+| Operating System | Firecracker (x86_64) | Firecracker (arm64) | Cloud Hypervisor (x86_64) | Cloud Hypervisor (arm64) | Default user |
+| ------------------ | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| Ubuntu 22.04       | `ghcr.io/openfaasltd/slicer-systemd:5.10.240-x86_64-latest`, `ghcr.io/openfaasltd/slicer-systemd:6.1.90-x86_64-latest`         | `ghcr.io/openfaasltd/slicer-systemd-arm64:6.1.90-aarch64-latest` | `ghcr.io/openfaasltd/slicer-systemd-ch:5.10.240-x86_64-latest`,  `ghcr.io/openfaasltd/slicer-systemd-ch:6.1.90-x86_64-latest` |  | `ubuntu` |
+| Ubuntu 24.04       | `ghcr.io/openfaasltd/slicer-systemd-2404:5.10.240-x86_64-latest`    |                                                                |                                                              |  | `ubuntu` |
+| Rocky Linux 9      | `ghcr.io/openfaasltd/slicer-systemd-rocky9:5.10.240-x86_64-latest`  |                                                                |                                                              |  | `slicer` |
