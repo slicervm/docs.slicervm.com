@@ -6,7 +6,7 @@ It is also possible to build completely different images from scratch, however t
 
 Cloud Hypervisor is required to mount a PCI device such as an Nvidia GPU into a microVM. In all other cases, Firecracker is preferred.
 
-Generally, Slicer makes use of systemd to run, tune, and manage services and background agents. It is technically possible to use other init systems, but is not supported at this time.
+Generally, Slicer makes use of systemd to run, tune, and manage services and background agents. It is technically possible to use other init systems such as openrc, reach out if this is a core requirement for your usage.
 
 Image availability:
 
@@ -25,3 +25,4 @@ Table of image tags:
 | Ubuntu 22.04       | `ghcr.io/openfaasltd/slicer-systemd:5.10.240-x86_64-latest`, `ghcr.io/openfaasltd/slicer-systemd:6.1.90-x86_64-latest`         | `ghcr.io/openfaasltd/slicer-systemd-arm64:6.1.90-aarch64-latest` | `ghcr.io/openfaasltd/slicer-systemd-ch:5.10.240-x86_64-latest`,  `ghcr.io/openfaasltd/slicer-systemd-ch:6.1.90-x86_64-latest` |  | `ubuntu` |
 | Ubuntu 24.04       | `ghcr.io/openfaasltd/slicer-systemd-2404:5.10.240-x86_64-latest`    |                                                                |                                                              |  | `ubuntu` |
 | Rocky Linux 9      | `ghcr.io/openfaasltd/slicer-systemd-rocky9:5.10.240-x86_64-latest`  |                                                                |                                                              |  | `slicer` |
+The most tested and stable images for *x86_64* are based upon the `5.10.x` Kernel. Feel free to use the `6.9.x` Kernels and report any discrepancies you may find.
