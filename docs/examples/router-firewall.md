@@ -185,22 +185,10 @@ Edit `ens7` and `enp0s7` to match the values show in the output of the `ip addr 
 ```bash
 #!/usr/bin/env bash
 set -euo pipefail
-
-log() { echo "[router-setup] $*"; }
+log(){ echo "[router-setup] $*"; }
 
 WAN_IF="eth0"
-
-# LAN interface: prefer ens7, fallback to altname enp0s7
-LAN_IF=""
-if ip link show ens7 >/dev/null 2>&1; then
-  LAN_IF="ens7"
-elif ip link show enp0s7 >/dev/null 2>&1; then
-  LAN_IF="enp0s7"
-else
-  log "ERROR: Could not find LAN interface ens7 or enp0s7"
-  ip -br link || true
-  exit 1
-fi
+LAN_IF="ens7"
 
 LAN_IP="10.88.0.1"
 LAN_CIDR="${LAN_IP}/24"
@@ -209,34 +197,59 @@ LAN_NET="10.88.0.0/24"
 DHCP_START="10.88.0.50"
 DHCP_END="10.88.0.200"
 
-# dnsmasq will forward to these
 UP_DNS1="1.1.1.1"
 UP_DNS2="8.8.8.8"
 
-log "WAN_IF=${WAN_IF} (untouched) LAN_IF=${LAN_IF} LAN_CIDR=${LAN_CIDR}"
-
 export DEBIAN_FRONTEND=noninteractive
+
+if ! ip link show "${LAN_IF}" >/dev/null 2>&1; then
+  log "ERROR: ${LAN_IF} not found. Run: ip -br link"
+  ip -br link || true
+  exit 1
+fi
+
+log "Installing packages"
 apt-get update -y
-apt-get install -y dnsmasq iptables nmap net-tools
+echo iptables-persistent iptables-persistent/autosave_v4 boolean true | debconf-set-selections
+echo iptables-persistent iptables-persistent/autosave_v6 boolean true | debconf-set-selections
+apt-get install -y dnsmasq iptables iptables-persistent nmap
 
-# ---- Configure LAN interface IP only (no netplan, no eth0 changes) ----
-ip link set "${LAN_IF}" up
-# Remove any existing 10.88.0.1/24 if present; keep other IPs intact
-ip addr del "${LAN_CIDR}" dev "${LAN_IF}" 2>/dev/null || true
-ip addr add "${LAN_CIDR}" dev "${LAN_IF}"
+log "Configuring systemd-networkd for ${LAN_IF}=${LAN_CIDR} (eth0 untouched)"
+mkdir -p /etc/systemd/network
+cat >/etc/systemd/network/10-lan-ens7.network <<EOF
+[Match]
+Name=${LAN_IF}
 
-# ---- Enable IPv4 forwarding ----
+[Link]
+RequiredForOnline=no
+
+[Network]
+Address=${LAN_CIDR}
+ConfigureWithoutCarrier=yes
+IPv6AcceptRA=no
+EOF
+
+systemctl enable systemd-networkd
+systemctl restart systemd-networkd
+networkctl reconfigure "${LAN_IF}" || true
+ip link set "${LAN_IF}" up || true
+
+log "Enable IPv4 forwarding"
 cat >/etc/sysctl.d/99-router.conf <<EOF
 net.ipv4.ip_forward=1
 EOF
 sysctl --system
 
-# ---- dnsmasq: DHCP + DNS on LAN only ----
+log "Configuring dnsmasq (LAN only, resilient bind)"
 mkdir -p /etc/dnsmasq.d
 cat >/etc/dnsmasq.d/pi-lan.conf <<EOF
+# Strictly LAN only
 interface=${LAN_IF}
-listen-address=${LAN_IP}
-bind-interfaces
+except-interface=${WAN_IF}
+except-interface=lo
+
+# Don't fail if ${LAN_IP} isn't present yet; rebind when it appears
+bind-dynamic
 
 # DHCP scope
 dhcp-range=${DHCP_START},${DHCP_END},255.255.255.0,12h
@@ -253,10 +266,22 @@ log-dhcp
 log-queries
 EOF
 
-systemctl enable --now dnsmasq
+systemctl enable dnsmasq
 
-# ---- iptables: add minimal rules (do NOT change default policies) ----
-# INPUT: allow DHCP + DNS arriving on LAN
+log "Writing router runtime apply script (runs every boot)"
+cat >/usr/local/sbin/router-apply.sh <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+log(){ echo "[router-apply] $*"; }
+
+WAN_IF="eth0"
+LAN_IF="ens7"
+LAN_NET="10.88.0.0/24"
+
+# Bring LAN up (harmless if already up)
+ip link set "${LAN_IF}" up || true
+
+# iptables rules (idempotent)
 iptables -C INPUT -i "${LAN_IF}" -p udp --dport 67 -j ACCEPT 2>/dev/null || \
   iptables -A INPUT -i "${LAN_IF}" -p udp --dport 67 -j ACCEPT
 
@@ -266,20 +291,54 @@ iptables -C INPUT -i "${LAN_IF}" -p udp --dport 53 -j ACCEPT 2>/dev/null || \
 iptables -C INPUT -i "${LAN_IF}" -p tcp --dport 53 -j ACCEPT 2>/dev/null || \
   iptables -A INPUT -i "${LAN_IF}" -p tcp --dport 53 -j ACCEPT
 
-# FORWARD: allow LAN -> WAN and established back
 iptables -C FORWARD -i "${LAN_IF}" -o "${WAN_IF}" -s "${LAN_NET}" -j ACCEPT 2>/dev/null || \
   iptables -A FORWARD -i "${LAN_IF}" -o "${WAN_IF}" -s "${LAN_NET}" -j ACCEPT
 
 iptables -C FORWARD -i "${WAN_IF}" -o "${LAN_IF}" -d "${LAN_NET}" -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT 2>/dev/null || \
   iptables -A FORWARD -i "${WAN_IF}" -o "${LAN_IF}" -d "${LAN_NET}" -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 
-# NAT: masquerade LAN subnet out of WAN
 iptables -t nat -C POSTROUTING -o "${WAN_IF}" -s "${LAN_NET}" -j MASQUERADE 2>/dev/null || \
   iptables -t nat -A POSTROUTING -o "${WAN_IF}" -s "${LAN_NET}" -j MASQUERADE
 
+# Persist current rules (so netfilter-persistent is always correct)
+iptables-save > /etc/iptables/rules.v4
+ip6tables-save > /etc/iptables/rules.v6
+
+# Ensure dnsmasq is up (safe even if already running)
+systemctl restart dnsmasq || true
+
+log "Applied."
+EOF
+chmod +x /usr/local/sbin/router-apply.sh
+
+log "Creating systemd oneshot service"
+cat >/etc/systemd/system/router-apply.service <<'EOF'
+[Unit]
+Description=Apply router LAN + firewall config
+After=systemd-networkd.service
+Wants=systemd-networkd.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/router-apply.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl daemon-reload
+systemctl enable router-apply.service
+
+# Enable persistence service too
+systemctl enable netfilter-persistent
+
+# Run once now
+/usr/local/sbin/router-apply.sh
+
 log "Done."
 ip -br addr || true
-ip route || true
+sudo iptables -L -v -n || true
 systemctl --no-pager --full status dnsmasq || true
 ```
 
@@ -294,11 +353,11 @@ You can then connect and start viewing the logs from the DHCP/DNS server:
 ```bash
 sudo -E slicer vm shell --uid 1000 router-1
 
-sudo journalctl -xfe
+# Then within the microVM:
+sudo journalctl -u dnsmasq --since today -f
 ```
 
 ## Configure a Raspberry Pi to run on LAN2
-
 
 [![Raspberry Pi plugged directly into the N100](/images/router/rpi4.jpg)](/images/router/rpi4.jpg)
 > Raspberry Pi plugged directly into the N100
