@@ -123,6 +123,7 @@ nav:
       - Logs & Monitoring: tasks/monitoring.md
       - Share files over NFS: tasks/share-files-with-nfs.md
       - Nested Virtualization: tasks/nested-virtualization.md
+      - Run slicer without KVM on cloud VMs: tasks/pvm.md
       - Execute commands in VMs with the SDK: tasks/execute-commands-with-sdk.md
   - Storage:
       - Overview: storage/overview.md
