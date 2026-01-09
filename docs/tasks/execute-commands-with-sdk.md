@@ -78,8 +78,8 @@ func run() error {
 
 	// Define VM specifications
 	createReq := sdk.SlicerCreateNodeRequest{
-		RamGB:    8, // 8GB RAM
-		CPUs:     4, // 4 CPU cores for video processing
+		RamBytes:    8 * 1024 * 1024 * 1024, // 8GB RAM
+		CPUs:        4, // 4 CPU cores for video processing
 	}
 
 	// Create VM in the 'sdk' host group
