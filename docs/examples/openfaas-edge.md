@@ -10,14 +10,17 @@ Create `openfaas-edge.sh`.
 
 By default the script installs OpenFaaS Edge a private registry and the [OpenFaaS Function Builder API](https://docs.openfaas.com/edge/builder/) as additional services. Select which services to install by changing the environment variables in the script configuration section.
 
-Note that the function builder addon requires a separate license.
-
 Available configuration options:
 
 | Env | Description | Default|
 | --- | ----------- | ------ |
 | INSTALL_REGISTRY | Install a private registry | `true` |
 | INSTALL_BUILDER | Install the OpenFaaS Function Builder API | `true` |
+
+!!! note "OpenfaaS Edge license"
+
+    Slicer subcriptions or GitHub sponsorship does not include the function builder addon for OpenFaaS Edge.
+    A separate [OpenFaaS Edge license](https://www.openfaas.com/pricing/) is required to use the function builder.
 
 ```bash
 #!/usr/bin/env bash
