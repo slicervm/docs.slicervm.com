@@ -104,7 +104,7 @@ nav:
           - OpenFaaS on K3s: examples/openfaas.md
       - AI/LLMs:
           - Ollama with a GPU: examples/gpu-ollama.md
-          - Headless OpenCode Coding Agent: examples/opencode-ai-agent.md
+          - Headless OpenCode Coding Agent: examples/opencode-agent.md
           - Headless Cursor Coding Agent: examples/cursor-cli-agent.md
       - Productivity:
           - Remote Docker builds over SSH: examples/buildkit.md

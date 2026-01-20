@@ -1,6 +1,6 @@
-# Run an AI Agent with OpenCode
+# Run a Headless Coding Agent with OpenCode
 
-We'll run an AI agent within a microVM using [OpenCode](https://opencode.ai/), an open-source tool to generate code using large language models (LLMs).
+We'll run a headless coding agent within a microVM using [OpenCode](https://opencode.ai/), an open-source tool to generate code using large language models (LLMs).
 
 OpenCode occasionally supports free trials for popular LLMs. This guide was written whilst Grok's Coder model was available for free - and at no cost.
 

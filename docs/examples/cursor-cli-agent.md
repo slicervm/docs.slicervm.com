@@ -1,4 +1,4 @@
-# Cursor CLI Agent
+# Run a Headless Coding Agent with Cursor CLI
 
 Cursor's CLI can be used in a non-interactive way within a script or CI job. That makes it ideal for use as a [one-shot task](/tasks/userdata) with a SlicerVM, or a longer running VM that you connect to with a [remote VSCode IDE](/examples/remote-vscode.md).
 
