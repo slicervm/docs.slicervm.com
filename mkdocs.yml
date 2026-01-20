@@ -1,5 +1,5 @@
 site_name: Slicer
-site_description: Slicer up bare-metal into microVMs
+site_description: Slice bare-metal into sandboxes and services
 site_author: OpenFaaS Ltd
 site_url: https://docs.slicervm.com/
 

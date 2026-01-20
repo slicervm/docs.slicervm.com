@@ -210,13 +210,13 @@ fi
 
 log "Installing packages"
 apt-get update -y
-echo iptables-persistent iptables-persistent/autosave_v4 boolean true | debconf-set-selections
-echo iptables-persistent iptables-persistent/autosave_v6 boolean true | debconf-set-selections
+echo iptables-persistent iptables-persistent/autosave_v4 boolean true | debconf-set-selections || true
+echo iptables-persistent iptables-persistent/autosave_v6 boolean true | debconf-set-selections || true
 apt-get install -y dnsmasq iptables iptables-persistent nmap
 
 log "Configuring systemd-networkd for ${LAN_IF}=${LAN_CIDR} (eth0 untouched)"
 mkdir -p /etc/systemd/network
-cat >/etc/systemd/network/10-lan-ens7.network <<EOF
+cat >/etc/systemd/network/10-lan-${LAN_IF}.network <<EOF
 [Match]
 Name=${LAN_IF}
 
@@ -234,21 +234,21 @@ systemctl restart systemd-networkd
 networkctl reconfigure "${LAN_IF}" || true
 ip link set "${LAN_IF}" up || true
 
-log "Enable IPv4 forwarding"
+log "Enable IPv4 forwarding (set only what we need; avoid sysctl --system noise)"
 cat >/etc/sysctl.d/99-router.conf <<EOF
 net.ipv4.ip_forward=1
 EOF
-sysctl --system
+sysctl -w net.ipv4.ip_forward=1 >/dev/null || true
 
 log "Configuring dnsmasq (LAN only, resilient bind)"
 mkdir -p /etc/dnsmasq.d
 cat >/etc/dnsmasq.d/pi-lan.conf <<EOF
-# Strictly LAN only
+# Only serve on LAN
 interface=${LAN_IF}
 except-interface=${WAN_IF}
 except-interface=lo
 
-# Don't fail if ${LAN_IP} isn't present yet; rebind when it appears
+# Resilient bind: don't fail if IP isn't present yet; rebind when it appears
 bind-dynamic
 
 # DHCP scope
@@ -261,12 +261,21 @@ no-resolv
 server=${UP_DNS1}
 server=${UP_DNS2}
 
-# Debug (helpful during demo)
+# Debug
 log-dhcp
 log-queries
 EOF
 
-systemctl enable dnsmasq
+# Don't rely on apt auto-start (policy-rc.d may block it)
+systemctl enable dnsmasq || true
+
+log "Writing router defaults"
+cat >/etc/default/router-apply <<EOF
+WAN_IF=${WAN_IF}
+LAN_IF=${LAN_IF}
+LAN_NET=${LAN_NET}
+EOF
+chmod 0644 /etc/default/router-apply
 
 log "Writing router runtime apply script (runs every boot)"
 cat >/usr/local/sbin/router-apply.sh <<'EOF'
@@ -274,37 +283,34 @@ cat >/usr/local/sbin/router-apply.sh <<'EOF'
 set -euo pipefail
 log(){ echo "[router-apply] $*"; }
 
-WAN_IF="eth0"
-LAN_IF="ens7"
-LAN_NET="10.88.0.0/24"
+# shellcheck disable=SC1091
+source /etc/default/router-apply
 
-# Bring LAN up (harmless if already up)
+: "${WAN_IF:?missing WAN_IF}"
+: "${LAN_IF:?missing LAN_IF}"
+: "${LAN_NET:?missing LAN_NET}"
+
 ip link set "${LAN_IF}" up || true
 
-# iptables rules (idempotent)
 iptables -C INPUT -i "${LAN_IF}" -p udp --dport 67 -j ACCEPT 2>/dev/null || \
   iptables -A INPUT -i "${LAN_IF}" -p udp --dport 67 -j ACCEPT
-
 iptables -C INPUT -i "${LAN_IF}" -p udp --dport 53 -j ACCEPT 2>/dev/null || \
   iptables -A INPUT -i "${LAN_IF}" -p udp --dport 53 -j ACCEPT
-
 iptables -C INPUT -i "${LAN_IF}" -p tcp --dport 53 -j ACCEPT 2>/dev/null || \
   iptables -A INPUT -i "${LAN_IF}" -p tcp --dport 53 -j ACCEPT
 
 iptables -C FORWARD -i "${LAN_IF}" -o "${WAN_IF}" -s "${LAN_NET}" -j ACCEPT 2>/dev/null || \
   iptables -A FORWARD -i "${LAN_IF}" -o "${WAN_IF}" -s "${LAN_NET}" -j ACCEPT
-
 iptables -C FORWARD -i "${WAN_IF}" -o "${LAN_IF}" -d "${LAN_NET}" -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT 2>/dev/null || \
   iptables -A FORWARD -i "${WAN_IF}" -o "${LAN_IF}" -d "${LAN_NET}" -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
 
 iptables -t nat -C POSTROUTING -o "${WAN_IF}" -s "${LAN_NET}" -j MASQUERADE 2>/dev/null || \
   iptables -t nat -A POSTROUTING -o "${WAN_IF}" -s "${LAN_NET}" -j MASQUERADE
 
-# Persist current rules (so netfilter-persistent is always correct)
 iptables-save > /etc/iptables/rules.v4
 ip6tables-save > /etc/iptables/rules.v6
 
-# Ensure dnsmasq is up (safe even if already running)
+# Start/restart dnsmasq now that interface/address is ready
 systemctl restart dnsmasq || true
 
 log "Applied."
@@ -329,16 +335,14 @@ EOF
 
 systemctl daemon-reload
 systemctl enable router-apply.service
-
-# Enable persistence service too
-systemctl enable netfilter-persistent
+systemctl enable netfilter-persistent || true
 
 # Run once now
 /usr/local/sbin/router-apply.sh
 
 log "Done."
 ip -br addr || true
-sudo iptables -L -v -n || true
+iptables -L -v -n || true
 systemctl --no-pager --full status dnsmasq || true
 ```
 
