@@ -290,8 +290,7 @@ It's also possible to copy back the whole workdir folder, which is ideal when op
 
 ```bash
 mkdir -p workdir-out
-sudo -E slicer vm cp --mode=tar --uid 1000 opencode-1:/home/ubuntu/workdir/ ./workdi
-r-out
+sudo -E slicer vm cp --mode=tar --uid 1000 opencode-1:/home/ubuntu/workdir/ ./workdir-out
 ```
 
 Then, examine the contents:
