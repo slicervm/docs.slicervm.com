@@ -135,7 +135,6 @@ ExecStartPre=/usr/bin/env bash -c 'while [ ! -d /home/ubuntu/workdir/arkade ]; d
 ExecStart=/usr/bin/env bash -lc '/usr/local/bin/opencode run "$(cat /home/ubuntu/workdir/task.txt)" -m opencode/grok-code'
 ```
 
-
 ## View the results
 
 Once the VM is running, you can check the status of the `opencode` service.
@@ -180,8 +179,140 @@ cd agent-runs
 scp -r ubuntu@192.168.137.2:/home/ubuntu/workdir .
 ```
 
-## Further thoughts
+## Running an opencode agent via the exec and cp APIs
 
-This was a very basic example to get you thinking - you could write your own program and use that to drive the whole interaction, rather than using systemd and bash.
+You can also run an opencode agent from bash after booting up a host, and syncing in a secret for the API keys.
 
-SSH could also be a better way to interact with the agent, rather than passing an initial prompt and token via the userdata file.
+```bash
+slicer new opencode \
+  --userdata-file userdata.sh \
+  >  opencode.yaml
+```
+
+Create your userdata to only setup opencode, its workdir, and to sync the API secret to the correct location from the host.
+
+*userdata.sh*
+
+```bash
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# Install opencode -> /usr/local/bin
+arkade get opencode --path /usr/local/bin >/dev/null
+chown ubuntu /usr/local/bin/opencode
+chmod +x /usr/local/bin/opencode
+
+# Prep dirs & auth for user "ubuntu" (no group assumption)
+for d in /home/ubuntu/workdir /home/ubuntu/.local/share/opencode /home/ubuntu/.local/state /home/ubuntu/.cache; do
+  mkdir -p "$d"
+  chown ubuntu "$d"
+done
+cp /run/slicer/secrets/opencode-auth.json /home/ubuntu/.local/share/opencode/auth.json
+chown ubuntu /home/ubuntu/.local/share/opencode/auth.json
+chmod 600 /home/ubuntu/.local/share/opencode/auth.json
+```
+
+Authenticate to opencode on your host, then copy the auth file to the .secrets folder relative to where you created `opencode.yaml`.
+
+```bash
+#opencode auth login --provider github --token <your-github-token>
+
+mkdir -p .secrets
+chmod 700 .secrets
+cp ~/.local/share/opencode/auth.json .secrets/opencode-auth.json
+chmod 600 .secrets/opencode-auth.json
+```
+
+Now boot up the microVM, just before userdata it will synchronise any secrets placed in the .secrets folder into the microVM.
+
+```bash
+sudo -E slicer up ./opencode.yaml
+```
+
+The following command will indicate whether the userdata script has completed:
+
+```bash
+sudo -E slicer vm health opencode-1 
+HOSTNAME                  AGENT UPTIME         SYSTEM UPTIME        AGENT VERSION   USERDATA RAN
+--------                  ------------         -------------        -------------   ------------
+opencode-1                53s                  53s                  0.1.55          1   
+```
+
+If you're automating the process from bash, you can also run `--json` for something you can parse with `jq`.
+
+Define a prompt and use the `cp` command to sync it into the microVM:
+
+```bash
+cat > task.txt <<'EOF'
+
+Write a simple Go program that prints "Hello, World!" to the console.
+
+EOF
+```
+
+```bash
+sudo -E slicer vm cp --uid 1000 ./task.txt opencode-1:/home/ubuntu/workdir/task.txt
+```
+
+Next, use the `exec` command to run the opencode agent interactively, streaming the response back to the host.
+
+```bash
+sudo -E slicer vm exec --uid 1000 --cwd /home/ubuntu/workdir opencode-1 -- opencode run -m opencode/grok-code $(cat task.txt)
+
+# Example output:
+
+|  Write    home/ubuntu/workdir/hello.go
+Created hello.go
+```
+
+You can now see the response in the terminal.
+
+Finally, copy out the results from the microVM via `cp` in the alternate direction.
+
+```bash
+sudo -E slicer vm cp --uid 1000 opencode-1:/home/ubuntu/workdir/main.go ./main.go
+```
+
+Examine the output:
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+        fmt.Println("Hello, World!")
+}
+```
+
+It's also possible to copy back the whole workdir folder, which is ideal when opencode has created multiple files and folders.
+
+```bash
+mkdir -p workdir-out
+sudo -E slicer vm cp --mode=tar --uid 1000 opencode-1:/home/ubuntu/workdir/ ./workdi
+r-out
+```
+
+Then, examine the contents:
+
+```bash
+sudo find workdir-out
+
+workdir-out
+workdir-out/main.go
+workdir-out/hello.go
+workdir-out/workdir
+workdir-out/task.txt
+```
+
+## Taking opencode automation further
+
+Once a microVM has been started, you can run the `opencode` agent in prompt mode any number of times, or limit it to just a single prompt.
+
+One advantage of keeping a microVM alive, is that you can follow-up if the results are not as expected, or give it further direction.
+
+A practical application of opencode in a Slicer sandbox, is for code reviews linked to a Source Control Management (SCM) system like GitHub or GitLab.
+
+The CLI can be driven manually or via bash, for our own code review bot, [we used the Go SDK](https://docs.slicervm.com/tasks/execute-commands-with-sdk/).
+
