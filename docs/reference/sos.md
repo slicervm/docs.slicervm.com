@@ -96,3 +96,28 @@ Type `exit` or press `Ctrl+D` to exit the shell session.
 
 To enter the menu again, reconnect with the SSH command you used earlier.
 
+## Pause and Resume from the CLI
+
+In addition to pausing and resuming VMs through the SOS console, you can now use the CLI commands directly:
+
+```bash
+# Pause a VM to stop CPU usage
+slicer vm pause vm-1
+
+# Resume a paused VM
+slicer vm resume vm-1
+```
+
+Pausing a VM stops all vCPU execution while keeping memory allocated. The VM will wake up instantly when resumed, preserving its state.
+
+You can view the pause status in the VM list:
+
+```bash
+slicer vm list
+```
+
+VMs that are paused will show `-` in each field of the `slicer vm top` output.
+
+Paused VMs cannot use the `cp`, or `exec` functionality until they are resumed.
+
+

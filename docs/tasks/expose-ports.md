@@ -50,6 +50,22 @@ slicer vm forward vm-1 0.0.0.0:8080:127.0.0.1:80
 
 Then you'll be able to access the forwarded service with your own machine's IP address.
 
+### UNIX Socket Forwarding
+
+Slicer also supports UNIX socket forwarding, allowing you to forward sockets from the VM to your local system. This is useful for accessing services like Docker, containerd, or other socket-based services.
+
+Forward a remote UNIX socket to your local system:
+
+```bash
+slicer vm forward vm-1 -L /Users/alex/docker.sock:/run/docker.sock --token "..." --url "..."
+
+DOCKER_HOST=unix:///Users/alex/docker.sock docker ps
+```
+
+In this example, we assume you've installed Docker into the microVM, and want to access it via a socket from your local machine - perhaps a Linux or MacOS client.
+
+Port forwarding works in any combination of: UNIX:UNIX, UNIX:TCP, TCP:UNIX, TCP:TCP.
+
 ## Public access with Inlets
 
 [`inlets-pro`](https://inlets.dev) is a self-hosted tunnel that's easy to use, gives you full privacy and control over security and networking.
