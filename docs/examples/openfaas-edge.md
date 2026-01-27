@@ -305,7 +305,7 @@ fi
 Use `slicer new` to generate a configuration file:
 
 ```bash
-slicer new openfaas-edge \
+slicer new of-edge \
   --userdata-file ./openfaas-edge.sh \
   > openfaas-edge.yaml
 ```
@@ -321,7 +321,7 @@ The userdate script provided in this guide can be used with both Ubuntu and Rock
 Start the VM:
 
 ```sh
-sudo -E slicer up ./openfaas-edge.yaml`
+sudo -E slicer up ./openfaas-edge.yaml
 ```
 
 Login to the VM and activate faasd using a static license key are by running faasd activate.
@@ -329,7 +329,7 @@ Login to the VM and activate faasd using a static license key are by running faa
 Commercial users can create their license key as follows:
 
 ```sh
-sudo nano /var/lib/faasd/secrets/openfaas_license"
+sudo nano /var/lib/faasd/secrets/openfaas_license
 ```
 
 For personal, non-commercial use only, GitHub Sponsors of @openfaas can run:
