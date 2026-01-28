@@ -17,6 +17,11 @@ For the third use-case, to run Slicer within Slicer, you just need to pay carefu
 [![Example of Nested Virtualization](https://pbs.twimg.com/media/G2mW2PBWoAAbG6-?format=jpg&name=4096x4096)](https://x.com/alexellisuk/status/1975276011941150963/)
 > This image shows an example of nested virtualization setup running on my Intel N100.
 
+## Prerequisites
+
+* The IP range of the outer Slicer host must differ from the IP range of the nested Slicer. The default example uses `192.168.137.0/24` for the outer host and `192.168.130.0/24` for the nested host.
+* The Slicer host and Slicer guest should use different host group names. This is due to the way the MAC address is generated through a hash.
+
 ## Slicer within Slicer
 
 ![Nested Virtualization](/images/slicer-in-slicer.png)
