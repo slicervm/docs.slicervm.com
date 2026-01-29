@@ -84,6 +84,7 @@ You can install the Nvidia drivers using our utility script:
 ```bash
 curl -SLsO https://raw.githubusercontent.com/self-actuated/nvidia-run/refs/heads/master/setup-nvidia-run.sh
 chmod +x ./setup-nvidia-run.sh
+echo "Downloading and installing Nvidia drivers... via nvidia.run"
 sudo bash ./setup-nvidia-run.sh
 ```
 
@@ -127,7 +128,26 @@ Mon Sep  1 11:28:45 2025
 Then install Ollama:
 
 ```bash
+
+sudo apt update -qy && \
+  sudo apt install -qy zstd
+
 curl -fsSL https://ollama.com/install.sh | sh
+```
+
+If you want to access the API from another machine, you can edit the service definition.
+
+Edit `/etc/systemd/system/ollama.service` and add the following line under the `[Service]` section:
+
+```
+Environment="OLLAMA_HOST=0.0.0.0:11434"
+```
+
+Then restart the service:
+
+```bash
+sudo systemctl daemon-reload && \
+  sudo systemctl restart ollama
 ```
 
 Next, pull a model and try out a prompt:
