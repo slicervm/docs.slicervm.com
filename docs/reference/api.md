@@ -69,6 +69,16 @@ You can install Caddy via `arkade system install caddy`
 - IDs: opaque strings returned by the API.
 - Errors: JSON: { "error": "message", "code": "optional_code" } with appropriate HTTP status.
 
+## GET /info
+
+Get server version information.
+
+Response 200:
+
+```json
+{ "version": "1.0.0", "git_commit": "abcdef123" }
+```
+
 ## GET /healthz
 
 Check service liveness.
@@ -114,7 +124,7 @@ HTTP GET
 Response 200:
 
 ```json
-[{"name":"vm","count":1,"ram_gb":4,"vcpu":2}]
+[{"name":"vm","count":1,"ram_bytes":4294967296,"cpus":2,"gpu_count":0,"arch":"x86_64"}]
 ```
 
 ## Create a new host within a Host Group
@@ -147,6 +157,18 @@ Add a host with a custom GitHub user to override the SSH keys:
 }
 ```
 
+## List nodes in a Host Group
+
+HTTP GET
+
+`/hostgroup/NAME/nodes`
+
+Response 200:
+
+```json
+[{"hostname":"vm-1","ip":"192.168.137.2","ram_bytes":2147483648,"cpus":2,"created_at":"2025-09-02T08:32:37.667253315+01:00","arch":"x86_64","status":"Running"}]
+```
+
 ## Get serial console logs from a VM
 
 HTTP GET
@@ -160,11 +182,7 @@ When `n` is `0`, the whole contents will be returned.
 Response 200:
 
 ```
-[  OK  ] Started slicer-ssh-agent.
-[  OK  ] Started slicer-vmmeter.
-[  OK  ] Reached target Multi-User System.
-         Starting Record Runlevel Change in UTMP...
-[  OK  ] Finished Record Runlevel Change in UTMP.
+{"hostname":"vm-1","lines":20,"content":"[  OK  ] Started slicer-ssh-agent.\n[  OK  ] Started slicer-vmmeter.\n"}
 ```
 
 ## Delete a host within a Host Group
@@ -173,7 +191,11 @@ HTTP DELETE
 
 `/hostgroup/NAME/nodes/HOSTNAME`
 
-Response 204: No Content
+Response 200:
+
+```json
+{"message":"Node deleted","disk_removed":"true"}
+```
 
 ## Get node consumption details
 
@@ -219,6 +241,33 @@ HTTP GET
 ]
 ```
 
+## Get node consumption details for a single VM
+
+HTTP GET
+
+`/node/{hostname}/stats`
+
+Response 200:
+
+```json
+{
+  "hostname": "vm-1",
+  "ip": "192.168.137.2",
+  "created_at": "2025-09-02T08:32:37.667253315+01:00",
+  "snapshot": {
+    "hostname": "vm-1",
+    "arch": "x86_64",
+    "timestamp": "2025-09-02T07:39:32.388239809Z",
+    "uptime": "6m53s",
+    "totalCpus": 2,
+    "totalMemory": 4024136000,
+    "memoryUsed": 220184000,
+    "memoryAvailable": 3803952000,
+    "memoryUsedPercent": 5.471584459372148
+  }
+}
+```
+
 ## Copy files to and from the microVM
 
 HTTP POST/GET
@@ -244,6 +293,8 @@ For the highest level of fidelity, you can create your own tar and copy it as a 
   - `path` (required): destination path in VM
   - `uid` (optional): user ID for file ownership
   - `gid` (optional): group ID for file ownership
+  - `mode` (optional): `binary` or `tar` (defaults to `binary`)
+  - `permissions` (optional): permissions for copied files (e.g. `0644`)
 
 **Copy a directory to the VM**
 
@@ -253,6 +304,8 @@ For the highest level of fidelity, you can create your own tar and copy it as a 
   - `path` (required): destination path in VM
   - `uid` (optional): user ID for file ownership
   - `gid` (optional): group ID for file ownership
+  - `mode` (optional): `tar` (recommended when sending tar content)
+  - `permissions` (optional): permissions for copied files (e.g. `0644`)
 
 ### Copy a file or folder from the microVM
 
@@ -263,6 +316,7 @@ The same applies as copying a file to the VM, however it works in the reverse. I
 - Accept: `application/octet-stream`
 - Query parameters:
   - `path` (required): destination path in VM
+  - `mode` (optional): `binary` or `tar`
 - Response: binary data of file
 
 **Copy a directory to the client**
@@ -270,6 +324,7 @@ The same applies as copying a file to the VM, however it works in the reverse. I
 - Accept: `application/octet-stream`
 - Query parameters:
   - `path` (required): destination path in VM
+  - `mode` (optional): `tar` (recommended when receiving tar content)
 - Response: binary data of directory
 
 ## Execute commands
@@ -324,7 +379,8 @@ HTTP GET
     "size": 1024,
     "permissions": "0600",
     "uid": 1000,
-    "gid": 1000
+    "gid": 1000,
+    "mod_time": "2025-09-02T08:32:37.667253315+01:00"
   }
 ]
 ```
@@ -376,3 +432,58 @@ This is endpoint is used by `slicer vm shell` to obtain a shell without needing 
 This endpoint is only available in a VM if the `slicer-agent` service is running. The CLI is the only official client compatible with this functionality.
 
 `/vm/{hostname}/shell`
+
+Query parameters:
+- `uid` (optional): user ID to run shell as
+- `gid` (optional): group ID to run shell as
+- `shell` (optional): shell interpreter
+- `cwd` (optional): working directory
+
+## Agent health (no body)
+
+HTTP HEAD
+
+`/vm/{hostname}/health`
+
+Response 200: No body
+
+## Shutdown or reboot a VM
+
+HTTP POST
+
+`/vm/{hostname}/shutdown`
+
+Query parameters:
+- `action` (optional): `shutdown` or `reboot`
+
+Response 200: text/plain
+
+## Pause a VM
+
+HTTP POST
+
+`/vm/{hostname}/pause`
+
+Response 200: text/plain
+
+## Resume a VM
+
+HTTP POST
+
+`/vm/{hostname}/resume`
+
+Response 200: text/plain
+
+## Forward TCP connections
+
+HTTP GET
+
+`/vm/{hostname}/forward`
+
+This endpoint is used by the inlets client to establish TCP tunnels via the VM agent.
+
+## Prometheus metrics
+
+HTTP GET
+
+`/metrics`

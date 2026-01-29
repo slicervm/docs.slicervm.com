@@ -24,6 +24,56 @@ When the `slicer-vmmeter.service` is loaded and running, then system utilization
 
 If you need more monitoring that is available, feel free to let us know what you're looking for.
 
+### Prometheus metrics via `/metrics`
+
+Slicer exposes Prometheus metrics at the `/metrics` endpoint on the API server. This endpoint uses the same auth as the rest of the API. If auth is enabled, supply a bearer token.
+
+Example curl (local token file):
+
+```bash
+curl -H "Authorization: Bearer $(sudo cat /var/lib/slicer/auth/token)" \
+  http://127.0.0.1:8080/metrics
+```
+
+Example curl (explicit token value):
+
+```bash
+curl -H "Authorization: Bearer TOKEN_VALUE" \
+  http://127.0.0.1:8080/metrics
+```
+
+Common metric names:
+
+- `slicer_vm_launch_total` (labels: `host_group`, `code`)
+- `slicer_vm_running` (labels: `host_group`, `api`, `state`)
+- `slicer_vm_gpu_count` (labels: `host_group`)
+- `slicer_api_requests_total` (labels: `method`, `code`)
+- `slicer_api_request_duration_seconds` (labels: `method`, `code`)
+- `slicer_system_load_avg_1`
+- `slicer_system_load_avg_5`
+- `slicer_system_load_avg_15`
+- `slicer_system_memory_total_bytes`
+- `slicer_system_memory_available_bytes`
+- `slicer_system_egress_tx`
+- `slicer_system_egress_rx`
+- `slicer_system_open_files`
+- `slicer_system_open_connections`
+
+Note: `slicer_system_egress_*` uses the primary egress adapter detected at runtime. You can override it with `SLICER_EGRESS_ADAPTER`.
+
+Prometheus scrape config (with token file):
+
+```yaml
+scrape_configs:
+  - job_name: slicer
+    metrics_path: /metrics
+    scheme: http
+    bearer_token_file: /var/lib/slicer/auth/token
+    static_configs:
+      - targets:
+          - 127.0.0.1:8080
+```
+
 ### View utilization via `slicer vm top`
 
 ```bash
@@ -74,4 +124,3 @@ $ sudo slicer vm top
 The Open Source [node_exporter](https://github.com/prometheus/node_exporter) project from the Prometheus project can be used to collect system metrics from each VM, you can install the agent as a systemd unit file through userdata, or a custom base image.
 
 [Prometheus](https://prometheus.io/) or the [Grafana Agent](https://grafana.com/docs/grafana-cloud/agent/) can then be run on the host, or somewhere else to collect the metrics and store them in a time-series database.
-
