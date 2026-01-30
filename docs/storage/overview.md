@@ -37,9 +37,9 @@ If you need more storage space in a VM using image storage mode, resize the disk
    sudo e2fsck -fy ./vm-hostname.img
    ```
 
-3. **Resize the filesystem** to fill available space:
+3. **Resize the filesystem** to a given size i.e. 30G:
    ```bash
-   sudo resize2fs ./vm-hostname.img
+   sudo resize2fs ./vm-hostname.img 30G
    ```
 
 4. **Start the VM again**:
