@@ -21,6 +21,36 @@ Cons:
 * No deduplication, as is possible with snapshots/Copy On Write (CoW) systems
 * Launch/clone time slower than CoW when launching many VMs
 
+### Resizing disk images
+
+If you need more storage space in a VM using image storage mode, resize the disk after shutting down the VM:
+
+1. **Shutdown the VM**:
+   ```bash
+   slicer vm shutdown vm-hostname
+   ```
+
+   Then close Slicer with Control + C, so you can boot the VM again on next start up.
+
+2. **Check the filesystem** on the disk image:
+   ```bash
+   sudo e2fsck -fy ./vm-hostname.img
+   ```
+
+3. **Resize the filesystem** to fill available space:
+   ```bash
+   sudo resize2fs ./vm-hostname.img
+   ```
+
+4. **Start the VM again**:
+   ```bash
+   slicer up ./config.yaml
+   ```
+
+**Note**: The VM must be using image storage mode (set with `storage: image` in your config). This assumes you've already increased the physical disk image size beforehand.
+
+**Warning**: Always run `e2fsck` before resizing and ensure the VM is completely shut down to avoid data corruption.
+
 ## ZFS
 
 [ZFS](https://en.wikipedia.org/wiki/ZFS) is an advanced filesystem that supports CoW snapshots.

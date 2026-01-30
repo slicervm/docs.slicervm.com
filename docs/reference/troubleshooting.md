@@ -131,3 +131,5 @@ sudo systemctl stop containerd
 sudo rm -rf /var/lib/containerd
 sudo systemctl restart containerd
 ```
+
+If you're using image storage mode and need to resize a VM's disk, see the [storage overview](/storage/overview) for instructions on resizing disk images.

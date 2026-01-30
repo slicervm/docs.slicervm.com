@@ -15,6 +15,7 @@ Image availability:
 | Ubuntu 22.04 | :white_check_mark: | :white_check_mark: | :white_check_mark: | :cross_mark: |
 | Ubuntu 24.04 | :white_check_mark: | :cross_mark: | :cross_mark: | :cross_mark: |
 | Rocky Linux 9 | :white_check_mark: | :cross_mark: | :cross_mark: | :cross_mark: |
+| Arch Linux | :white_check_mark: | :cross_mark: | :cross_mark: | :cross_mark: |
 
 Ubuntu 22.04 is supported by Cannoncial is supported [until April 2027](https://ubuntu.com/about/release-cycle).
 
@@ -25,4 +26,5 @@ Table of image tags:
 | Ubuntu 22.04       | `ghcr.io/openfaasltd/slicer-systemd:5.10.240-x86_64-latest`, `ghcr.io/openfaasltd/slicer-systemd:6.1.90-x86_64-latest`         | `ghcr.io/openfaasltd/slicer-systemd-arm64:6.1.90-aarch64-latest` | `ghcr.io/openfaasltd/slicer-systemd-ch:5.10.240-x86_64-latest`,  `ghcr.io/openfaasltd/slicer-systemd-ch:6.1.90-x86_64-latest` |  | `ubuntu` |
 | Ubuntu 24.04       | `ghcr.io/openfaasltd/slicer-systemd-2404:5.10.240-x86_64-latest`    |                                                                |                                                              |  | `ubuntu` |
 | Rocky Linux 9      | `ghcr.io/openfaasltd/slicer-systemd-rocky9:5.10.240-x86_64-latest`  |                                                                |                                                              |  | `slicer` |
+| Arch Linux         | `ghcr.io/openfaasltd/slicer-systemd-archlinux:6.1.90-x86_64-latest` |                                                                |                                                              |  | `slicer` |
 The most tested and stable images for *x86_64* are based upon the `5.10.x` Kernel. Feel free to use the `6.9.x` Kernels and report any discrepancies you may find.
