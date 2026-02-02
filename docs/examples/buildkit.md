@@ -1,4 +1,4 @@
-# Remote Docker builds over SSH
+# Remote Docker builds
 
 [BuildKit](https://docs.docker.com/build/buildkit/) is a modern backend that powers Docker's build engine. This example shows how to set up a dedicated BuildKit instance in a Slicer VM for isolated, remote container builds.
 
@@ -18,7 +18,9 @@ Using a remote BuildKit instance in a Slicer VM provides several benefits:
 This example is very minimal and covers the basic setup. You can expand it according to your needs. In the next steps we are going to:
 
 - Install and configure BuildKit automatically on first boot with a userdate script.
-- Set up Docker buildx to use the remote BuildKit instance.
+- Set up Docker buildx to use the remote BuildKit instance with two connection options:
+    1. Forwarding the BuildKit Unix socket to the host using `slicer vm forward`
+    2. Connect to BuildKit over SSH.
 
 ## BuildKit installation script
 
@@ -71,7 +73,7 @@ slicer new buildkit \
   > buildkit.yaml
 ```
 
-Use the `--ssh-key` or `--github` flags to add ssh keys so you can connect to the BuildKit instance over SSH. The [Docker buildx remote driver](https://docs.docker.com/build/builders/drivers/remote/) supports connection to a remote BuildKit instance over SSH.
+If you plan to connect to buildkit over SSH, use the `--ssh-key` or `--github` flags to add SSH keys. The [Docker buildx remote driver](https://docs.docker.com/build/builders/drivers/remote/) supports connection to a remote BuildKit instance over SSH. On ssh connection is not required when using socket forwarding with `slicer vm forward`.
 
 For better build performance, consider increasing the VM resources:
 
@@ -91,9 +93,34 @@ sudo -E slicer up ./buildkit.yaml
 
 ## Configure Docker buildx
 
-Once your VM is running and BuildKit is installed, you can configure Docker buildx to use it as a remote builder. For more information about Docker builders, see the [Docker builders documentation](https://docs.docker.com/build/builders/).
+Once your VM is running and BuildKit is installed, you can configure Docker buildx to use it as a remote builder. You have two options:
 
-### Add VM to known hosts
+- Use SSH to connect buildx directly to the VM.
+- Forward the BuildKit Unix socket to your host and connect locally.
+
+For more information about Docker builders, see the [Docker builders documentation](https://docs.docker.com/build/builders/).
+
+### Option 1: Forward the BuildKit Unix socket
+
+Forward the BuildKit Unix socket from the VM to a local Unix socket:
+
+```bash
+slicer vm forward buildkit-1 \
+  -L ./buildkitd.sock:/run/buildkit/buildkitd.sock
+```
+
+Point buildx to the forwarded socket with a `unix://` URL (the `driver-opt` value is passed directly to buildx):
+
+```bash
+docker buildx create \
+  --name slicer \
+  --driver remote \
+  unix://$(pwd)/buildkitd.sock
+```
+
+### Option 2: Connect over SSH
+
+#### Add VM to known hosts
 
 First, add the Slicer VM to your SSH known hosts to avoid connection issues:
 
@@ -102,7 +129,7 @@ First, add the Slicer VM to your SSH known hosts to avoid connection issues:
 ssh-keyscan 192.168.137.2 >> ~/.ssh/known_hosts
 ```
 
-### Create the remote builder
+#### Create the remote builder
 
 Create a new buildx builder instance that connects to your Slicer VM:
 
@@ -116,7 +143,7 @@ docker buildx create \
 
 ### Verify the builder
 
-Check that your new builder is available and working:
+After configuring either option above, check that your new builder is available and working:
 
 ```bash
 # List available builders
@@ -171,19 +198,19 @@ If you're having trouble connecting to the remote builder:
 
 1. **Check VM status**: Ensure the VM is running and BuildKit service is active
    ```bash
-   # SSH into the VM and check service status
-   ssh ubuntu@192.168.137.2
+   # Open a shell in the VM and check service status
+   slicer vm shell buildkit-1 --uid 1000
    sudo systemctl status buildkitd
    ```
 
-2. **Verify SSH connectivity**: Test SSH connection directly
+2. **Check BuildKit socket**: Verify the socket is accessible
    ```bash
-   ssh ubuntu@192.168.137.2 "echo 'SSH connection successful'"
+   slicer vm exec buildkit-1 -- "sudo -u ubuntu -g buildkit buildctl --addr unix:///run/buildkit/buildkitd.sock debug info"
    ```
 
-3. **Check BuildKit socket**: Verify the socket is accessible
+3. **Verify SSH connectivity** (Only required remote buildkit over SSH ): Test SSH connection directly
    ```bash
-   ssh ubuntu@192.168.137.2 "sudo -u ubuntu -g buildkit buildctl --addr unix:///run/buildkit/buildkitd.sock debug info"
+   ssh ubuntu@192.168.137.2 "echo 'SSH connection successful'"
    ```
 
 ## Further thoughts
