@@ -33,7 +33,7 @@ Enterprise:
 
 A Linux system with KVM is required (bare-metal or nested virtualisation), so if you see `/dev/kvm`, Slicer will work there.
 
-Ubuntu LTS is formally supported, whilst Arch Linux and RHEL-like Operating Systems should work - we won't be able to debug your system.
+Ubuntu LTS is formally supported, whilst Debian, Fedora, RHEL-like Operating Systems (Rocky, Alma, CentOS), and Arch Linux should work - we won't be able to debug your system.
 
 Ideally, nothing else should be installed on a host that runs Slicer. It should be thought of as a basic appliance - a bare OS, with minimal packages.
 
@@ -68,6 +68,9 @@ Next, start your first VM with the [walk through](/getting-started/walkthrough).
 Snapshot-based storage enables much faster VM creation times. ZFS is the recommended option for Slicer, devmapper is also supported. See [storage for slicer](/storage/overview) for more info on the different storage backends.
 
 For best performance using a dedicated drive, volume or partition for the storage backend is recommended. If no disk is provided a loopback device will be created automatically.
+
+!!! note "ZFS on non-Ubuntu distributions"
+    Automatic ZFS installation is only supported on Ubuntu. On other distributions, [install ZFS manually](https://openzfs.github.io/openzfs-docs/Getting%20Started/index.html) before running the install script with the `--zfs` flag.
 
 **ZFS (loopback)**
 
