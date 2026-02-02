@@ -55,6 +55,16 @@ Next, connect into the first VM launced by Slicer using SSH:
 ssh ubuntu@192.168.137.2
 ```
 
+Enable KVM by loading the kernel modules:
+
+```bash
+# For AMD CPUs
+sudo modprobe kvm && sudo modprobe kvm_amd
+
+# For Intel CPUs
+sudo modprobe kvm && sudo modprobe kvm_intel
+```
+
 Now perform an [installation](/getting-started/install.md) of Slicer within the VM.
 
 Copy the walkthrough example YAML from the [walkthrough](/getting-started/install.md) and save it as `nested.yaml`.
