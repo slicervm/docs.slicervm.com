@@ -1,6 +1,6 @@
 # Introduction to Slicer
 
-[Slicer](https://slicervm.com) (aka SlicerVM) turns any machine into your own private microVM cloud using [Firecracker](https://firecracker-microvm.github.io/) or [Cloud Hypervisor](https://cloud-hypervisor.org/). It takes a low level, but powerful primitive and makes it accessible for humans, through a CLI, API and SDK.
+[Slicer](https://slicervm.com) (aka SlicerVM) turns any machine into your own private microVM cloud using [Firecracker](https://firecracker-microvm.github.io/) or [Cloud Hypervisor](https://cloudhypervisor.org/). It takes a low level, but powerful primitive and makes it accessible for humans, through a CLI, API and SDK.
 
 Not only can you run applications like websites, databases, APIs, or Kubernetes clusters, you can also fully control a system programmatically and from scripts - making it ideal for both long-running and short-lived jobs, AI agents, background jobs, bots, and CI runners.
 
