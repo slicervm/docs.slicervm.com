@@ -42,6 +42,9 @@ theme:
 
   favicon: images/favicon.ico
 
+extra_css:
+  - stylesheets/extra.css
+
 extra:
   search:
     languages: "en"
