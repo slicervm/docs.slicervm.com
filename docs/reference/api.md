@@ -1,8 +1,12 @@
 # Slicer REST API
 
 This page documents the HTTP API exposed by Slicer for managing micro-VMs, images, disks, and operations.
-
 Some endpoints will fail if a trailing slash is given, i.e. `/nodes` is documented, however `/nodes/` may return an error.
+
+A note on Slicer Services vs Slicer Sandboxes:
+
+* A Slicer Service is a VM launched via YAML - protected from VM deletion - disk persistent is controlled via the `persistent` flag in the YAML config. `storage: image` is persistent by default.
+* A Slicer Sandbox is a VM launched via API - and is ephemeral/disposable. It can be deleted, and disk/snapshot is cleaned up on shutdown of the VM or deletion. Shutting down Slicer will terminate and delete all sandboxes.
 
 ## Authentication
 
