@@ -1,0 +1,1087 @@
+openapi: 3.0.3
+info:
+  title: Slicer API
+  version: "0.1.71"
+  description: |
+    REST API for Slicer VM management. Derived from server routes and SDK types.
+servers:
+  - url: http://localhost:8080
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required: [error]
+
+    SlicerInfo:
+      type: object
+      properties:
+        version:
+          type: string
+        git_commit:
+          type: string
+
+    SlicerHostGroup:
+      type: object
+      properties:
+        name:
+          type: string
+        count:
+          type: integer
+        ram_bytes:
+          type: integer
+          format: int64
+        cpus:
+          type: integer
+        gpu_count:
+          type: integer
+        arch:
+          type: string
+
+    NodeResponse:
+      type: object
+      properties:
+        hostname:
+          type: string
+        ip:
+          type: string
+        ram_bytes:
+          type: integer
+          format: int64
+        cpus:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        tags:
+          type: array
+          items:
+            type: string
+        arch:
+          type: string
+        status:
+          type: string
+          description: "Running or Paused"
+
+    SlicerSnapshot:
+      type: object
+      properties:
+        hostname:
+          type: string
+        arch:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        uptime:
+          type: string
+        totalCpus:
+          type: integer
+        totalMemory:
+          type: integer
+          format: uint64
+        memoryUsed:
+          type: integer
+          format: uint64
+        memoryAvailable:
+          type: integer
+          format: uint64
+        memoryUsedPercent:
+          type: number
+          format: float
+        loadAvg1:
+          type: number
+          format: float
+        loadAvg5:
+          type: number
+          format: float
+        loadAvg15:
+          type: number
+          format: float
+        diskReadTotal:
+          type: number
+          format: float
+        diskWriteTotal:
+          type: number
+          format: float
+        networkReadTotal:
+          type: number
+          format: float
+        networkWriteTotal:
+          type: number
+          format: float
+        diskIOInflight:
+          type: integer
+          format: int64
+        openConnections:
+          type: integer
+          format: int64
+        openFiles:
+          type: integer
+          format: int64
+        entropy:
+          type: integer
+          format: int64
+        diskSpaceTotal:
+          type: integer
+          format: uint64
+        diskSpaceUsed:
+          type: integer
+          format: uint64
+        diskSpaceFree:
+          type: integer
+          format: uint64
+        diskSpaceUsedPercent:
+          type: number
+          format: float
+
+    NodeStatResponse:
+      allOf:
+        - $ref: '#/components/schemas/NodeResponse'
+        - type: object
+          properties:
+            snapshot:
+              $ref: '#/components/schemas/SlicerSnapshot'
+            error:
+              type: string
+
+    Secret:
+      type: object
+      properties:
+        name:
+          type: string
+        size:
+          type: integer
+          format: int64
+        permissions:
+          type: string
+        uid:
+          type: integer
+          format: uint32
+        gid:
+          type: integer
+          format: uint32
+        mod_time:
+          type: string
+          format: date-time
+      required: [name, size, permissions, uid, gid, mod_time]
+
+    CreateSecretRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        permissions:
+          type: string
+        uid:
+          type: integer
+          format: uint32
+        gid:
+          type: integer
+          format: uint32
+        data:
+          type: string
+          description: Base64-encoded secret content
+      required: [name, data]
+
+    UpdateSecretRequest:
+      type: object
+      properties:
+        permissions:
+          type: string
+        uid:
+          type: integer
+          format: uint32
+        gid:
+          type: integer
+          format: uint32
+        data:
+          type: string
+          description: Base64-encoded secret content
+
+    SlicerCreateNodeRequest:
+      type: object
+      description: Combined from LaunchParams and SDK request.
+      properties:
+        hostname:
+          type: string
+        ip:
+          type: string
+        ram_bytes:
+          type: integer
+          format: int64
+        cpus:
+          type: integer
+        gpu_count:
+          type: integer
+        persistent:
+          type: boolean
+        disk_image:
+          type: string
+        import_user:
+          type: string
+        ssh_keys:
+          type: array
+          items:
+            type: string
+        protected:
+          type: boolean
+        userdata:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        secrets:
+          type: array
+          items:
+            type: string
+        pci_devices:
+          type: array
+          items:
+            type: string
+
+    SlicerCreateNodeResponse:
+      type: object
+      properties:
+        hostname:
+          type: string
+        ip:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        arch:
+          type: string
+
+    SlicerDeleteResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        disk_removed:
+          type: string
+        error:
+          type: string
+
+    SlicerLogsResponse:
+      type: object
+      properties:
+        hostname:
+          type: string
+        lines:
+          type: integer
+        content:
+          type: string
+
+    SlicerExecRequestQuery:
+      type: object
+      description: Query parameters used by /vm/{hostname}/exec
+      properties:
+        cmd:
+          type: string
+        args:
+          type: array
+          items:
+            type: string
+        uid:
+          type: integer
+          format: uint32
+        gid:
+          type: integer
+          format: uint32
+        stdin:
+          type: boolean
+        stdout:
+          type: boolean
+        stderr:
+          type: boolean
+        shell:
+          type: string
+        cwd:
+          type: string
+        permissions:
+          type: string
+
+    SlicerExecWriteResult:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        stdout:
+          type: string
+        stderr:
+          type: string
+        exit_code:
+          type: integer
+        error:
+          type: string
+
+    SlicerAgentHealthResponse:
+      type: object
+      properties:
+        hostname:
+          type: string
+        agent_uptime:
+          type: integer
+          format: int64
+        agent_version:
+          type: string
+        system_uptime:
+          type: integer
+          format: int64
+        userdata_ran:
+          type: boolean
+
+paths:
+  /info:
+    get:
+      summary: Get server version info
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Server version information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SlicerInfo'
+        "401":
+          description: Missing or invalid auth
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /healthz:
+    get:
+      summary: Server liveness check
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema: { type: string, example: "OK" }
+    head:
+      summary: Server liveness check (HEAD)
+      responses:
+        "200":
+          description: OK
+
+  /hostgroup:
+    get:
+      summary: List host groups
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Host groups
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SlicerHostGroup'
+        "401":
+          description: Missing or invalid auth
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /hostgroup/{name}/nodes:
+    get:
+      summary: List nodes in a host group
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Nodes in host group
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/NodeResponse' }
+        "401":
+          description: Missing or invalid auth
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+    post:
+      summary: Create a node in a host group
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SlicerCreateNodeRequest' }
+      responses:
+        "200":
+          description: Node created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SlicerCreateNodeResponse' }
+        "201":
+          description: Node created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SlicerCreateNodeResponse' }
+        "400":
+          description: Invalid input or limits exceeded
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "403":
+          description: Trial mode or protected constraints
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "404":
+          description: Host group not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "500":
+          description: Internal error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /hostgroup/{name}/nodes/{node}:
+    delete:
+      summary: Delete a node
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema: { type: string }
+        - in: path
+          name: node
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Node deleted
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SlicerDeleteResponse' }
+        "403":
+          description: Protected node cannot be deleted
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "404":
+          description: Node not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "500":
+          description: Internal error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /nodes:
+    get:
+      summary: List all nodes
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Nodes list
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/NodeResponse' }
+        "401":
+          description: Missing or invalid auth
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /nodes/stats:
+    get:
+      summary: List stats for all nodes
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: VM stats for all nodes
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/NodeStatResponse' }
+        "401":
+          description: Missing or invalid auth
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /node/{hostname}/stats:
+    get:
+      summary: Get stats for a single node
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: hostname
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: VM stats for node
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/NodeStatResponse' }
+        "400":
+          description: Invalid hostname
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "404":
+          description: Node not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /secrets:
+    get:
+      summary: List secrets (metadata only)
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: List of secrets
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Secret' }
+        "500":
+          description: Secrets directory error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+    post:
+      summary: Create secret
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateSecretRequest' }
+      responses:
+        "201":
+          description: Secret created
+        "400":
+          description: Invalid input or base64
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "409":
+          description: Secret already exists
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "500":
+          description: Internal error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /secrets/{name}:
+    patch:
+      summary: Update secret metadata and/or content
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UpdateSecretRequest' }
+      responses:
+        "200":
+          description: Secret updated
+        "400":
+          description: Invalid input or base64
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "404":
+          description: Secret not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "500":
+          description: Internal error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+    delete:
+      summary: Delete secret
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Secret deleted
+        "404":
+          description: Secret not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "500":
+          description: Internal error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /vm/{hostname}/logs:
+    get:
+      summary: Get VM logs
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: hostname
+          required: true
+          schema: { type: string }
+        - in: query
+          name: lines
+          schema:
+            type: integer
+          description: Number of lines to return. 0 = full file.
+      responses:
+        "200":
+          description: Logs response
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SlicerLogsResponse' }
+        "400":
+          description: Invalid hostname or query
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "404":
+          description: VM or log file not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "500":
+          description: Read failure
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /vm/{hostname}/health:
+    get:
+      summary: Get agent health (JSON)
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: hostname
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Agent health
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SlicerAgentHealthResponse' }
+        "400":
+          description: No agent vsock path
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "404":
+          description: VM not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "500":
+          description: Internal error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+    head:
+      summary: Get agent health (no body)
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: hostname
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Agent health OK (no response body)
+
+  /vm/{hostname}/shutdown:
+    post:
+      summary: Shutdown or reboot VM
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: hostname
+          required: true
+          schema: { type: string }
+        - in: query
+          name: action
+          schema:
+            type: string
+            enum: [shutdown, reboot]
+          description: Defaults to reboot unless hypervisor is cloud-hypervisor.
+      responses:
+        "200":
+          description: Shutdown initiated
+          content:
+            text/plain:
+              schema:
+                type: string
+        "400":
+          description: Invalid action or request
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "404":
+          description: VM not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "500":
+          description: Internal error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /vm/{hostname}/pause:
+    post:
+      summary: Pause VM
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: hostname
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Pause initiated
+          content:
+            text/plain:
+              schema: { type: string }
+        "404":
+          description: VM not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "500":
+          description: Internal error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /vm/{hostname}/resume:
+    post:
+      summary: Resume VM
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: hostname
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Resume initiated
+          content:
+            text/plain:
+              schema: { type: string }
+        "404":
+          description: VM not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "500":
+          description: Internal error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /vm/{hostname}/exec:
+    post:
+      summary: Execute a command in the VM (streaming NDJSON)
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: hostname
+          required: true
+          schema: { type: string }
+        - in: query
+          name: cmd
+          required: true
+          schema: { type: string }
+        - in: query
+          name: args
+          schema:
+            type: array
+            items: { type: string }
+          style: form
+          explode: true
+        - in: query
+          name: uid
+          schema: { type: integer, format: uint32 }
+        - in: query
+          name: gid
+          schema: { type: integer, format: uint32 }
+        - in: query
+          name: stdin
+          schema: { type: boolean }
+        - in: query
+          name: stdout
+          schema: { type: boolean }
+        - in: query
+          name: stderr
+          schema: { type: boolean }
+        - in: query
+          name: shell
+          schema: { type: string }
+        - in: query
+          name: cwd
+          schema: { type: string }
+        - in: query
+          name: permissions
+          schema: { type: string }
+      requestBody:
+        description: Optional raw stdin stream when stdin=true.
+        content:
+          application/octet-stream:
+            schema: { type: string, format: binary }
+      responses:
+        "200":
+          description: Stream of JSON lines with exec output
+          content:
+            application/x-ndjson:
+              schema: { $ref: '#/components/schemas/SlicerExecWriteResult' }
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "404":
+          description: VM not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "409":
+          description: VM paused
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /vm/{hostname}/cp:
+    get:
+      summary: Copy files from VM to host (binary/tar stream)
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: hostname
+          required: true
+          schema: { type: string }
+        - in: query
+          name: path
+          required: true
+          schema: { type: string }
+        - in: query
+          name: mode
+          schema: { type: string, enum: [tar, binary] }
+        - in: query
+          name: permissions
+          schema: { type: string }
+      responses:
+        "200":
+          description: File stream
+          content:
+            application/octet-stream:
+              schema: { type: string, format: binary }
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "404":
+          description: VM not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "409":
+          description: VM paused
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+    post:
+      summary: Copy files from host to VM (binary/tar stream)
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: hostname
+          required: true
+          schema: { type: string }
+        - in: query
+          name: path
+          required: true
+          schema: { type: string }
+        - in: query
+          name: uid
+          schema: { type: integer, format: uint32 }
+        - in: query
+          name: gid
+          schema: { type: integer, format: uint32 }
+        - in: query
+          name: mode
+          schema: { type: string, enum: [tar, binary] }
+        - in: query
+          name: permissions
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema: { type: string, format: binary }
+      responses:
+        "200":
+          description: File received
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "404":
+          description: VM not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "409":
+          description: VM paused
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /vm/{hostname}/shell:
+    get:
+      summary: Interactive shell (WebSocket upgrade)
+      description: WebSocket endpoint for VM shell. Optional query params for uid/gid/shell/cwd.
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: hostname
+          required: true
+          schema: { type: string }
+        - in: query
+          name: uid
+          schema: { type: integer, format: uint32 }
+        - in: query
+          name: gid
+          schema: { type: integer, format: uint32 }
+        - in: query
+          name: shell
+          schema: { type: string }
+        - in: query
+          name: cwd
+          schema: { type: string }
+      responses:
+        "101":
+          description: Switching Protocols (WebSocket)
+        "400":
+          description: Invalid request or agent capability mismatch
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "404":
+          description: VM not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "409":
+          description: VM paused
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+      x-websocket: true
+
+  /vm/{hostname}/forward:
+    get:
+      summary: Forward TCP via VM agent (inlets)
+      description: |
+        Tunnel forward endpoint. The router does not restrict HTTP method; typically used
+        with CONNECT/upgrade semantics by the inlets client.
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: hostname
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Tunnel established or proxying
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "404":
+          description: VM not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /metrics:
+    get:
+      summary: Prometheus metrics
+      responses:
+        "200":
+          description: Prometheus metrics text
+          content:
+            text/plain:
+              schema: { type: string }

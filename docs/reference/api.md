@@ -109,6 +109,18 @@ To get additional data like System Uptime, Agent Uptime and Agent Version, use a
 
 `/vm/{hostname}/health`
 
+Response 200:
+
+```json
+{
+  "hostname": "vm-1",
+  "agent_uptime": 3600,
+  "agent_version": "0.1.0",
+  "system_uptime": 7200,
+  "userdata_ran": true
+}
+```
+
 ## List nodes
 
 HTTP GET
@@ -152,6 +164,7 @@ Make sure the string for userdata is JSON encoded.
 {
   "userdata": "sudo apt update && sudo apt upgrade"
 }
+```
 
 Add a host with a custom GitHub user to override the SSH keys:
 
@@ -321,6 +334,7 @@ The same applies as copying a file to the VM, however it works in the reverse. I
 - Query parameters:
   - `path` (required): destination path in VM
   - `mode` (optional): `binary` or `tar`
+  - `permissions` (optional): permissions for copied files (e.g. `0644`)
 - Response: binary data of file
 
 **Copy a directory to the client**
@@ -347,6 +361,9 @@ Query parameters:
 - `cwd` (optional): working directory
 - `shell` (optional): shell interpreter (default: /bin/bash)
 - `stdin` (optional): enable stdin pipe (true/false)
+- `stdout` (optional): enable stdout capture (true/false)
+- `stderr` (optional): enable stderr capture (true/false)
+- `permissions` (optional): permissions for the command
 
 Body: stdin data (if `stdin=true`)
 
@@ -355,9 +372,9 @@ Response: streaming newline-delimited JSON with stdout/stderr/exit_code
 Example response stream:
 
 ```json
-{"stdout":"Hello from VM\n","stderr":"","exit_code":0}
-{"stdout":"","stderr":"some error\n","exit_code":0}
-{"stdout":"","stderr":"","exit_code":0}
+{"timestamp":"2025-09-02T07:39:32.388239809Z","stdout":"Hello from VM\n","stderr":"","exit_code":0}
+{"timestamp":"2025-09-02T07:39:32.488239809Z","stdout":"","stderr":"some error\n","exit_code":0}
+{"timestamp":"2025-09-02T07:39:32.588239809Z","stdout":"","stderr":"","exit_code":0}
 ```
 
 Each JSON object is separated by a newline character.
