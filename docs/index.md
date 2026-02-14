@@ -1,6 +1,6 @@
 # Introduction to Slicer
 
-[Slicer](https://slicervm.com) (aka SlicerVM) turns any machine into your own private microVM cloud using [Firecracker](https://firecracker-microvm.github.io/) or [Cloud Hypervisor](https://cloudhypervisor.org/). It takes a low level, but powerful primitive and makes it accessible for humans, through a CLI, API and SDK.
+[Slicer](https://slicervm.com) (aka SlicerVM) turns any machine into your own private microVM cloud using [Firecracker](https://firecracker-microvm.github.io/) or [Cloud Hypervisor](https://cloudhypervisor.org/) on Linux, and Apple's [Virtualization framework](https://developer.apple.com/documentation/virtualization) on macOS. It takes a low level, but powerful primitive and makes it accessible for humans, through a CLI, API and SDK.
 
 Not only can you run applications like websites, databases, APIs, or Kubernetes clusters, you can also fully control a system programmatically and from scripts - making it ideal for both long-running and short-lived jobs, AI agents, background jobs, bots, and CI runners.
 
@@ -10,26 +10,29 @@ It's ideal for learning & experimentation - and powerful enough for R&D, custome
 
 Slicer was developed by our team for internal use before being released to the public.
 
-*How we use Slicer at OpenFaaS Ltd*
+_How we use Slicer at OpenFaaS Ltd_
 
-* To boot up a Kubernetes cluster in ~ 1min (large or small) to test new versions of Helm charts
-* To reproduce customer support tickets - sometimes running multiple environments at once
-* For introducing chaos testing into Kubernetes - where the network can be turned off whilst retaining a shell
-* For R&D with AI / LLM models in isolated environments
-* Replacing slower cloud VMs with much faster hardware - desktop CPUs burst up to 5.5Ghz, have local NVMes
-* Reducing cloud costs of R&D/permanent environments - using mini PCs, self-built servers, and bare-metal in the cloud i.e. Hetzner
+- To boot up a Kubernetes cluster in ~ 1min (large or small) to test new versions of Helm charts
+- To reproduce customer support tickets - sometimes running multiple environments at once
+- For introducing chaos testing into Kubernetes - where the network can be turned off whilst retaining a shell
+- For R&D with AI / LLM models in isolated environments
+- Replacing slower cloud VMs with much faster hardware - desktop CPUs burst up to 5.5Ghz, have local NVMes
+- Reducing cloud costs of R&D/permanent environments - using mini PCs, self-built servers, and bare-metal in the cloud i.e. Hetzner
 
-*Where can you run it?*
+_Where can you run it?_
 
 When commodity cloud vendors charge ~ 200 USD / mo for as little as 8vCPU and 32GB of RAM, working at scale becomes prohibitively expensive. You can obtain a brand new mini PC, or used server from eBay for a similar amount as a one-off cost. Or pay a bare-metal cloud provider like Hetzner Robot 33-100 EUR / mo for a powerful server for a public IP with reliable power and Internet. If you're tied to the cloud - Slicer also runs on DigitalOcean, Azure and GCP via nested virtualisation.
 
 > Slicer [is also fully functional on WSL2!](https://x.com/alexellisuk/status/1962785021976076322)
+
+[Slicer for Mac](/mac/overview) runs natively on Apple Silicon using Apple's Virtualization framework. It provides a persistent Linux VM with shared folders via VirtioFS, Docker, K3s, and disposable sandboxes - all without `sudo`.
 
 Learn more in Alex's blog post [Preview: Slice Up Bare-Metal with Slicer](https://blog.alexellis.io/slicer-bare-metal-preview/).
 
 See initial customer interest via this [X/Twitter post](https://x.com/alexellisuk/status/1961752898552914074)
 
 [![Slicer running on a Raspberry Pi 5 with NVMe](images/rpi5.png)](https://youtu.be/f_YAbqI7YoQ)
+
 > Slicer running on a Raspberry Pi 5 with NVMe. Click above to watch the video.
 
 ## Slicer Architecture
@@ -39,9 +42,10 @@ You can run Slicer with a predefined count of VMs as set via its YAML configurat
 The Slicer binary itself contains a client for the API for managing the VMs, and SDK is also made available for Go.
 
 ![Slicer Architecture](/images/slicer-arch.svg)
+
 > Slicer is run as a daemon, and VMs can be launched when it starts up, or on demand via the API.
 
-Before you can launch a microVM, you need to create a YAML configuration file and at least one host group. The host group sets the networking, and resources to be used by the VM. 
+Before you can launch a microVM, you need to create a YAML configuration file and at least one host group. The host group sets the networking, and resources to be used by the VM.
 
 The slicer-agent runs in the guest to provide: secrets syncing, port-forwarding, command execution, file copying and an interactive Shell Over SSH (SOS).
 
@@ -111,6 +115,7 @@ Our second production instance of Slicer has three VMs in its group: 1 hosts a G
 
 ## Next steps
 
-* [Install Slicer](/getting-started/install) and get started today.
-* [Read the launch blog post](https://blog.alexellis.io/slicer-bare-metal-preview/)
-* [Get in touch](/contact) for a commercial demo or order
+- [Install Slicer on Linux](/getting-started/install) and get started today.
+- [Slicer for Mac](/mac/overview) - run arm64 Linux VMs on Apple Silicon
+- [Read the launch blog post](https://blog.alexellis.io/slicer-bare-metal-preview/)
+- [Get in touch](/contact) for a commercial demo or order
