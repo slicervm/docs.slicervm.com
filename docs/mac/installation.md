@@ -6,25 +6,17 @@ Slicer for Mac is included in the [Home Edition](https://slicervm.com/pricing) a
 
 You need three binaries: `slicer-mac` (the daemon), `slicer` (the CLI client), and `slicer-tray` (the menu bar app).
 
-Install Arkade, then use it to install from OCI:
-
-```bash
-curl -sLS https://get.arkade.dev | sudo bash
-```
-
-Change to the destination directory and install all mac assets:
-
-```bash
-mkdir -p ~/slicer-mac
-cd ~/slicer-mac
-arkade oci install docker.io/alexellis2/slicer-mac:latest .
-```
-
-You can also install the CLI from the Linux package to match your license:
+First, install the `slicer` CLI and activate your license:
 
 ```bash
 curl -sLS https://get.slicervm.com | sudo bash
 slicer activate
+```
+
+Then use the CLI to install the Mac-specific assets:
+
+```bash
+slicer install slicer-mac ~/slicer-mac
 ```
 
 ## Generate the config
