@@ -11,14 +11,14 @@ slicer vm shell slicer-1
 ```
 
 ```bash
-sudo mkdir -p /home/ubuntu/host
-sudo mount -t virtiofs host /home/ubuntu/host
+sudo mkdir -p /home/ubuntu/home
+sudo mount -t virtiofs home /home/ubuntu/home
 ```
 
 ## Make sharing persistent
 
 ```bash
-echo "host /home/ubuntu/host virtiofs rw,nofail 0 0" | sudo tee -a /etc/fstab
+echo "home /home/ubuntu/home virtiofs rw,nofail 0 0" | sudo tee -a /etc/fstab
 ```
 
 ## Limit the mount path
