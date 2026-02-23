@@ -72,15 +72,21 @@ Run the daemon. The first run pulls and prepares the VM image automatically.
 
 ## Start the daemon
 
-Start `slicer-mac` with the config file:
+Start `slicer-mac`:
 
 ```bash
-slicer-mac --config ./slicer-mac.yaml
+slicer-mac up
+```
+
+The config file can also be given as an argument:
+
+```bash
+slicer-mac up ./slicer-mac.yaml
 ```
 
 ## Start the menu bar app (optional)
 
-The menu bar app gives you quick access to VM status, shells, and controls:
+The menu bar is an optional extension that gives you quick access to VM status, shells, and controls:
 
 ```bash
 slicer-tray --url ./slicer.sock
@@ -104,7 +110,9 @@ Rather than passing `--url` on every command, set the `SLICER_URL` environment v
 export SLICER_URL=./slicer.sock
 ```
 
-Add that to your `~/.zshrc` or `~/.bashrc` to make it permanent. Verify it's working:
+If you add it to your `~/.zshrc` or `~/.bashrc`, it will be set automatically for every session, but then you must use the whole absolute path to the socket i.e. `~/slicer-mac/slicer.sock` instead of `./slicer.sock`.
+
+Verify it's working:
 
 ```bash
 slicer vm list
