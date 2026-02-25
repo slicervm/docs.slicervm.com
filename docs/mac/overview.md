@@ -3,7 +3,7 @@
 Slicer for Mac runs arm64 Linux VMs on Apple Silicon using Apple's native [Virtualization framework](https://developer.apple.com/documentation/virtualization). It provides a persistent Linux VM with native folder sharing, Docker, K3s, and disposable sandboxes - all driven by the same CLI and REST API as Slicer for Linux.
 
 !!! note "Preview"
-    Slicer for Mac is available as a preview for [all subscription levels](https://slicervm.com/pricing). We've tested primarily on macOS Sequoia and Tahoe, with users reporting that Sonoma also works well. `slicer-mac` does not need `sudo`, but `slicer` on Linux generally does for most commands.
+    Slicer for Mac is available on all Slicer license tiers. We've tested on macOS Sequoia and Tahoe. `slicer-mac` does not need `sudo`.
 
 ## How it works
 

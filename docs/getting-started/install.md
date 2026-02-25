@@ -1,8 +1,13 @@
-# Installation for Slicer
+# Installation for Slicer for Linux
+
+!!! note "Slicer for Mac"
+    Slicer for Mac is available on all Slicer license tiers. We've tested on macOS Sequoia and Tahoe. `slicer-mac` does not need `sudo`.
 
 Don't wait for the perfect system. Slicer can run practically anywhere.
 
-To activate Slicer, you'll need a [Home Edition or Commercial subscription](https://slicervm.com/pricing) - pick according to your needs. Both are available on a monthly basis.
+To activate Slicer, pick the tier that matches your use-case on the [Slicer pricing page](https://slicervm.com/pricing). A free trial is available.
+
+If you need Slicer for Mac instead, use the [Slicer for Mac installation guide](/mac/installation) first.
 
 After the installation, when you run `slicer activate` you'll get an invite link to the Discord server. We highly recommend joining.
 
@@ -51,7 +56,7 @@ The installer sets up [Firecracker](https://firecracker-microvm.github.io), [Clo
 
 Additional storage backends can always be enabled later by running the installer again with the appropriate flags.
 
-For Home Edition/Hobbyist users, activate Slicer with your GitHub account to obtain a license key:
+Activate Slicer to obtain your license key:
 
 ```bash
 slicer activate --help
@@ -59,7 +64,7 @@ slicer activate --help
 slicer activate
 ```
 
-Pro/Commercial users should save their license key (received by email after checking out) to `~/.slicer/LICENSE` without running any additional commands.
+When using your selected tier, save your license key from the welcome email to `~/.slicer/LICENSE` and continue.
 
 Next, start your first VM with the [walk through](/getting-started/walkthrough).
 

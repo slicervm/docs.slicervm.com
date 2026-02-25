@@ -1,6 +1,6 @@
 # Installation
 
-Slicer for Mac is included in the [Home Edition](https://slicervm.com/pricing) and commercial licenses. You'll need macOS Sequoia or later on Apple Silicon.
+Slicer for Mac is available on all Slicer license tiers. We've tested on macOS Sequoia and Tahoe. `slicer-mac` does not need `sudo`.
 
 ## Install the binaries
 

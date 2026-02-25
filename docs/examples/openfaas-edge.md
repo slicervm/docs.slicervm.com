@@ -329,13 +329,13 @@ sudo -E slicer up ./openfaas-edge.yaml
 
 Login to the VM and activate faasd using a static license key are by running faasd activate.
 
-Commercial users can create their license key as follows:
+Users with a paid OpenFaaS Edge entitlement can create their license key as follows:
 
 ```sh
 sudo nano /var/lib/faasd/secrets/openfaas_license
 ```
 
-For personal, non-commercial use only, GitHub Sponsors of @openfaas can run:
+For personal use, GitHub Sponsors of @openfaas can run:
 
 ```sh
 sudo faasd github login

@@ -1,6 +1,6 @@
 # Troubleshooting Slicer
 
-The best place to get help with the Home Edition is via Discord. For Pro users, email support is available, check the welcome email for details.
+For Slicer plans with standard support, Discord is the best first support option. For paid-support plans, email support is available; check your welcome email for details.
 
 ## Doesn't boot right or has a networking issue - perhaps GitHub keys aren't being imported?
 

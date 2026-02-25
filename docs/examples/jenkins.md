@@ -427,7 +427,7 @@ The rest is up to you.
 
 ### 3. Questions and support
 
-If you have any questions or notice anything unexpected, reach out to us via your support channels. Discord for Home Edition, email for Commercial, and Slack/Email for Enterprise.
+If you have any questions or notice anything unexpected, reach out to us via our support channels. Use Discord for standard Slicer tiers, email for paid support plans, and Slack/Email for Enterprise.
 
 **Is the Jenkins URL empty or nil?**
 
