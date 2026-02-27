@@ -1,5 +1,9 @@
 # Use Docker from macOS with the Slicer VM socket
 
+Slicer for Mac can replace the need to run Docker For Mac, however you may want to keep a workflow that is familiar to you, and run both.
+
+In order to run both, without conflicts on networking, go into the settings of Docker for Mac, and pick "Docker VMM" as the hypervisor, and restart it. Docker VMM is a wrapper for libkrun, which will use a different IP range for VMs that does not conflict with the range used by Slicer.
+
 You can keep Docker running inside `slicer-1` and access it from your Mac
 with the local Docker CLI by forwarding the VM's Unix socket.
 
