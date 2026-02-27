@@ -1,6 +1,12 @@
 # Mac sleep behavior
 
-Running Slicer for Mac on a laptop means host sleep can affect VM lifecycle. Set `sleep_action` inside each host group in `slicer-mac.yaml` (`slicer` and `sbox` blocks):
+Apple's sleep behaviour can get in the way of running local VMs, whatever solution you happen to use.
+
+A fool-proof solution is to run `slicer vm suspend slicer-1` before closing the laptop lid or putting it into sleep. Then, later you can run `slicer vm restore slicer-1`. This relies on the suspend/resume functionality of Apple's Virtualization framework, and dumps all memory to disks. Slicer will sync the clock via its guest agent after restoring any suspended VM.
+
+Running Slicer for Mac on a laptop means host sleep can affect VM lifecycle.
+
+You can set a `sleep_action` inside each host group in `slicer-mac.yaml` (`slicer` and `sbox` blocks):
 
 ```yaml
   - name: slicer
