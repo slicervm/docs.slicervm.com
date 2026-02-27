@@ -27,6 +27,21 @@ During preview, Slicer for Mac does not come with a background service/definitio
 
 `tmux` is available via `brew install tmux`, and you can get [brew here](https://brew.sh).
 
+The `slicer` command acts as an API client to Slicer for Mac, and requires the socket path for each command. You can set this in the following way:
+
+For the current shell:
+
+```bash
+export SLICER_URL=~/slicer-mac/slicer.sock
+```
+
+Or permanently for every shell session:
+
+```bash
+echo 'export SLICER_URL=~/slicer-mac/slicer.sock' >> ~/.bash_profile
+echo 'export SLICER_URL=~/slicer-mac/slicer.sock' >> ~/.zshrc
+```
+
 ## Initial configuration.
 
 As a new user, we recommend you do not change the default configuration in any way.
@@ -38,7 +53,8 @@ The `slicer-mac` OCI bundle includes a default `slicer-mac.yaml` in the folder a
 Only run this if you want to recreate the file because you edited or edited it.
 
 ```bash
-slicer-mac new > slicer-mac.yaml
+cd ~/slicer-mac
+./slicer-mac new > slicer-mac.yaml
 ```
 
 The generated `slicer-mac.yaml` has two host groups:
@@ -87,13 +103,8 @@ Run the daemon. The first run pulls and prepares the VM image automatically.
 Start `slicer-mac`:
 
 ```bash
-slicer-mac up
-```
-
-The config file can also be given as an argument:
-
-```bash
-slicer-mac up ./slicer-mac.yaml
+cd ~/slicer-mac
+./slicer-mac up
 ```
 
 ## Start the menu bar app (optional)
@@ -101,7 +112,8 @@ slicer-mac up ./slicer-mac.yaml
 The menu bar is an optional extension that gives you quick access to VM status, shells, and controls:
 
 ```bash
-slicer-tray --url ./slicer.sock
+cd ~/slicer-mac
+./slicer-tray --url ./slicer.sock
 ```
 
 ![Slicer for Mac menu bar](/images/mac/menu-bar.jpg)
@@ -114,15 +126,7 @@ By default, shells open in Terminal.app. For Ghostty or another terminal:
 slicer-tray --url ./slicer.sock --terminal "ghostty"
 ```
 
-## Set up the CLI
-
-Rather than passing `--url` on every command, set the `SLICER_URL` environment variable:
-
-```bash
-export SLICER_URL=./slicer.sock
-```
-
-If you add it to your `~/.zshrc` or `~/.bashrc`, it will be set automatically for every session, but then you must use the whole absolute path to the socket i.e. `~/slicer-mac/slicer.sock` instead of `./slicer.sock`.
+## Set up the Slicer CLI
 
 Verify it's working:
 
@@ -131,6 +135,39 @@ slicer vm list
 HOSTNAME          IP              STATUS     CREATED
 --------          --              ------     -------
 slicer-1          192.168.64.2    Running    2026-02-10 12:46:14
+```
+
+The `slicer-1` VM is your main development environment, and is persistent.
+
+You can shell into it with:
+
+```bash
+slicer vm shell slicer-1
+```
+
+To launch temporary VMs, run the following to launch a new VM into the `sbox` host group:
+
+```bash
+slicer vm launch sbox
+```
+
+Then:
+
+```bash
+# The following will show the two VMs:
+slicer vm list
+
+# Access a shell
+slicer vm shell sbox-1
+
+# Copy a file in
+slicer vm cp ~/file.txt sbox-1:~/
+
+# Use that file, remotely via exec:
+slicer vm exec sbox-1 -- stat ~/file.txt
+
+# Delete that VM
+slicer vm delete sbox-1
 ```
 
 ## Next steps

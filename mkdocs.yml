@@ -152,6 +152,7 @@ nav:
           - Enable Rosetta: mac/rosetta.md
           - Storage: mac/storage.md
           - Folder sharing: mac/folder-sharing.md
+          - Docker: mac/docker.md
           - Sleep behavior: mac/sleep.md
           - Tray integration: mac/tray-integration.md
       - Examples:
