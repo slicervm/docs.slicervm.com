@@ -53,7 +53,7 @@ config:
 
 The HTTP API is enabled by default and can be disabled with `enabled: false`.
 
-The SSH server is disabled by default and can be enabled by providing a port.
+The Serial Over SSH (SOS) server is disabled by default and can be enabled by providing a port. Most users will  not need the SOS.
 
 The default `bind_address` for both the API and SSH is `127.0.0.1` - loopback on the host system.
 
@@ -75,6 +75,8 @@ Now, open a new terminal window, or ideally launch `tmux` so you can leave the b
 ```bash
 sudo -E slicer up ./vm-image.yaml
 ```
+
+> Note: The `sudo -E` command above preserves the user's HOME directory, so it means the LICENSE file can be found by Slicer and managed by your normal user account. If you want to run `sudo` without remembering to add `-E`, then run `sudo -E cp -r ~/.slicer /root/`
 
 Having customised the `github_user` to your own username, your SSH keys will have been fetched from your profile, and preinstalled into the VM.
 

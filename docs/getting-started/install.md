@@ -1,7 +1,7 @@
 # Installation for Slicer for Linux
 
-!!! note "Slicer for Mac"
-    Slicer for Mac is available on all Slicer license tiers. We've tested on macOS Sequoia and Tahoe. `slicer-mac` does not need `sudo`.
+!!! note "Slicer for Linux and sudo"
+    The Slicer for Linux daemon requires root, and can listen on a UNIX socket or a a TCP port. When it listens on a UNIX socket, then typically, you'll want to run `slicer` as a client using `sudo -E`. The `-E` flag preserves the user's environment variables and HOME directory.
 
 Don't wait for the perfect system. Slicer can run practically anywhere.
 
@@ -64,11 +64,15 @@ slicer activate --help
 slicer activate
 ```
 
-When using your selected tier, save your license key from the welcome email to `~/.slicer/LICENSE` and continue.
+For the Individual tier the a license key will be written to `~/.slicer/LICENSE` along with a GitHub token. The key will last for 30 days, but can be refreshed via `slicer activate`. When refreshing, it'll use the stored GitHub token, instead of running the device flow again.
+
+For higher tiers, the license key is an API key delivered to you via email. You should save it to `~/.slicer/LICENSE`.
 
 Next, start your first VM with the [walk through](/getting-started/walkthrough).
 
 ## Snapshot-based storage
+
+Snapshot-based storage is not required for development and testing, instead, it's recommended that most users use the `image` storage approach instead, until they want to trade a little extra setup, for much improved VM disk clone times.
 
 Snapshot-based storage enables much faster VM creation times. ZFS is the recommended option for Slicer, devmapper is also supported. See [storage for slicer](/storage/overview) for more info on the different storage backends.
 
