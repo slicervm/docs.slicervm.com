@@ -9,21 +9,27 @@ Do you need to run Slicer as a systemd service right off the bat? It depends.
 
 Not only can we monitor Slicer's logs via `journalctl`, but we can manage it with standard `systemctl` commands.
 
-Let's take the example from the [walkthrough](/getting-started/walkthrough) and create a systemd service for it.
+You can run one or many Slicer daemons in this way, just make sure the host group CIDRs do not overlap, and that the API binds to a different UNIX socket or a different TCP port.
 
-Create a service named i.e. `vm-image.service`:
+Let's say you wanted to create a service for a hostgroup named "vm":
+
+```bash
+mkdir -p ~/vm/
+slicer new vm > ~/vm/slicer.yaml
+```
+
+Create a service named i.e. `vm.service`:
 
 ```bash
 [Unit]
-Description=Slicer
+Description=Slicer for vm
 
 [Service]
-User=root
+User=alex
 Type=simple
-WorkingDirectory=/home/alex
-ExecStart=sudo -E /usr/local/bin/slicer up \
-  /home/alex/vm-image.yaml \
-  --license-file /home/alex/.slicer/LICENSE
+WorkingDirectory=/home/alex/slicer
+ExecStart=sudo /usr/local/bin/slicer up \
+  /home/alex/slicer/vm/slicer.yaml
 Restart=always
 RestartSec=30s
 KillMode=mixed
@@ -36,32 +42,23 @@ WantedBy=multi-user.target
 Install the service, and set it to start up on reboots:
 
 ```bash
-sudo cp ./vm-image.service /etc/systemd/system/
-sudo systemctl enable vm-image.service
-```
-
-Now before starting the service, make sure you shut down any existing Slicer process that is managing this particular VM.
-
-Then:
-
-```bash
-sudo systemctl start vm-image.service
+sudo systemctl enable --now vm.service
 ```
 
 To view the logs for the service run:
 
 ```bash
 # Page through all logs
-sudo journalctl --output=cat -u vm-image
+sudo journalctl --output=cat -u vm
 
 # Tail the latest logs
-sudo journalctl --output=cat -f -u vm-image
+sudo journalctl --output=cat -f -u vm
 
 # View all logs since today/yesterday
-sudo journalctl --output=cat --since today -u vm-image
-sudo journalctl --output=cat --since yesterday -u vm-image
+sudo journalctl --output=cat --since today -u vm
+sudo journalctl --output=cat --since yesterday -u vm
 ```
 
-To stop the service run `sudo systemctl stop vm-image`, and to prevent it loading on start-up run: `sudo systemctl disable vm-image`.
+To stop the service run `sudo systemctl stop vm`, and to prevent it loading on start-up run: `sudo systemctl disable vm`.
 
 You can create multiple Slicer services to run different sets of VMs or configurations on the same host.
