@@ -6,24 +6,36 @@ Slicer for Mac is available on all Slicer license tiers. We've tested on macOS S
 
 You need three binaries: `slicer-mac` (the daemon), `slicer` (the CLI client), and `slicer-tray` (the menu bar app).
 
-First, install the `slicer` CLI and activate your license:
+If you have the Invididual tier, then first, install the `slicer` CLI and activate your license:
 
 ```bash
 curl -sLS https://get.slicervm.com | sudo bash
 slicer activate
 ```
 
-Then use the CLI to install the Mac-specific assets:
+The activate command will start an OAuth Device Flow via GitHub. Follow the instructions to complete the flow, and you'll get a license key valid for 30 days. The key is written to `~/.slicer/LICENSE` along with a GitHub token. The token can be used to refresh the license key without going through Device Flow again.
+
+If you have a higher tier than Individual, you'll have received an email with the license key, copy and paste it into a file at `~/.slicer/LICENSE`.
+
+Then use the CLI to install the Mac-specific binaries:
 
 ```bash
 slicer install slicer-mac ~/slicer-mac
 ```
 
-## Generate the config
+During preview, Slicer for Mac does not come with a background service/definition (known as a plist on macOS). So you need to launch it as and when you want it. Either directly in a terminal, or in a `tmux` window.
 
-The `slicer-mac` OCI bundle includes a default `slicer-mac.yaml` in the folder after install, so you can use that file directly and skip regeneration.
+`tmux` is available via `brew install tmux`, and you can get [brew here](https://brew.sh).
 
-Only run this if you want to recreate the file:
+## Initial configuration.
+
+As a new user, we recommend you do not change the default configuration in any way.
+
+First of all, get used to it, leave it in the path we recommend (`~/slicer-mac`) and explore the use-cases you have in mind.
+
+The `slicer-mac` OCI bundle includes a default `slicer-mac.yaml` in the folder after install, so you can use that file directly.
+
+Only run this if you want to recreate the file because you edited or edited it.
 
 ```bash
 slicer-mac new > slicer-mac.yaml
@@ -32,7 +44,7 @@ slicer-mac new > slicer-mac.yaml
 The generated `slicer-mac.yaml` has two host groups:
 
 - **`slicer`** (`count: 1`) - your persistent Linux VM, starts with the daemon
-- **`sbox`** (`count: 0`) - ephemeral sandboxes, launched on demand
+- **`sbox`** (`count: 0`) - ephemeral sandboxes, launched on demand for things like coding agents.
 
 ```yaml
 config:

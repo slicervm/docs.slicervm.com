@@ -4,7 +4,48 @@ You can run coding agents like [Claude Code](https://code.claude.com/docs/en/ove
 
 Running an agent inside a VM means you don't have to pass `--dangerously-skip-permissions` on your Mac. The agent gets its own kernel and filesystem, and can't touch your SSH keys, cloud credentials, or browser sessions.
 
-## Install agents
+## Automated agent and sandbox launches
+
+Slicer has a number of experimental commands that do the following:
+
+* Boot a new VM
+* Copy the current directory to the VM in the same relative path
+* Installs the specified AI agent, and copies in its config/auth files
+* Launches the agent in a shell (`slicer vm shell`)
+
+Available agent commands:
+
+* `slicer amp`
+* `slicer copilot`
+* `slicer codex`
+* `slicer claude`
+* `slicer opencode`
+
+Finally, there's another option for custom AI agents `slicer workspace`
+
+To launch i.e. a new slicer VM for Claude:
+
+```
+mkdir -p ~/dev/
+cd ~/dev/
+git clone --depth=1 https://github.com/alexellis/arkade
+
+cd arkade
+
+export SLICER_URL=~/slicer-mac/slicer.sock
+
+slicer claude .
+```
+
+When launching a VM for a coding agent, you can specify:
+
+* `--tmux=none` - launch the agent directly in the shell
+* `--tmux=local` - launch a shell using tmux on your mac (requires `brew install tmux`)
+* `--tmux=remote` - launch a shell using tmux on the VM
+
+Tmux is a time-tested terminal tool and ideal for running processes in the background, and reconnecting to them later.
+
+## Install agents manually
 
 Shell into your VM and install agents with [arkade](https://github.com/alexellis/arkade):
 
