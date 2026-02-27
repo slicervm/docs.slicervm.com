@@ -53,3 +53,13 @@ To remove a single VM image and recreate it from the host-group base image:
 ```bash
 rm -f ./slicer-1.img
 ```
+
+## Troubleshooting
+
+If your VM crashes for some reason, or the Mac's sleep mode causes an issue with the VM, you may find the `.img` file needs to be checked or repaired with the `e2fsck` utility.
+
+```bash
+e2fsck -f ./slicer-1.img
+```
+
+You can obtain `e2fsck` by installing the `e2fsprogs` package via `brew install e2fsprogs`. Brew is available separately at: [https://brew.sh/](https://brew.sh/).
