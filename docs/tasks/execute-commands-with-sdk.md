@@ -84,7 +84,7 @@ func run() error {
 
 	// Create VM in the 'sdk' host group
 	hostGroupName := "sdk"
-	node, err := client.CreateNode(ctx, hostGroupName, createReq)
+	node, err := client.CreateVM(ctx, hostGroupName, createReq)
 	if err != nil {
 		return fmt.Errorf("failed to create VM: %s", err)
 	}
@@ -301,7 +301,7 @@ func run() error {
 
 	// Create VM in the 'sdk' host group
 	hostGroupName := "sdk"
-	node, err := client.CreateNode(ctx, hostGroupName, createReq)
+	node, err := client.CreateVM(ctx, hostGroupName, createReq)
 	if err != nil {
 		return fmt.Errorf("failed to create VM: %s", err)
 	}
