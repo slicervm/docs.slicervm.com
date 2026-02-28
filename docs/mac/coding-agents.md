@@ -32,8 +32,6 @@ git clone --depth=1 https://github.com/alexellis/arkade
 
 cd arkade
 
-export SLICER_URL=~/slicer-mac/slicer.sock
-
 slicer claude .
 ```
 

@@ -27,20 +27,9 @@ During preview, Slicer for Mac does not come with a background service/definitio
 
 `tmux` is available via `brew install tmux`, and you can get [brew here](https://brew.sh).
 
-The `slicer` command acts as an API client to Slicer for Mac, and requires the socket path for each command. You can set this in the following way:
+The `slicer` command acts as an API client to Slicer for Mac.
 
-For the current shell:
-
-```bash
-export SLICER_URL=~/slicer-mac/slicer.sock
-```
-
-Or permanently for every shell session:
-
-```bash
-echo 'export SLICER_URL=~/slicer-mac/slicer.sock' >> ~/.bash_profile
-echo 'export SLICER_URL=~/slicer-mac/slicer.sock' >> ~/.zshrc
-```
+By default, `slicer` auto-discovers the local mac socket at `~/slicer-mac/slicer.sock`, so you usually don't need any socket flags or environment variables for local use.
 
 ## Initial configuration.
 
@@ -113,7 +102,7 @@ The menu bar is an optional extension that gives you quick access to VM status, 
 
 ```bash
 cd ~/slicer-mac
-./slicer-tray --url ./slicer.sock
+./slicer-tray
 ```
 
 ![Slicer for Mac menu bar](/images/mac/menu-bar.jpg)
@@ -123,7 +112,7 @@ cd ~/slicer-mac
 By default, shells open in Terminal.app. For Ghostty or another terminal:
 
 ```bash
-slicer-tray --url ./slicer.sock --terminal "ghostty"
+slicer-tray --terminal "ghostty"
 ```
 
 ## Set up the Slicer CLI
@@ -168,6 +157,25 @@ slicer vm exec sbox-1 -- stat ~/file.txt
 
 # Delete that VM
 slicer vm delete sbox-1
+```
+
+## Run slicer-mac as a background service
+
+```bash
+cd ~/slicer-mac
+
+# Simplest, without tray icon / menu:
+./slicer-mac install --no-tray
+
+# With tray icon / menu:
+./slicer-mac install
+```
+
+To uninstall:
+
+```bash
+cd ~/slicer-mac
+./slicer-mac uninstall
 ```
 
 ## Next steps
