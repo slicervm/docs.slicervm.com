@@ -5,6 +5,9 @@ Table of contents:
 * [Bridge Networking](#bridge-networking)
 * [CNI Networking](#cni-networking)
 * [Isolated Mode Networking](#isolated-mode-networking)
+  * [Quick start](#quick-start)
+  * [Specifying an explicit range](#specifying-an-explicit-range)
+  * [Drop and allow rules](#drop-and-allow-rules)
   * [Firewall](#firewall)
   * [Additional configuration for Netplan](#additional-configuration-for-netplan)
 
@@ -95,18 +98,7 @@ The `slicer` network is defined at: `/etc/cni/net.d/51-slicer.conflist` and can 
 
 ## Isolated Mode Networking
 
-Isolated Mode networking is the newest option, and will come in a future release of Slicer.
-
-In this mode, each microVM's TAP is created in a private network namespace, then connected to the host via a veth pair.
-
-Any additional host groups should use the next consecutive subnet within the given range, i.e.
-
-* `169.254.100.0/22`
-* `169.254.104.0/22`
-* `169.254.108.0/22`
-* `169.254.112.0/22`
-
-When Slicer is running on various different hosts, you can re-use the same subnet ranges on different machines. If Slicer is running multiple times on the same host (or if one instance contains more than one host group), then you need to use non-overlapping subnets.
+In this mode, each microVM's TAP is created in a private network namespace, then connected to the host via a veth pair. Each VM is fully isolated from the others, from the host, and from the LAN.
 
 Pros:
 
@@ -121,21 +113,67 @@ Cons:
 * Additional complexity in managing the network namespaces and cleaning up all resources in error conditions or crashes
 * Maximum node group name including the suffix `-` and a number, can't be longer than 15 characters. I.e. `agents-1` up to `agents-1000` is fine, but `isolated-agents-1` would not fit.
 
-> The easiest way to try out Isolated Network Mode is to use the `slicer vm new` command, which will create a new YAML file for you, just pass in the `--net=isolated` flag. And optionally, specify a number of `--allow` and `--drop` flags, with IPs or CIDR blocks.
+### Quick start
 
-Example dropping requests to `192.168.1.0/24`, allowing all other traffic:
+The easiest way to use isolated mode is with `slicer new` — no IP range is needed:
+
+```bash
+slicer new sandbox --net=isolated
+```
+
+This generates a minimal config with no `range:` field. Slicer automatically derives a `/22` subnet within `169.254.0.0/16` from the hostgroup name. Each `/22` provides 256 usable `/30` blocks (one per VM).
+
+To add firewall rules at generation time:
+
+```bash
+slicer new sandbox --net=isolated --drop 192.168.1.0/24
+```
+
+The generated YAML looks like:
 
 ```yaml
 config:
   host_groups:
-    - name: isolated
+    - name: sandbox
+      network:
+        mode: "isolated"
+        drop: ["192.168.1.0/24"]
+```
+
+This is safe to use with multiple Slicer daemons running on the same host — each hostgroup name hashes to a different subnet, and Slicer checks for IP collisions on host interfaces before assigning each `/30` block, skipping any that are already in use.
+
+### Specifying an explicit range
+
+If you prefer to control the exact subnet, you can specify a `range:` field. This is useful when you want deterministic IP assignments or need to coordinate ranges across many host groups manually.
+
+```yaml
+config:
+  host_groups:
+    - name: sandbox
       network:
         mode: "isolated"
         range: "169.254.100.0/22"
         drop: ["192.168.1.0/24"]
 ```
 
-The range of `169.254.100.0/22` gives 127 usable IP address blocks, each containing a /30 subnet. The first IP is for the network, the second is for the gateway, the third is for the microVM, and the fourth is for broadcast.
+A `/22` range gives 256 usable `/30` blocks. Each `/30` contains 4 IPs: network, gateway, host (microVM), and broadcast.
+
+When using explicit ranges with multiple host groups or multiple Slicer daemons on the same host, use non-overlapping subnets:
+
+* `169.254.100.0/22`
+* `169.254.104.0/22`
+* `169.254.108.0/22`
+* `169.254.112.0/22`
+
+When Slicer is running on different hosts, you can re-use the same subnet ranges on different machines.
+
+You can also pass an explicit range via `slicer new`:
+
+```bash
+slicer new sandbox --net=isolated --isolated-range 169.254.100.0/22
+```
+
+### Drop and allow rules
 
 The `drop` list contains CIDR blocks that should be blocked for all microVMs in this hostgroup. In the example above, all microVMs will have all traffic to the standard LAN network `192.168.1.0/24` dropped before it has a chance to leave the private network namespace.
 
