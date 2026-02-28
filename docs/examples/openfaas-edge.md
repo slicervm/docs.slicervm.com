@@ -324,7 +324,7 @@ The userdate script provided in this guide can be used with both Ubuntu and Rock
 Start the VM:
 
 ```sh
-sudo -E slicer up ./openfaas-edge.yaml
+sudo slicer up ./openfaas-edge.yaml
 ```
 
 Login to the VM and activate faasd using a static license key are by running faasd activate.

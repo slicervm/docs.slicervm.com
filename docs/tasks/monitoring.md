@@ -13,9 +13,9 @@ sudo tail -f /var/log/slicer/vm-1.txt
 These logs are also available via the [REST API](/reference/api) or the CLI:
 
 ```bash
-sudo -E slicer logs vm-1               # Tail the last 20 lines (default)
-sudo -E slicer logs vm-1 --lines 50    # Tail the last 50 lines
-sudo -E slicer logs vm-1 --lines 0     # Print the whole file
+sudo slicer logs vm-1               # Tail the last 20 lines (default)
+sudo slicer logs vm-1 --lines 50    # Tail the last 50 lines
+sudo slicer logs vm-1 --lines 0     # Print the whole file
 ```
 
 ## Monitoring
@@ -113,7 +113,7 @@ $ slicer vm top --api http://192.168.1.114:8080 --token TOKEN_VALUE
 $ slicer vm top --api http://192.168.1.114:8080 --token-file TOKEN_VALUE
 ```
 
-When slicer is running locally, and authentication is enabled, use `sudo -E` and slicer will attempt to read the auth token from the default location of `/var/lib/slicer/auth/token`.
+When slicer is running locally, and authentication is enabled, use `sudo` and slicer will attempt to read the auth token from the default location of `/var/lib/slicer/auth/token`.
 
 ```bash
 $ sudo slicer vm top

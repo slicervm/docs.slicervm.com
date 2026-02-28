@@ -60,8 +60,8 @@ Then start up the control plane nodes:
 
 ```bash
 # Deploy control plane
-sudo -E slicer up ./k3s-cp.yaml
-sudo -E slicer vm list --json > devices.json
+sudo slicer up ./k3s-cp.yaml
+sudo slicer vm list --json > devices.json
 ```
 ## Step 1.1: Install K3s on the control plane nodes
 
@@ -119,7 +119,7 @@ slicer new k3s-agents-1 \
   > k3s-agents-1.yaml
 
 # Deploy worker host group
-sudo -E slicer up ./k3s-agents-1.yaml
+sudo slicer up ./k3s-agents-1.yaml
 ```
 
 This host group starts with zero nodes (`count=0`). The Cluster Autoscaler will call the Slicer API to dynamically add nodes to this group based on scheduling demands.
@@ -641,10 +641,10 @@ On the host managing `k3s-agents-1`, you would run:
 
 ```bash
 # Show the available nodes
-sudo -E slicer vm list --url http://127.0.0.1:8081/nodes
+sudo slicer vm list --url http://127.0.0.1:8081/nodes
 
 # Get a root shell into node 1
-sudo -E slicer vm exec --url http://127.0.0.1:8081/nodes k3s-agents-1-1
+sudo slicer vm exec --url http://127.0.0.1:8081/nodes k3s-agents-1-1
 ```
 
 From there you can check the logs of the `k3s` service via `sudo journalctl -u k3s -f`.

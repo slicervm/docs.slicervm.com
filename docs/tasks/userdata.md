@@ -97,7 +97,7 @@ curl -sLSf http://127.0.0.1:8080/hostgroup/agents/nodes \
 Or you can use the CLI for more convenience:
 
 ```bash
-sudo -E slicer vm add \
+sudo slicer vm add \
     --userdata ./userdata.sh
 ```
 

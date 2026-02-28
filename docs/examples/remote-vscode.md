@@ -56,7 +56,7 @@ Use the `--ssh-key` or `--github` flags to add your ssh keys so you can connect 
 Start the VM with the following command:
 
 ```bash
-sudo -E slicer up ./vscode.yaml
+sudo slicer up ./vscode.yaml
 ```
 
 You can watch the installation by adding the [fstail](https://github.com/alexellis/fstail) tool via `arkade get fstail`.

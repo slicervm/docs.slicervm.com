@@ -137,7 +137,7 @@ EOF
 Then, boot up the microVM, then check the logs for the stable name of the network adapter:
 
 ```bash
-sudo -E slicer up ./router.yaml
+sudo slicer up ./router.yaml
 ```
 
 Once booted, review the log file for the microVM, the userdata script will output to the console:
@@ -349,13 +349,13 @@ systemctl --no-pager --full status dnsmasq || true
 Start up the microVM:
 
 ```bash
-sudo -E slicer up ./router.yaml
+sudo slicer up ./router.yaml
 ```
 
 You can then connect and start viewing the logs from the DHCP/DNS server:
 
 ```bash
-sudo -E slicer vm shell --uid 1000 router-1
+sudo slicer vm shell --uid 1000 router-1
 
 # Then within the microVM:
 sudo journalctl -u dnsmasq --since today -f
@@ -468,7 +468,7 @@ Next, make sure the Raspberry Pi is plugged into the network interface on the Sl
 From the Slicer host, open a shell into the microVM:
 
 ```bash
-sudo -E slicer vm shell --uid 1000 router-1
+sudo slicer vm shell --uid 1000 router-1
 ```
 
 You can either find the IP given out from the `journalctl` command we ran earlier, or use nmap to discover the Raspberry Pi on the network:

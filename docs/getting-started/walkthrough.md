@@ -73,10 +73,8 @@ The `storage: image` setting means a disk image will be cloned from the root fil
 Now, open a new terminal window, or ideally launch `tmux` so you can leave the binary running in the background.
 
 ```bash
-sudo -E slicer up ./vm-image.yaml
+sudo slicer up ./vm-image.yaml
 ```
-
-> Note: The `sudo -E` command above preserves the user's HOME directory, so it means the LICENSE file can be found by Slicer and managed by your normal user account. If you want to run `sudo` without remembering to add `-E`, then run `sudo -E cp -r ~/.slicer /root/`
 
 Having customised the `github_user` to your own username, your SSH keys will have been fetched from your profile, and preinstalled into the VM.
 

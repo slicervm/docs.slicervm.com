@@ -54,7 +54,7 @@ But, you can also bind devices to VFIO via the `cmdline` argument in your bootlo
 
 Note: That this method only works at the vendor/device ID level, so if you have multiple GPUs, or multiple NICs of the same time, it's very unlikely that you'll want to bind them all to VFIO because they will not be accessible to the host.
 
-Use `sudo -E slicer pci list` to find the vendor and device IDs of the devices you want to bind to VFIO.
+Use `sudo slicer pci list` to find the vendor and device IDs of the devices you want to bind to VFIO.
 
 Then add them to the `cmdline` argument as follows, replacing the example IDs below with your own:
 
@@ -67,7 +67,7 @@ vfio-pci.ids=10de:2204,10de:1aef
 To view the PCI devices and their IOMMU groups, you can use the following command:
 
 ```
-sudo -E slicer pci list
+sudo slicer pci list
 ```
 
 Example output:
@@ -90,9 +90,9 @@ You can bind a device to VFIO in two ways:
 
 We recommend only using 2. because 1. is unable to differentiate between multiple devices of the same type such as two or more NICs or two or more GPUs. You often need at least one of these to be available for the host.
 
-View PCI devices via `sudo -E slicer pci list` and note the `ADDRESS` column.
+View PCI devices via `sudo slicer pci list` and note the `ADDRESS` column.
 
-Then run `sudo -E slicer pci bind <PCI_ADDRESS>` to bind the device to VFIO. Replace `<PCI_ADDRESS>` with the actual PCI address of the device you want to bind.
+Then run `sudo slicer pci bind <PCI_ADDRESS>` to bind the device to VFIO. Replace `<PCI_ADDRESS>` with the actual PCI address of the device you want to bind.
 
 By default, this command will attempt to unbind the device from the original driver on your host system, but if it doesn't work, unbind it manually with the steps below.
 
@@ -101,7 +101,7 @@ By default, this command will attempt to unbind the device from the original dri
 To unbind a device from VFIO, you can use the following command:
 
 ```
-sudo -E slicer pci unbind <PCI_ADDRESS>
+sudo slicer pci unbind <PCI_ADDRESS>
 ```
 
 ## Rebind a device to its original driver
@@ -111,8 +111,8 @@ Once unbound, you can use `bind` with the `--driver` flag to re-bind it to the o
 In the case of the GPU example above, you may want to allocate one of the bound GPUs back to the host for display purposes.
 
 ```
-sudo -E slicer pci bind 0000:0b:00.0 --driver=nvidia
-sudo -E slicer pci bind 0000:0b:00.1 --driver=snd_hda_intel
+sudo slicer pci bind 0000:0b:00.0 --driver=nvidia
+sudo slicer pci bind 0000:0b:00.1 --driver=snd_hda_intel
 ```
 
 ## Troubleshooting
@@ -128,8 +128,8 @@ sudo modprobe vfio-pci
 2. Also double-check your bootloader i.e. Grub configuration for the command line that's passed to the Linux Kernel. Did you skip `update-grub` or `update-initramfs`?
 3. Check the output of `sudo dmesg | grep -e DMAR -e IOMMU` for any errors related to IOMMU initialization.
 4. Ensure that the device you are trying to passthrough is not being used by the host system and that it's not already bound to a specific driver.
-5. Verify that the device is in its own IOMMU group using `sudo -E slicer pci list` - you typically have to bind every device within an IOMMU group otherwise they cannot be used in a VM.
-6. If you're having issues binding a device to VFIO, try explicitly unbinding it from the original driver with `sudo -E slicer pci unbind <PCI_ADDRESS>` first.
+5. Verify that the device is in its own IOMMU group using `sudo slicer pci list` - you typically have to bind every device within an IOMMU group otherwise they cannot be used in a VM.
+6. If you're having issues binding a device to VFIO, try explicitly unbinding it from the original driver with `sudo slicer pci unbind <PCI_ADDRESS>` first.
 
 After checking all of the above, if you find your devices are all mixed into the same IOMMU group, that means your system is not designed for VFIO.
 

@@ -119,7 +119,7 @@ Over multiple lines
 EOF
 ```
 
-Start up the VM i.e. `sudo -E slicer up ./opencode.yaml`
+Start up the VM i.e. `sudo slicer up ./opencode.yaml`
 
 **What if you want to copy in a private Git repository?**
 
@@ -227,13 +227,13 @@ chmod 600 .secrets/opencode-auth.json
 Now boot up the microVM, just before userdata it will synchronise any secrets placed in the .secrets folder into the microVM.
 
 ```bash
-sudo -E slicer up ./opencode.yaml
+sudo slicer up ./opencode.yaml
 ```
 
 The following command will indicate whether the userdata script has completed:
 
 ```bash
-sudo -E slicer vm health opencode-1 
+sudo slicer vm health opencode-1 
 HOSTNAME                  AGENT UPTIME         SYSTEM UPTIME        AGENT VERSION   USERDATA RAN
 --------                  ------------         -------------        -------------   ------------
 opencode-1                53s                  53s                  0.1.55          1   
@@ -252,13 +252,13 @@ EOF
 ```
 
 ```bash
-sudo -E slicer vm cp --uid 1000 ./task.txt opencode-1:/home/ubuntu/workdir/task.txt
+sudo slicer vm cp --uid 1000 ./task.txt opencode-1:/home/ubuntu/workdir/task.txt
 ```
 
 Next, use the `exec` command to run the opencode agent interactively, streaming the response back to the host.
 
 ```bash
-sudo -E slicer vm exec --uid 1000 --cwd /home/ubuntu/workdir opencode-1 -- opencode run -m opencode/grok-code $(cat task.txt)
+sudo slicer vm exec --uid 1000 --cwd /home/ubuntu/workdir opencode-1 -- opencode run -m opencode/grok-code $(cat task.txt)
 
 # Example output:
 
@@ -271,7 +271,7 @@ You can now see the response in the terminal.
 Finally, copy out the results from the microVM via `cp` in the alternate direction.
 
 ```bash
-sudo -E slicer vm cp --uid 1000 opencode-1:/home/ubuntu/workdir/main.go ./main.go
+sudo slicer vm cp --uid 1000 opencode-1:/home/ubuntu/workdir/main.go ./main.go
 ```
 
 Examine the output:
@@ -290,7 +290,7 @@ It's also possible to copy back the whole workdir folder, which is ideal when op
 
 ```bash
 mkdir -p workdir-out
-sudo -E slicer vm cp --mode=tar --uid 1000 opencode-1:/home/ubuntu/workdir/ ./workdir-out
+sudo slicer vm cp --mode=tar --uid 1000 opencode-1:/home/ubuntu/workdir/ ./workdir-out
 ```
 
 Then, examine the contents:

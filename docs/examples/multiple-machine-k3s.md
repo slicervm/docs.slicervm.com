@@ -51,11 +51,11 @@ slicer new k3s-b \
 On each respective machine run:
 
 ```bash
-sudo -E slicer up ./k3s-a.yaml
+sudo slicer up ./k3s-a.yaml
 ```
 
 ```bash
-sudo -E slicer up ./k3s-b.yaml
+sudo slicer up ./k3s-b.yaml
 ```
 
 ## Enable routing between the machines and VMs

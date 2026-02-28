@@ -88,7 +88,7 @@ For better build performance, consider increasing the VM resources:
 Start the VM with the following command:
 
 ```bash
-sudo -E slicer up ./buildkit.yaml
+sudo slicer up ./buildkit.yaml
 ```
 
 ## Configure Docker buildx

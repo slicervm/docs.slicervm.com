@@ -1,8 +1,5 @@
 # Installation for Slicer for Linux
 
-!!! note "Slicer for Linux and sudo"
-    The Slicer for Linux daemon requires root, and can listen on a UNIX socket or a a TCP port. When it listens on a UNIX socket, then typically, you'll want to run `slicer` as a client using `sudo -E`. The `-E` flag preserves the user's environment variables and HOME directory.
-
 Don't wait for the perfect system. Slicer can run practically anywhere.
 
 To activate Slicer, pick the tier that matches your use-case on the [Slicer pricing page](https://slicervm.com/pricing). A free trial is available.
@@ -116,12 +113,12 @@ The `--devmapper` and `--zfs` flags can be used together to enable both storage 
 To update Slicer, use the `slicer update` command:
 
 ```bash
-sudo -E slicer update
+sudo slicer update
 ```
 
 Alternatively, if you're on an earlier version, repeat this command from the installation step:
 
 ```bash
-sudo -E arkade oci install ghcr.io/openfaasltd/slicer:latest \
+sudo arkade oci install ghcr.io/openfaasltd/slicer:latest \
   --path /usr/local/bin
 ```

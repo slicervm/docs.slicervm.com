@@ -33,7 +33,7 @@ Feel free to customise the vCPU, RAM, and disk sizes.
 Boot up the VM:
 
 ```bash
-sudo -E slicer up ./k3s-gpu.yaml
+sudo slicer up ./k3s-gpu.yaml
 ```
 
 Now, run the route commands so you can SSH into the host from your workstation.

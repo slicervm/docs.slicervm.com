@@ -171,13 +171,13 @@ You can provide one or more SSH keys via:
 Now create the VM:
 
 ```bash
-sudo -E slicer up ./jenkins-master.yaml
+sudo slicer up ./jenkins-master.yaml
 ```
 
 You can run an interactive shell into the VM and read the password file directly from `/home/ubuntu/jenkins-admin.txt`:
 
 ```bash
-$ sudo -E ./bin/slicer vm shell jenkins-master-1
+$ sudo slicer vm shell jenkins-master-1
 
 Connecting to VM: jenkins-master-1
 Connected! Press Ctrl+] to exit.
@@ -329,7 +329,7 @@ Then you only need to relaunch the Slicer slave instance for the new packages to
 Create the Slicer instance for the slaves:
 
 ```bash
-sudo -E slicer up ./jenkins-slaves.yaml
+sudo slicer up ./jenkins-slaves.yaml
 ```
 
 If your master and slave are running on different hosts, make sure you run the routing commands (`ip route add`) that are printed out on start up.
@@ -446,7 +446,7 @@ Find out whether there are networking or other issues with the following
 * Check the logs of the jenkins server on the master
 
 ```bash
-sudo -E slicer vm shell jenkins-master-1
+sudo slicer vm shell jenkins-master-1
 sudo journalctl -u jenkins.service -f
 ```
 

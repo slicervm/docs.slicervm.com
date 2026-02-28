@@ -40,7 +40,7 @@ If you have ZFS set up, you can simply replace the storage flags with something 
 Start the Slicer API using the generated configuration:
 
 ```bash
-sudo -E slicer up sdk.yaml
+sudo slicer up sdk.yaml
 ```
 
 ### Create a sample program

@@ -44,7 +44,7 @@ slicer new buildkit \
 Now start up slicer:
 
 ```bash
-sudo -E slicer up ./tasks.yaml
+sudo slicer up ./tasks.yaml
 ```
 
 Now set up a HTTP endpoint using a free service like [ReqBin.com](https://reqbin.com/post-online) or [webhook.site](https://webhook.site).

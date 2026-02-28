@@ -50,7 +50,7 @@ config:
 Boot the VM(s) with:
 
 ```bash
-sudo -E slicer up ./ollama-gpu.yaml
+sudo slicer up ./ollama-gpu.yaml
 ```
 
 Note: adding PCI devices will add a boot delay of a few seconds vs. microVMs without any PCI devices. To monitor this, run `ping` in the background or `sudo fstail /var/log/slicer/` to see when the dmesg messages start appearing. 

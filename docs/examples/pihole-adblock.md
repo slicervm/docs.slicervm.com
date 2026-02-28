@@ -135,7 +135,7 @@ slicer new pihole \
 Start the VM with the following command:
 
 ```bash
-sudo -E slicer up ./pihole.yaml
+sudo slicer up ./pihole.yaml
 ```
 
 ## Accessing PiHole

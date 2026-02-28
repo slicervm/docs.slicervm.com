@@ -86,7 +86,7 @@ For SSH access, use the `--github` flag to specify a GitHub username to import S
 Then start up slicer with the generated config:
 
 ```bash
-sudo -E slicer up -f openfaas-pro.yaml
+sudo slicer up -f openfaas-pro.yaml
 ```
 
 Connect to the slicer VM over SSH:
