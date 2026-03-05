@@ -6,7 +6,7 @@ SSH is usually not required for normal workflows. Most tasks are faster with the
 
 - `slicer vm shell slicer-1`
 - `slicer vm cp ...`
-- `slicer vm port-forward ...`
+- `slicer vm forward ...`
 
 Use SSH only when you need direct shell access outside this interface. You can add keys directly in the guest by writing to `~/.ssh/authorized_keys`:
 
@@ -31,8 +31,8 @@ sudo systemctl enable docker --now
 Forward Docker's socket to your Mac so `docker` commands work natively on the host:
 
 ```bash
-slicer vm port-forward slicer-1 \
-  ~/.slicer/docker.sock:/var/run/docker.sock
+slicer vm forward slicer-1 \
+  -L ~/.slicer/docker.sock:/var/run/docker.sock
 ```
 
 Then on your Mac:
@@ -57,8 +57,8 @@ k3sup install --local
 Forward K3s port 6443 so `kubectl` on your Mac can reach the cluster:
 
 ```bash
-slicer vm port-forward slicer-1 \
-  6443:127.0.0.1:6443
+slicer vm forward slicer-1 \
+  -L 6443:127.0.0.1:6443
 ```
 
 Then point kubectl at it:
