@@ -42,6 +42,22 @@ TimeoutStopSec=30
 WantedBy=multi-user.target
 ```
 
+Next, make sure the target user i.e. `alex` has password-less sudo permissions to run `slicer`:
+
+Run `visudo`, then add this line to the end of the file, replacing `alex` with your username:
+
+```
+alex ALL=(ALL) NOPASSWD: ALL
+```
+
+Or you could be more specific and only allow `slicer` to elevate to sudo for your user:
+
+```
+export USER=alex
+
+echo "$USER ALL=(ALL) NOPASSWD: /usr/local/bin/slicer" | sudo tee /etc/sudoers.d/$USER-slicer
+```
+
 Install the service, and set it to start up on reboots:
 
 ```bash
