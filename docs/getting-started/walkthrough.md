@@ -39,9 +39,6 @@ config:
   api:
     port: 8080
     bind_address: "127.0.0.1"
-  ssh:
-    port: 2222
-    bind_address: "0.0.0.0"
 ```
 
 * `count` - the number of VMs to create - the default is `1` - you can set this to `0` to [create VMs via API instead](/reference/api)
@@ -51,22 +48,7 @@ config:
 * `storage_size` - for storage backends which support it, you can specify the size of the disk
 * `github_user` - your GitHub username, used to fetch your public SSH keys from your profile - additional SSH keys can be added via the [ssh_keys](/reference/ssh) API.
 
-The HTTP API is enabled by default and can be disabled with `enabled: false`.
-
-The Serial Over SSH (SOS) server is disabled by default and can be enabled by providing a port. Most users will  not need the SOS.
-
-The default `bind_address` for both the API and SSH is `127.0.0.1` - loopback on the host system.
-
-There's no need to provide the HTTP API section unless you plan to run Slicer more than once on the same host, in that case, it's useful to include it so you can change it to a different port on another slicer instance.
-
-**Configuration for an Arm64 Slicer installation**
-
-`slicer new` will generate a configuration file for the correct image for Arm or x86_64, but if you create one manually, you'll need to edit the `image` field.
-
-```diff
--  image: "ghcr.io/openfaasltd/slicer-systemd:5.10.240-x86_64-latest"
-+  image: "ghcr.io/openfaasltd/slicer-systemd-arm64:6.1.90-aarch64-latest"
-```
+The API can bind to a TCP address (secured with an auth token) or a unix socket (secured by OS filesystem permissions). If you run multiple Slicer instances on the same host, give each one a different port or socket path. See the [API reference](/reference/api) for details.
 
 The `storage: image` setting means a disk image will be cloned from the root filesystem into a local file. It's not the fastest option for the initial setup, but it's the simplest, persistent and great for long-living VMs.
 
@@ -89,6 +71,91 @@ Then, you can connect with SSH:
 ```bash
 ssh ubuntu@192.168.137.2
 ```
+
+## Quick start with slicer auto
+
+If you want to skip the configuration step, use `slicer auto`:
+
+```bash
+sudo slicer auto
+```
+
+This will:
+
+* Auto-detect a free bridge network range from `10.0.0.0/8` that doesn't conflict with your existing interfaces
+* Pick a random API port (so multiple instances don't clash)
+* Import your SSH keys from `~/.ssh/*.pub`
+* Write an `auto.yaml` config in the current directory
+* Start the API server ready for VMs to be launched
+
+The API port is printed on startup and written to `auto.yaml` for reference.
+
+To launch a VM, open a new terminal and run:
+
+```bash
+export SLICER_URL="http://127.0.0.1:PORT"
+export SLICER_TOKEN_FILE="/var/lib/slicer/auth/token"
+
+slicer vm add
+```
+
+Replace `PORT` with the port shown in the `auto.yaml` file or the startup output.
+
+### Flags
+
+| Flag | Default | Description |
+|---|---|---|
+| `--count` | `0` | Number of VMs to pre-start (0 means API-only, launch with `slicer vm add`) |
+| `--ram` | `4` | RAM in GiB per VM |
+| `--cpu` | `2` | vCPUs per VM |
+| `--isolated` | `false` | Use isolated networking instead of bridge |
+| `--ssh-key` | | SSH public key(s) to add (can be repeated) |
+| `--github` | | GitHub username to import SSH keys from |
+| `--find-ssh-keys` | `true` | Scan `~/.ssh/` for public keys |
+| `--api-port` | auto | Explicit API server port (default: auto-assign free port) |
+| `--api-bind` | `127.0.0.1` | API bind address or unix socket path |
+| `--socket` | `false` | Use a unix socket at `./auto.sock` instead of TCP |
+| `--kernel` | | Path to a custom kernel, or leave blank to extract one from the rootfs |
+
+### Examples
+
+Pre-start VMs with the daemon instead of launching them separately:
+
+```bash
+sudo slicer auto --count=1
+
+sudo slicer auto --count=3 --ram=8 --cpu=4
+```
+
+SSH keys from `~/.ssh/*.pub` on the host are imported automatically. You can also import keys from a GitHub profile:
+
+```bash
+sudo slicer auto --github=alexellis
+```
+
+Use isolated networking (no bridge, access VMs via `slicer vm exec` / `slicer vm forward`):
+
+```bash
+sudo slicer auto --isolated
+```
+
+Use a unix socket instead of TCP for the API:
+
+```bash
+sudo slicer auto --socket
+```
+
+Set a fixed API port instead of auto-assigning:
+
+```bash
+sudo slicer auto --api-port=9090
+```
+
+### Re-run behavior
+
+On subsequent runs, `sudo slicer auto` reuses the existing `auto.yaml` - including the same port and CIDR. Pass any flag (like `--count=3`) to regenerate it with new settings.
+
+The generated `auto.yaml` is a standard Slicer config - you can inspect or edit it to learn the format, then graduate to `slicer new` + `slicer up` for full control over networking, storage, and naming.
 
 ## Ignore changing SSH host keys
 
@@ -136,46 +203,25 @@ If you want to tail the logs from all available VMs at once, use `fstail` via `a
 sudo -E fstail /var/log/slicer/
 ```
 
-## Launch a second VM
+## Managing VMs
 
-Edit the `count` field, and set it to `2`.
-
-Then hit Control + C and launch slicer again.
-
-You'll see the second VM come online and can connect to it over SSH.
-
-## Enable the HTTP API
-
-The API is used by the `slicer vm` commands, and can also be used directly via `curl`.
-
-```yaml
-  api:
-    port: 8080
-    bind_address: "127.0.0.1:"
-    auth:
-      enabled: true
-```
-
-The auth token will be created at `/var/lib/slicer/auth/token` and can be used via a `Authorization: Bearer` header.
-
-i.e.
+List running VMs:
 
 ```bash
-curl -s http://127.0.0.1:8080/nodes -H "Authorization: Bearer $(sudo cat /var/lib/slicer/auth/token)" | jq
+slicer vm list
 ```
 
-## Enable the Serial Over SSH Console
-
-The Serial Over SSH (SOS) console can be used to log into a VM without a password, and without any form of networking enabled.
-
-```yaml
-  ssh:
-    port: 2222
-    bind_address: "0.0.0.0:"
-```
-
-Example:
+Launch additional VMs without restarting the daemon:
 
 ```bash
-ssh -p 2222 ubuntu@localhost
+slicer vm add
 ```
+
+Delete a VM:
+
+```bash
+slicer vm delete VM_NAME
+```
+
+See all available commands with `slicer vm --help`, or refer to the [API reference](/reference/api) for direct HTTP access.
+
