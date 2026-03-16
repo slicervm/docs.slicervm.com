@@ -60,123 +60,13 @@ sudo slicer up ./vm-image.yaml
 
 Having customised the `github_user` to your own username, your SSH keys will have been fetched from your profile, and preinstalled into the VM.
 
-On your workstation, add any routes that are specified so you can access the VMs on their own network.
+**Getting a shell**
 
-If you need to get the route output back again, you can use the `slicer vm route` command on the host itself, specifying the config file as the argument.
+You can get an interactive shell with `slicer vm shell` - this is the simplest option and can be run directly on the host, or from another machine over the network if you have the API bound to a TCP address.
 
-Never run any route commands outputted by Slicer on the host itself. It's not required and will break the networking.
+When using `bridge` networking, you can run the routing commands printed out on start-up or via `slicer route` on another machine. then you can connect via SSH i.e. `ssh ubuntu@192.168.137.2`.
 
-Then, you can connect with SSH:
-
-```bash
-ssh ubuntu@192.168.137.2
-```
-
-## Quick start with slicer auto
-
-If you want to skip the configuration step, use `slicer auto`:
-
-```bash
-sudo slicer auto
-```
-
-This will:
-
-* Auto-detect a free bridge network range from `10.0.0.0/8` that doesn't conflict with your existing interfaces
-* Pick a random API port (so multiple instances don't clash)
-* Import your SSH keys from `~/.ssh/*.pub`
-* Write an `auto.yaml` config in the current directory
-* Start the API server ready for VMs to be launched
-
-The API port is printed on startup and written to `auto.yaml` for reference.
-
-To launch a VM, open a new terminal and run:
-
-```bash
-export SLICER_URL="http://127.0.0.1:PORT"
-export SLICER_TOKEN_FILE="/var/lib/slicer/auth/token"
-
-slicer vm add
-```
-
-Replace `PORT` with the port shown in the `auto.yaml` file or the startup output.
-
-### Flags
-
-| Flag | Default | Description |
-|---|---|---|
-| `--count` | `0` | Number of VMs to pre-start (0 means API-only, launch with `slicer vm add`) |
-| `--ram` | `4` | RAM in GiB per VM |
-| `--cpu` | `2` | vCPUs per VM |
-| `--isolated` | `false` | Use isolated networking instead of bridge |
-| `--ssh-key` | | SSH public key(s) to add (can be repeated) |
-| `--github` | | GitHub username to import SSH keys from |
-| `--find-ssh-keys` | `true` | Scan `~/.ssh/` for public keys |
-| `--api-port` | auto | Explicit API server port (default: auto-assign free port) |
-| `--api-bind` | `127.0.0.1` | API bind address or unix socket path |
-| `--socket` | `false` | Use a unix socket at `./auto.sock` instead of TCP |
-| `--kernel` | | Path to a custom kernel, or leave blank to extract one from the rootfs |
-
-### Examples
-
-Pre-start VMs with the daemon instead of launching them separately:
-
-```bash
-sudo slicer auto --count=1
-
-sudo slicer auto --count=3 --ram=8 --cpu=4
-```
-
-SSH keys from `~/.ssh/*.pub` on the host are imported automatically. You can also import keys from a GitHub profile:
-
-```bash
-sudo slicer auto --github=alexellis
-```
-
-Use isolated networking (no bridge, access VMs via `slicer vm exec` / `slicer vm forward`):
-
-```bash
-sudo slicer auto --isolated
-```
-
-Use a unix socket instead of TCP for the API:
-
-```bash
-sudo slicer auto --socket
-```
-
-Set a fixed API port instead of auto-assigning:
-
-```bash
-sudo slicer auto --api-port=9090
-```
-
-### Re-run behavior
-
-On subsequent runs, `sudo slicer auto` reuses the existing `auto.yaml` - including the same port and CIDR. Pass any flag (like `--count=3`) to regenerate it with new settings.
-
-The generated `auto.yaml` is a standard Slicer config - you can inspect or edit it to learn the format, then graduate to `slicer new` + `slicer up` for full control over networking, storage, and naming.
-
-## Ignore changing SSH host keys
-
-If, like the developers of Slicer, you'll be re-creating many hosts with the same IP addresses, you have two options:
-
-* Memorise and get familiar with the `ssh-keygen -R <ip-address>` command
-* Or add the following to your `~/.ssh/config` file to stop it complaining
-
-```
-Host 192.168.137.*
-    StrictHostKeyChecking no
-    UserKnownHostsFile /dev/null
-    GlobalKnownHostsFile /dev/null
-    CheckHostIP no
-    LogLevel QUIET
-    User ubuntu
-```
-
-Repeat it once for each IP range you use with Slicer.
-
-And bear in mind that you should not do this for production or long-running hosts.
+Do not run the route commands on the host itself because it'll break the networking.
 
 ## View the serial console
 
@@ -203,7 +93,34 @@ If you want to tail the logs from all available VMs at once, use `fstail` via `a
 sudo -E fstail /var/log/slicer/
 ```
 
+Additionally, you can run `slicer vm logs`.
+
 ## Managing VMs
+
+Copy a file to the VM:
+
+```bash
+slicer vm cp ./file vm-1:~/file
+```
+
+Copy a file back to the host:
+
+```bash
+slicer vm cp vm-1:~/file ./file
+```
+
+Copy a folder to the VM:
+
+```bash
+slicer vm cp --mode=tar ~/go/src/github.com/alexellis/arkade vm-1:~/arkade
+```
+
+Copy a folder back to the host:
+
+```bash
+slicer vm cp --mode=tar vm-1:~/arkade ~/go/src/github.com/alexellis/arkade
+```
+
 
 List running VMs:
 
@@ -211,7 +128,7 @@ List running VMs:
 slicer vm list
 ```
 
-Launch additional VMs without restarting the daemon:
+Launch ephemeral VMs:
 
 ```bash
 slicer vm add
