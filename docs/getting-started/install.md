@@ -53,17 +53,9 @@ The installer sets up [Firecracker](https://firecracker-microvm.github.io), [Clo
 
 Additional storage backends can always be enabled later by running the installer again with the appropriate flags.
 
-Activate Slicer to obtain your license key:
+If you have a subscription for Slicer Individual, Team or Platform, then you'll have received a license key via email. Save it to ~/.slicer/LICENSE`.
 
-```bash
-slicer activate --help
-
-slicer activate
-```
-
-For the Individual tier the a license key will be written to `~/.slicer/LICENSE` along with a GitHub token. The key will last for 30 days, but can be refreshed via `slicer activate`. When refreshing, it'll use the stored GitHub token, instead of running the device flow again.
-
-For higher tiers, the license key is an API key delivered to you via email. You should save it to `~/.slicer/LICENSE`.
+If you're using the GitHub Sponsors bundle for SlicerVM, K3sup Pro and Superterm, then you can run `slicer activate` to obtain a key with your GitHub account. The key will last for 30 days, but can be refreshed via `slicer activate`. When refreshing, it'll use the stored GitHub token, instead of running the device flow again.
 
 Next, start your first VM with the [walk through](/getting-started/walkthrough).
 
