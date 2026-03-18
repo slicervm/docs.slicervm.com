@@ -41,7 +41,7 @@ Slicer was developed internally at OpenFaaS Ltd and has been used across product
 
 Slicer for Linux
 
-* On Linux, KVM is used with [Firecracker](https://firecracker-microvm.github.io/) by default. [Cloud Hypervisor](https://www.cloudhypervisor.org/) is an option when you need PCI passthrough for devices like NICs or GPUs.
+* On Linux, KVM is used with [Firecracker](https://firecracker-microvm.github.io/) by default. [QEMU](https://www.qemu.org/) is an option when you need PCI passthrough for devices like NICs or GPUs.
 * You can start Slicer with a fixed host-group count or zero hosts and create VMs on demand through the API.
 
 Slicer for Mac:

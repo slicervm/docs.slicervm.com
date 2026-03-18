@@ -765,7 +765,7 @@ paths:
           schema:
             type: string
             enum: [shutdown, reboot]
-          description: Defaults to reboot unless hypervisor is cloud-hypervisor.
+          description: Defaults to reboot unless hypervisor is qemu.
       responses:
         "200":
           description: Shutdown initiated

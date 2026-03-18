@@ -20,8 +20,8 @@ GPU / VFIO mounting only works with Slicer running on `x86_64` at present.
 There a three differences to the other examples we've seen so far:
 
 1. `gpu_count: N` is added to the hostgroup, N is a the number of GPUs to allocate to each VM
-2. `hypervisor: cloud-hypervisor` - Cloud Hypervisor is used instead of Firecracker, to enable VFIO passthrough of a PCI device
-3. `image` - a separate Kernel and root filesystem is required for Cloud Hypervisor
+2. `hypervisor: qemu` - [QEMU](https://www.qemu.org/) is used instead of Firecracker, to enable VFIO passthrough of a PCI device
+3. `image` - a separate Kernel and root filesystem is required for QEMU
 
 The following to `gpu.yaml`, make sure you update `vcpu` and `ram_gb`
 
@@ -42,9 +42,9 @@ config:
 
   github_user: alexellis
 
-  image: "ghcr.io/openfaasltd/slicer-systemd-ch:5.10.240-x86_64-latest"
+  image: "ghcr.io/openfaasltd/slicer-systemd-ch:6.1.90-x86_64-latest"
 
-  hypervisor: cloud-hypervisor
+  hypervisor: qemu
 ```
 
 Boot the VM(s) with:

@@ -12,7 +12,7 @@ You can run Slicer on a varied range of hardware, from mini PCs, to your Mac, to
 
 See the [appendix](#appendix) for suggested local hardware and cloud-based options.
 
-Slicer is designed to run on a basic OS installation, without Docker, Kubernetes, or other virtualisation tools. Slicer installs and manage its own dependencies, such as Firecracker, Cloud Hypervisor, and containerd.
+Slicer is designed to run on a basic OS installation, without Docker, Kubernetes, or other virtualisation tools. Slicer installs and manage its own dependencies, such as Firecracker, [QEMU](https://www.qemu.org/), and containerd.
 
 ## Quick installation
 
@@ -24,7 +24,7 @@ curl -sLS https://get.slicervm.com | sudo bash
 
 > See also: [installation script](https://github.com/slicervm/slicervm.com/blob/master/get.sh)
 
-The installer sets up [Firecracker](https://firecracker-microvm.github.io), [Cloud Hypervisor](https://github.com/cloud-hypervisor/cloud-hypervisor), [containerd](https://containerd.io/) for storage, and a few networking options.
+The installer sets up [Firecracker](https://firecracker-microvm.github.io), [QEMU](https://www.qemu.org/), [containerd](https://containerd.io/) for storage, and a few networking options.
 
 **Setup the license key**
 

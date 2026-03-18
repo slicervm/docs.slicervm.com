@@ -23,9 +23,9 @@ config:
 
   github_user: alexellis
 
-  image: "ghcr.io/openfaasltd/slicer-systemd-ch:5.10.240-x86_64-latest"
+  image: "ghcr.io/openfaasltd/slicer-systemd-ch:6.1.90-x86_64-latest"
 
-  hypervisor: cloud-hypervisor
+  hypervisor: qemu
 ```
 
 Feel free to customise the vCPU, RAM, and disk sizes.

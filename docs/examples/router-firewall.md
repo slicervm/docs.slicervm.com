@@ -105,8 +105,8 @@ config:
         bridge: brrouter0
         tap_prefix: router
         gateway: 192.168.130.1/24
-  image: "ghcr.io/openfaasltd/slicer-systemd-ch:x86_64-latest"
-  hypervisor: cloud-hypervisor
+  image: "ghcr.io/openfaasltd/slicer-systemd-ch:6.1.90-x86_64-latest"
+  hypervisor: qemu
 
   api:
     port: 8080
