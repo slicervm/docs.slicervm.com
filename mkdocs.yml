@@ -134,6 +134,7 @@ nav:
           - Devmapper: storage/devmapper.md
       - Reference:
           - REST API: reference/api.md
+          - YAML Config: reference/yaml.md
           - Images for microVMs: reference/images.md
           - SSH access to VMs: reference/ssh.md
           - Secret management: reference/secrets.md
