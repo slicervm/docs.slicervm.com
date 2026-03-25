@@ -14,7 +14,7 @@ curl -sLS https://get.slicervm.com | sudo bash
 
 **Setup the license key**
 
-If you have a subscription for Slicer Individual, Team or Platform, then you'll have received a license key via email. Save it to ~/.slicer/LICENSE`. This license will not expire, so long as your subscription remains active.
+If you have a subscription for Slicer Individual, Team or Platform, then you'll have received a license key via email. Save it to `~/.slicer/LICENSE`. This license will not expire, so long as your subscription remains active.
 
 If you're paying for Slicer Individual via GitHub Sponsors, then after installation, you should run `slicer activate` to link your GitHub account to your Slicer installation. The keys for sponsors last for 30 days, but can be refreshed using the same command.
 
