@@ -10,12 +10,13 @@ If you have the Invididual tier, then first, install the `slicer` CLI and activa
 
 ```bash
 curl -sLS https://get.slicervm.com | sudo bash
-slicer activate
 ```
 
-The activate command will start an OAuth Device Flow via GitHub. Follow the instructions to complete the flow, and you'll get a license key valid for 30 days. The key is written to `~/.slicer/LICENSE` along with a GitHub token. The token can be used to refresh the license key without going through Device Flow again.
+**Setup the license key**
 
-If you have a higher tier than Individual, you'll have received an email with the license key, copy and paste it into a file at `~/.slicer/LICENSE`.
+If you have a subscription for Slicer Individual, Team or Platform, then you'll have received a license key via email. Save it to ~/.slicer/LICENSE`. This license will not expire, so long as your subscription remains active.
+
+If you're paying for Slicer Individual via GitHub Sponsors, then after installation, you should run `slicer activate` to link your GitHub account to your Slicer installation. The keys for sponsors last for 30 days, but can be refreshed using the same command.
 
 Then use the CLI to install the Mac-specific binaries:
 
