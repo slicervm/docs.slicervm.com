@@ -24,13 +24,7 @@ Then use the CLI to install the Mac-specific binaries:
 slicer install slicer-mac ~/slicer-mac
 ```
 
-During preview, Slicer for Mac does not come with a background service/definition (known as a plist on macOS). So you need to launch it as and when you want it. Either directly in a terminal, or in a `tmux` window.
-
-`tmux` is available via `brew install tmux`, and you can get [brew here](https://brew.sh).
-
-The `slicer` command acts as an API client to Slicer for Mac.
-
-By default, `slicer` auto-discovers the local mac socket at `~/slicer-mac/slicer.sock`, so you usually don't need any socket flags or environment variables for local use.
+The `slicer` command acts as an API client to Slicer for Mac. It'll automatically discover the socket at `~/slicer-mac/slicer.sock`, so you won't need to set `--url` or `SLICER_URL`.
 
 ## Initial configuration.
 
@@ -40,12 +34,6 @@ First of all, get used to it, leave it in the path we recommend (`~/slicer-mac`)
 
 The `slicer-mac` OCI bundle includes a default `slicer-mac.yaml` in the folder after install, so you can use that file directly.
 
-Only run this if you want to recreate the file because you edited or edited it.
-
-```bash
-cd ~/slicer-mac
-./slicer-mac new > slicer-mac.yaml
-```
 
 The generated `slicer-mac.yaml` has two host groups:
 
@@ -87,6 +75,13 @@ The `share_home` field maps your Mac home directory into the VM via VirtioFS. Se
 Need Rosetta for x86_64 binaries? Follow [Enable Rosetta](/mac/rosetta).
 
 Run the daemon. The first run pulls and prepares the VM image automatically.
+
+If you ever need to regenerate the `slicer-mac.yaml` file, you can do so with the command below:
+
+```bash
+cd ~/slicer-mac
+./slicer-mac new > slicer-mac.yaml
+```
 
 ## Start the daemon
 
@@ -160,7 +155,9 @@ slicer vm exec sbox-1 -- stat ~/file.txt
 slicer vm delete sbox-1
 ```
 
-## Run slicer-mac as a background service
+## Start Slicer for Mac with your system
+
+If you'd like to enable Slicer for Mac as a start-up service, you can run the following:
 
 ```bash
 cd ~/slicer-mac
@@ -172,7 +169,28 @@ cd ~/slicer-mac
 ./slicer-mac install
 ```
 
-To uninstall:
+Once running in the backgroud, you can use the `slicer-tray service` commands to manage it.
+
+The `daemon` service is `slicer-mac` itself, and the `tray` service is the `slicer-tray` menu bar helper.
+
+```bash
+cd ~/slicer-mac
+
+# Check the status of either service:
+./slicer-mac service status daemon
+./slicer-mac service status tray
+
+# View the logs from the process - if you see an error or want to know
+# what's happening
+./slicer-mac service logs daemon
+./slicer-mac service logs tray
+
+# Stop or Start a service for a period of time:
+./slicer-mac service stop daemon
+./slicer-mac service start daemon
+```
+
+You can turn off the start-up service with:
 
 ```bash
 cd ~/slicer-mac
