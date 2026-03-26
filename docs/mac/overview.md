@@ -1,26 +1,31 @@
 # Slicer for Mac
 
-Slicer for Mac runs arm64 Linux VMs on Apple Silicon using Apple's native [Virtualization framework](https://developer.apple.com/documentation/virtualization). It provides a persistent Linux VM with native folder sharing, Docker, K3s, and disposable sandboxes - all driven by the same CLI and REST API as Slicer for Linux.
+Slicer for Mac was built from the ground up to run Linux microVMs on Apple Silicon.
 
-!!! note "Preview"
-    Slicer for Mac is available on all Slicer license tiers. We've tested on macOS Sequoia and Tahoe. `slicer-mac` does not need `sudo`.
+It uses the same familiar API and CLI from Slicer for Linux, but instead of using KVM, leans heavily on Apple's native [Virtualization framework](https://developer.apple.com/documentation/virtualization).
+
+Typical use-cases include: disposable sandboxes for agents, running local Kubernetes clusters, or getting access to a real Linux system, instead of making do with POSIX compatibility.
+
+Slicer microVMs boot very quickly and have some advanced features like Rosetta for running Intel/AMD binaries, and folder sharing.
+
+!!! note "macOS versions"
+    Slicer for Mac is available on all Slicer license tiers. We've tested on macOS Sequoia and Tahoe. `slicer-mac` does not need `sudo`. Intel Macs are out of scope for Slicer at this time, but you could install Linux on them, and use Slicer for Linux instead.
 
 ## How it works
 
 Two binaries:
 
-- **`slicer`** - the CLI client (same binary as Slicer for Linux) and used to download `slicer-mac`
-- **`slicer-mac`** - the daemon that manages VMs using Apple's Virtualization framework
+- **`slicer`** - the CLI client (same binary as Slicer for Linux)
+- **`slicer-mac`** - the server process aka *daemon* that manages VMs using Apple's Virtualization framework
 
-An optional menu bar app (`slicer-tray`) provides quick access to VM status, shells, and controls.
-It is shipped as part of the `slicer-mac` OCI asset set.
-If you need tray details, see [Tray integration](/mac/tray-integration).
-If you need x86_64 support, see [Enable Rosetta](/mac/rosetta).
+An [optional menu bar app (`slicer-tray`)](/mac/tray-integration) provides quick access to VM status, shells, and controls.
 
-The daemon reads a `slicer-mac.yaml` config file that defines two host groups:
+If you need to run x86_64 binaries, see [Enable Rosetta](/mac/rosetta) after the initial setup.
 
-- **Services** (`slicer` group) - a persistent Linux VM that boots with the daemon and stays running. This is your day-to-day Linux environment, similar to WSL on Windows.
-- **Sandboxes** (`sbox` group) - ephemeral VMs launched on demand via the CLI or API. They're destroyed when you restart the daemon, close the lid, or delete them.
+The config file for Slicer for Mac is named `slicer-mac.yaml`, it defines two host groups. Host groups launch and manage microVMs. The names are flexible on Slicer for Linux, but Slicer for Mac has two fixed groups instead.
+
+- The `slicer` group - a runs a Linux VM that start-up and stays running. This is your day-to-day Linux environment, similar to WSL on Windows, and is fully persistent.
+- The ``sbox` group aka "sandbox" - is for ephemeral VMs launched on demand through the CLI, API, or by one of your AI coding agents. They are permanently deleted when you shut them down, shut down Slicer for Mac, or delete them via `slicer vm delete NAME`.
 
 # Architecture (conceptual)
 
