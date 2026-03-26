@@ -16,12 +16,12 @@ curl -sLS https://get.slicervm.com | sudo bash
 
 If you have a subscription for Slicer Individual, Team or Platform, then you'll have received a license key via email. Save it to `~/.slicer/LICENSE`. This license will not expire, so long as your subscription remains active.
 
-If you're paying for Slicer Individual via GitHub Sponsors, then after installation, you should run `slicer activate` to link your GitHub account to your Slicer installation. The keys for sponsors last for 30 days, but can be refreshed using the same command.
+> Note for GitHub Sponsors (not Polar): after installation, you should run `slicer activate` to link your GitHub account to your Slicer installation. The keys for sponsors last for 30 days, but can be refreshed using the same command.
 
-Then use the CLI to install the Mac-specific binaries:
+Then use the CLI to install the Mac-specific binaries to `~/slicer-mac`:
 
 ```bash
-slicer install slicer-mac ~/slicer-mac
+slicer install slicer-mac
 ```
 
 The `slicer` command acts as an API client to Slicer for Mac. It'll automatically discover the socket at `~/slicer-mac/slicer.sock`, so you won't need to set `--url` or `SLICER_URL`.
