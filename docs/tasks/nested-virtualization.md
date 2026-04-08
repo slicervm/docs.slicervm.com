@@ -105,7 +105,7 @@ sudo modprobe kvm && sudo modprobe kvm_intel
 
 ### Step 3: Install Slicer within the slicer0 VM
 
-Perform an [installation](/getting-started/install.md) of Slicer within the slicer0 VM.
+Perform an [installation](/getting-started/install) of Slicer within the slicer0 VM.
 
 Generate a configuration file for slicer1:
 

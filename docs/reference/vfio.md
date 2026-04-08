@@ -4,7 +4,7 @@ VFIO (Virtual Function I/O) is a Linux kernel framework that allows a PCI device
 
 Any device such as a GPU or NIC that is passed through to a VM must first be unbound from its current driver on the host, and is exclusively bound to the VFIO driver.
 
-Slicer supports VFIO passthrough for Nvidia GPUs when using Cloud Hypervisor as the hypervisor as per the example [Ollama with a GPU](/examples/gpu-ollama.md).
+Slicer supports VFIO passthrough for Nvidia GPUs when using Cloud Hypervisor as the hypervisor as per the example [Ollama with a GPU](/examples/gpu-ollama).
 
 Support for NICs for router appliances will be coming shortly.
 

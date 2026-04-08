@@ -1,6 +1,6 @@
 # Execute commands in a VM
 
-Just like [copying files in and out of a VM](/tasks/copy-files.md), executing commands can be done in several ways:
+Just like [copying files in and out of a VM](/tasks/copy-files), executing commands can be done in several ways:
 
 * Initially, via a userdata script or userdata file specified in the host group or via the API/CLI create command after Slicer has been started.
 * Through SSH assuming direct network access is available to the VM via the LAN or a VPN.

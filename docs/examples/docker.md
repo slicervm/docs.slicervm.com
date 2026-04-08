@@ -2,8 +2,8 @@
 
 There are three ways to try out a container or Docker within Slicer:
 
-1. Start your VM as per the [walkthrough](/getting-started/walkthrough.md), then connect via `ssh` and install Docker inside the VM.
-2. Use [Userdata](/tasks/userdata.md) to install Docker and pull your image on first boot.
+1. Start your VM as per the [walkthrough](/getting-started/walkthrough), then connect via `ssh` and install Docker inside the VM.
+2. Use [Userdata](/tasks/userdata) to install Docker and pull your image on first boot.
 3. Create a custom base image with Docker pre-installed, and your image pre-pulled, with a systemd service to start it on every boot.
 
 On this page we'll cover options 2 and 3.
@@ -16,7 +16,7 @@ The container we're going to use is a [Docker Registry](https://hub.docker.com/_
 
 ## Install Docker and a container via Userdata
 
-You can use [Userdata](/tasks/userdata.md) to install Docker and pull your image on first boot.
+You can use [Userdata](/tasks/userdata) to install Docker and pull your image on first boot.
 
 The below is only a partial snippet to show you the relevant changes:
 
