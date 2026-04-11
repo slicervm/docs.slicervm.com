@@ -16,7 +16,7 @@ The copy command enables bidirectional file transfer between the host and guest 
 For example, to copy a file named `local-file.txt` from the host to a VM named `vm-1` use the command:
 
 ```bash
-slicer vm cp example.txt vm-1:.
+slicer vm cp example.txt vm-1:~/example.txt
 ```
 
 To copy a file from the instance named `vm-1` run:

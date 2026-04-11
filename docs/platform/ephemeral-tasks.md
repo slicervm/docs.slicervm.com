@@ -1,6 +1,6 @@
-# Run a task in a VM
+# Ephemeral Tasks
 
-This example shows how to run a one-shot task in a VM via API. The CLI can also act as a client to the API during testing.
+This page shows how to launch short-lived VMs for one-shot tasks via the API. The CLI can also act as a client to the API during testing.
 
 Use-cases could include:
 
@@ -143,50 +143,3 @@ After SSH is disabled, the only way to debug a machine is via the Slicer agent u
 You can also disable `slicer-agent` (not actually a full SSH daemon), however the `slicer vm` commands will no longer work.
 
 If you publish an image to the Docker Hub, make sure you include its prefix i.e. `docker.io/owner/repo:tag`.
-
-### Cache the Kernel to a local file
-
-Rather than downloading an extracting the Kernel on each run of Slicer, you can extract a given vmlinux file and tell the YAML file to use that.
-
-This is preferred for a long-running host, where we need to keep the root-filesystem image and Kernel in sync.
-
-The Kernel must agree with the root filesystem image, which means using a proper tag and not a `latest` tag.
-
-Why? The Kernel is built as a vmlinux, however its modules are packaged into the root filesystem image.
-
-Run the following:
-
-```bash
-$ arkade get crane
-$ crane ls ghcr.io/openfaasltd/actuated-kernel:5.10.240-x86_64-latest
-
-5.10.240-x86_64-3d7a67d1683b524b4128ad338f90b1da710f2fd9
-5.10.240-kvm-x86_64-3d7a67d1683b524b4128ad338f90b1da710f2fd9
-5.10.240-x86_64-ea04b63b9117c966a57e17e1bc1bfcf713cd6276
-5.10.240-x86_64-bb71bdd1cd06bad2cc11f8ab3f323c3f19d41c8b
-5.10.240-x86_64-2f2ebc0bbefe128aa3061e6ea6806cbcdc975208
-6.1.90-aarch64-2f2ebc0bbefe128aa3061e6ea6806cbcdc975208
-6.1.90-aarch64-5c59e9b9b08eea49499be8449099291c93469b80
-5.10.240-x86_64-5c59e9b9b08eea49499be8449099291c93469b80
-```
-
-Pick a stable tag for your architecture i.e. `x86_64-SHA` or `aarch64-SHA`, then run:
-
-```bash
-$ arkade oci install ghcr.io/openfaasltd/actuated-kernel:5.10.240-x86_64-2f2ebc0bbefe128aa3061e6ea6806cbcdc975208 --output ./
-$ ls
-vmlinux
-```
-
-Next, find the matching root filesystem image:
-
-```bash
-$ crane ls ghcr.io/openfaasltd/slicer-systemd
-```
-
-Use it in your YAML file, replacing `kernel_image` with `kernel_file`:
-
-```yaml
-  kernel_file: "./vmlinux"
-  image: "ghcr.io/openfaasltd/slicer-systemd:5.10.240-x86_64-2f2ebc0bbefe128aa3061e6ea6806cbcdc975208"
-```

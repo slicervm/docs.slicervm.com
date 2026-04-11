@@ -99,7 +99,6 @@ nav:
           - Walkthrough: getting-started/walkthrough.md
           - Running in the background: getting-started/daemon.md
       - Examples:
-          - Run a one-shot task via API: examples/run-a-task.md
           - Kubernetes:
               - HA Kubernetes: examples/ha-k3s.md
               - Autoscaling Kubernetes: examples/autoscaling-k3s.md
@@ -129,7 +128,6 @@ nav:
           - Share files over NFS: tasks/share-files-with-nfs.md
           - Nested Virtualization: tasks/nested-virtualization.md
           - Run slicer without KVM on cloud VMs: tasks/pvm.md
-          - Execute commands in VMs with the SDK: tasks/execute-commands-with-sdk.md
       - Storage:
           - Overview: storage/overview.md
           - ZFS: storage/zfs.md
@@ -143,6 +141,16 @@ nav:
           - Networking: reference/networking.md
           - VFIO Passthrough: reference/vfio.md
           - Troubleshooting: reference/troubleshooting.md
+  - Slicer Platform:
+      - Overview: platform/overview.md
+      - Quickstart: platform/quickstart.md
+      - Go SDK: platform/go-sdk.md
+      - Ephemeral tasks: platform/ephemeral-tasks.md
+      - Examples:
+          - Video conversion: platform/video-conversion.md
+      - REST API Reference: reference/api.md
+      - Build a custom image: platform/custom-images.md
+      - Publish your own images: platform/publish-images.md
   - Slicer for Mac:
       - Overview: mac/overview.md
       - Installation: mac/installation.md

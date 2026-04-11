@@ -2,8 +2,6 @@
 
 In this example we'll walk through how to create a Linux VM using Slicer on an x86_64 host, or an Arm64 host.
 
-The `/dev/kvm` device must exist and be available to continue.
-
 ## Create the VM configuration
 
 Slicer is a long lived process that can be run in the foreground or as a daemon with systemd.
@@ -141,4 +139,3 @@ slicer vm delete VM_NAME
 ```
 
 See all available commands with `slicer vm --help`, or refer to the [API reference](/reference/api) for direct HTTP access.
-
