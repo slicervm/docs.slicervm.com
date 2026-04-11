@@ -11,11 +11,19 @@ Table of contents:
   * [Firewall](#firewall)
   * [Additional configuration for Netplan](#additional-configuration-for-netplan)
 
-Both Firecracker and Cloud Hypervisor microVMs use TAP devices for networking. A Linux TAP operates at Layer 2 (Data Link Layer), one end is attached to the microVM, and the other end is attached to the host system.
+The Firecracker, QEMU, and Cloud Hypervisors use TAP devices for networking. A Linux TAP operates at Layer 2 (Data Link Layer), one end is attached to the microVM, and the other end is attached to the host system.
 
 Slicer supports multiple networking modes for microVMs, each with their own pros and cons. Generally, you should use the default option (Bridge Networking) unless you have specific requirements that need a different mode.
 
 See `slicer new --help` to generate a Slicer config with bridge-based networking. You can also provide a CIDR block to allocate IP addresses from, if you need to run Slicer across different machines and have them all be routable on the local network.
+
+How do you pick?
+
+* Bridge networking is the default - use it when you want to get started. It lets VMs talk to each other, so it's ideal for K3s where nodes need direct IP to IP access. The host can ingress to VMs via their IP.
+
+* Isolated networking is best when you're running appliances that are connected to the Internet, and can run untrusted workloads, or for other multi-tenant services. You can block VMs from egressing to specific IPs or entire CIDRs like your LAN i.e. `192.168.0.0/24`. There is no ingress available other via `slicer forward` or via network tunnels such as [Inlets](https://inlets.dev).
+
+* CNI mode is generally not recommended or required, but enables additional networking modes, and shares a single pool of IPs across all Slicer daemons running in this mode.
 
 ## Bridge Networking
 
@@ -81,7 +89,6 @@ Cons:
 * Reliance on CNI to manage networking
 * microVMs can communicate with the host, and the rest of the LAN, which may not be desirable in some use-cases
 * May also have learning delays like the bridge mode
-
 
 Example:
 

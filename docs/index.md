@@ -49,6 +49,7 @@ Slicer for Mac:
 * On macOS, Slicer for Mac uses [Apple’s Virtualization Framework](https://developer.apple.com/documentation/virtualization).
 * Mac guests can use VirtioFS folder sharing for local paths.
 * Mac guests support Rosetta for x86_64 Linux binaries.
+* Networking uses [VZNATNetworkDeviceAttachment](https://developer.apple.com/documentation/virtualization/vznatnetworkdeviceattachment) for Internet access
 
 * Slicer runs as a daemon and exposes API, CLI, and SDK management for microVM host groups.
 * You define host groups and VM specs in YAML before launching VMs. These cannot be created via API at this point in time. Host groups need to have [non-overlapping networking](/reference/networking/) CIDRs defined.

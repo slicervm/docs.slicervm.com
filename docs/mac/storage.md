@@ -1,12 +1,12 @@
 # Storage on Slicer for Mac
 
-Slicer for Mac stores VM state using a base image flow with copy-on-write clones.
+Slicer for Mac stores VM disks using a raw disk image. Whenever a new VM is launched, a base image file is cloned instantly using the Copy-on-Write (CoW) support of APFS.
 
 You can set storage size per host group with `storage_size` in `slicer-mac.yaml`.
 
 Use `nG` style values (for example `15G`), and set at least `5G` to give enough initial headroom.
 
-Sparse files are used, so disk space is not allocated up front. A declared size of `15G` represents logical size and grows as data is written.
+Sparse files are used, so disk space is not allocated up front. A declared size of `15G` represents logical size and grows as data is written or changed.
 
 ## Image/bootstrap workflow
 
@@ -44,7 +44,7 @@ To force a full rebuild from OCI:
 
 ```bash
 rm -f ./slicer-base.img
-rm -rf ./kernel/slicer ./kernel/sbox
+rm -rf ./kernel
 rm -rf ./oci-cache
 ```
 
@@ -57,6 +57,14 @@ rm -f ./slicer-1.img
 ## Troubleshooting
 
 If your VM crashes for some reason, or the Mac's sleep mode causes an issue with the VM, you may find the `.img` file needs to be checked or repaired with the `e2fsck` utility.
+
+Check the filesystem (read-only, no changes):
+
+```bash
+e2fsck -v -n ./slicer-1.img
+```
+
+If errors are found, repair them:
 
 ```bash
 e2fsck -f ./slicer-1.img
