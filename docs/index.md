@@ -20,7 +20,9 @@ In both modes you get a full Linux system where often containers are not enough:
 
 Example of Slicer used for a Service: [A remote (persistent) BuildKit daemon](/examples/buildkit/) or [HA K3s cluster](/examples/ha-k3s/)
 
-Example of a Slicer used as a Sandbox: [Run a task](/examples/run-a-task/) or [Process video files with ffmpeg](/tasks/execute-commands-with-sdk/)
+Example of a Slicer used as a Sandbox: [Ephemeral tasks](/platform/ephemeral-tasks/) or [Video conversion with the Go SDK](/platform/video-conversion/)
+
+If you are building a product or internal system on top of Slicer - embedding sandboxes in a SaaS, running batch workloads via API, or integrating with the Go SDK - see the [Slicer Platform](/platform/overview/) docs.
 
 ## Our own use-cases
 
@@ -70,6 +72,6 @@ You can also run it on WSL2 for local experimentation, labs, and home office use
 - [Install Slicer on Linux](/getting-started/install)
 - [Install Slicer for Mac](/mac/installation)
 - [Try the walkthrough](/getting-started/walkthrough)
-- [Run a one-shot task](/examples/run-a-task/)
+- [Slicer Platform](/platform/overview/) - build on Slicer with the REST API and Go SDK
 - [GPU workloads with Slicer](/examples/gpu-ollama/)
 - [Get in touch](/contact) for commercial questions
