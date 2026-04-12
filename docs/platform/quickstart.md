@@ -67,6 +67,16 @@ To override the host group defaults for CPU or RAM:
 }
 ```
 
+Hostnames are auto-assigned (`sandbox-1`, `sandbox-2`, etc.). To track which VM belongs to which user or job in your system, pass `tags`:
+
+```json
+{
+  "tags": ["user=alice", "job=convert-video-123"]
+}
+```
+
+Tags are returned when you list VMs, so your application can match VMs back to its own records.
+
 ## Wait for the agent
 
 The guest agent needs to start before you can run commands or copy files. Poll the health endpoint:
@@ -163,6 +173,20 @@ curl -sf -H "Authorization: Bearer $TOKEN" \
 ```
 
 Poll `/vm/HOSTNAME/health` and check `userdata_ran` to know when the script has finished.
+
+## Create a persistent sandbox
+
+By default, sandboxes are ephemeral - they are destroyed when Slicer shuts down. To create a VM that survives restarts and retains its disk, pass `"persistent": true`:
+
+```bash
+curl -sf -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -X POST \
+  http://127.0.0.1:8080/hostgroup/sandbox/nodes \
+  -d '{"persistent": true}'
+```
+
+The `persistent` field is returned in list responses so your application can distinguish between ephemeral and persistent VMs.
 
 ## Delete the sandbox
 

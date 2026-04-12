@@ -62,6 +62,22 @@ Stop and remove the sandbox when you are done:
 slicer vm delete sbox-1
 ```
 
+## Persistent sandboxes
+
+By default, sandboxes are ephemeral - they are deleted when the daemon stops. To create a sandbox that retains its disk and survives restarts, use `--persistent`:
+
+```bash
+slicer vm launch sbox --persistent
+```
+
+If the daemon restarts (e.g. after a reboot or sleep), persistent sandboxes are not automatically re-launched. To bring one back:
+
+```bash
+slicer relaunch sbox-1
+```
+
+This boots the VM from its existing disk. Any data written to the filesystem is still there.
+
 ## Use cases
 
 Sandboxes are designed for short-lived workloads and experimentation:

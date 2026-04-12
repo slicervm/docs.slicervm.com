@@ -1,17 +1,16 @@
-# Ephemeral Tasks
+# Run a Task in Slicer
 
-This page shows how to launch short-lived VMs for one-shot tasks via the API. The CLI can also act as a client to the API during testing.
+If your product needs to run background jobs, cron-style tasks, or headless AI agents in isolated environments, you can launch microVMs on demand through the API and tear them down when the work is done. The CLI can also act as a client to the API during testing.
 
-Use-cases could include:
+Use-cases include:
 
-* Running an AI coding agent in a contained environment without risking your whole workstation
-* Starting on-demand IDEs for pull request development or review
-* Autoscaling Kubernetes nodes - added and removed on demand
-* Running a CI build or compiling untrusted customer code
-* Starting a temporary service such as a database for end to end testing
-* Cron jobs, batch jobs, and serverless functions
+* Background jobs and batch processing as part of a SaaS product
+* Running headless AI coding agents in isolated microVMs
+* Cron jobs, scheduled tasks, and serverless-style functions
+* CI builds or compiling untrusted customer code
+* On-demand IDEs for pull request development or review
 
-One-shot tasks are VMs that are launched on demand for a specific purposes. But there's no limit on the lifetime of these VMs, they can run for any period of time - be that 250ms to process a webhook, 48 hours to run some fine-tuning, or several weeks. Just bear in mind that if you shut down or close Slicer, they will also be shut down and destroyed.
+There is no limit on how long a task VM runs - it could be 250ms to process a webhook, 48 hours for fine-tuning, or several weeks. Ephemeral VMs are cleaned up when Slicer shuts down. Use `"persistent": true` if the VM needs to survive restarts.
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/5RjtVM4bvp0?si=2TPpSKn9YXFw_Nnt" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
@@ -32,7 +31,7 @@ If you don't have ZFS set up yet, you can simply replace the storage flags with 
 Create `tasks.yaml` slicer config:
 
 ```bash
-slicer new buildkit \
+slicer new task \
   --cpu 1 \
   --ram 2 \
   --count 0 \

@@ -5,6 +5,8 @@ SlicerVM gives you **real Linux, in milliseconds**.
 Full VMs with systemd and a real kernel, on your Mac, your servers, or your cloud.
 Slicer is built for teams that need isolation and control without moving code and data to third-party infrastructure.
 
+By installing and starting Slicer, you agree to the [End User License Agreement (EULA)](https://slicervm.com/eula/).
+
 ## Where Slicer fits
 
 Slicer is useful for both one-off/ephemeral workloads and long-running Linux services.

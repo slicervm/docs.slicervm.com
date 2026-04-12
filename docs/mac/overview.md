@@ -4,6 +4,8 @@ Slicer for Mac was built from the ground up to run Linux microVMs on Apple Silic
 
 It uses the same familiar API and CLI from Slicer for Linux, using Apple's native [Virtualization framework](https://developer.apple.com/documentation/virtualization) instead of KVM. Only Arm64 hosts and guests are supported, however Rosetta support can be enabled to run Intel/AMD binaries.
 
+By installing and starting Slicer, you agree to the [End User License Agreement (EULA)](https://slicervm.com/eula/).
+
 Typical use-cases include:
 
 * Real Linux with systemd instead of POSIX compatibility
