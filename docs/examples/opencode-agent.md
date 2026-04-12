@@ -10,7 +10,7 @@ This example is very minimal and can be tuned and adapted in many ways to suit y
 
 The general idea is that everything is orchestrated via an initial userdata script:
 
-* Install opencode CLI.
+* Install the `opencode` CLI.
 * Configure model authentication using a pre-defined config file `~/.local/share/opencode/auth.json` from another machine like your workstation.
 * Set the agent working away as a systemd service, with a prompt set in the userdata file.
 
@@ -314,4 +314,3 @@ One advantage of keeping a microVM alive, is that you can follow-up if the resul
 A practical application of opencode in a Slicer sandbox, is for code reviews linked to a Source Control Management (SCM) system like GitHub or GitLab.
 
 The CLI can be driven manually or via bash, for our own code review bot, [we used the Go SDK](https://docs.slicervm.com/tasks/execute-commands-with-sdk/).
-
