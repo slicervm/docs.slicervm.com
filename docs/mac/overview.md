@@ -92,6 +92,6 @@ See [Sleep behavior](/mac/sleep) for full guidance and per-mode behavior.
 ## Next steps
 
 - [Installation](/mac/installation) - install binaries and start Slicer for Mac
-- [Linux VM](/mac/your-linux-vm) - configure your persistent VM, shared folders, Docker, and K3s
-- [Sandboxes](/mac/launch-sandboxes) - spin up and tear down ephemeral VMs
-- [Coding agents](/mac/coding-agents) - run Claude Code, OpenCode, and other agents inside the VM
+- [Linux VM](/mac/linux-vm) - configure your persistent VM, shared folders, Docker, and K3s aka `slicer-1`
+- [Sandboxes](/mac/sandboxes) - spin up and tear down VMs via API for ephemeral tasks
+- [Coding agents](/mac/coding-agents) - automation to stand up a VM with Claude Code, OpenCode, and other agents inside the VM
