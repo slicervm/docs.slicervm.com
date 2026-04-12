@@ -1,18 +1,21 @@
-# Coding agents
+# Sandboxing Coding Agents
 
-You can run coding agents like [Claude Code](https://code.claude.com/docs/en/overview), [OpenCode](https://opencode.ai/), and [Amp](https://amp.dev/) inside your Slicer for Mac VM. VirtioFS sharing means the agent edits code on a shared folder that's visible on both your Mac and the VM, so you get the isolation of a VM without copying files around.
+You can run coding agents like [Claude Code](https://code.claude.com/docs/en/overview), [OpenCode](https://opencode.ai/), and [Amp](https://amp.dev/) inside Slicer VMs.
+This page applies to both Slicer for Linux and Slicer for Mac.
 
-Running an agent inside a VM means you don't have to pass `--dangerously-skip-permissions` on your Mac. The agent gets its own kernel and filesystem, and can't touch your SSH keys, cloud credentials, or browser sessions.
+Running an agent inside a VM means you don't need to grant broad permissions on your host CLI. The agent gets its own kernel and filesystem, and can't touch your SSH keys, cloud credentials, or browser sessions.
 
 ## `slicer workspace`: generic workspace runner
 
-`slicer workspace` is a generic command for booting a fresh VM and copying your current workspace into it. It is not limited to one specific agent binary.
+`slicer workspace` is a generic command that bootstraps a fresh VM for your current project workspace. It copies your working directory into the VM and drops you into a shell so you can run a tool of your choice.
 
-Use it when you want:
+Use it when you want one-VM-per-task behavior without being tied to a specific agent binary. For example, use it for:
 
-* one-off or temporary VM environments
-* custom agent tooling that isn't covered by `slicer claude` / `slicer opencode` shortcuts
-* a reproducible workspace copy for isolated scripting or testing
+* trying out a new tool against a codebase
+* running a custom script-based agent
+* reproducing task-specific work in a disposable environment
+
+Because it is generic, it’s a good fit when the built-in `slicer claude`, `slicer opencode`, etc. shortcuts don’t match your exact workflow.
 
 ## Automated agent and sandbox launches
 
@@ -20,8 +23,8 @@ Slicer has a number of experimental commands that do the following:
 
 * Boot a new VM
 * Copy the current directory to the VM in the same relative path
-* Installs the specified AI agent, and copies in its config/auth files
-* Launches the agent in a shell (`slicer vm shell`)
+* Install the specified AI agent and copy in its config/auth files
+* Launch the agent in a shell (`slicer vm shell`)
 
 Available agent commands:
 
@@ -34,9 +37,9 @@ Available agent commands:
 
 If your agent (for example, Pi or Hermes) is not listed above, request support in the Discord, or use `slicer workspace` and install and configure your agent via a bash script or userdata.
 
-To launch i.e. a new slicer VM for Claude:
+To launch a new Slicer VM for Claude:
 
-```
+```bash
 mkdir -p ~/dev/
 cd ~/dev/
 git clone --depth=1 https://github.com/alexellis/arkade
@@ -49,7 +52,7 @@ slicer claude .
 When launching a VM for a coding agent, you can specify:
 
 * `--tmux=none` - launch the agent directly in the shell
-* `--tmux=local` - launch a shell using tmux on your mac (requires `brew install tmux`)
+* `--tmux=local` - launch a shell using tmux on the host (requires `brew install tmux` on macOS)
 * `--tmux=remote` - launch a shell using tmux on the VM
 
 Tmux is a time-tested terminal tool and ideal for running processes in the background, and reconnecting to them later.
@@ -68,7 +71,7 @@ arkade get claude --path /usr/local/bin
 arkade get opencode --path /usr/local/bin
 ```
 
-Both binaries are installed into `/usr/local/bin` inside the VM. They persist across reboots since `slicer-1` is a persistent VM.
+Both binaries are installed into `/usr/local/bin` inside the VM. They persist across reboots if your base VM is persistent.
 
 ## Authenticate
 
@@ -89,14 +92,14 @@ echo 'export ANTHROPIC_API_KEY=sk-ant-...' >> ~/.bashrc
 Then run Claude Code:
 
 ```bash
-cd /home/ubuntu/host/my-project
+cd /home/ubuntu/host/code/my-project
 claude --dangerously-skip-permissions
 ```
 
 Inside the VM, `--dangerously-skip-permissions` is acceptable because the VM is the sandbox.
 
 !!! note "Claude Max plan"
-    The Claude Max subscription uses OAuth-based authentication. Run `claude` inside the VM and follow the interactive login flow. The auth token is stored inside the VM and does not affect your Mac.
+    The Claude Max subscription uses OAuth-based authentication. Run `claude` inside the VM and follow the interactive login flow. The auth token is stored inside the VM and does not affect your host.
 
 ### OpenCode
 
@@ -108,31 +111,13 @@ opencode auth login --provider github --token <your-github-token>
 
 The auth config is stored at `~/.local/share/opencode/auth.json` inside the VM.
 
-## Work on shared folders
+## Linux-specific workspace details
 
-With [folder sharing](/mac/folder-sharing), your Mac project paths can be visible at `/home/ubuntu/host/`.
+On Slicer for Linux, use the workspace mounting pattern defined for your host/group and the normal `slicer vm cp` flow for file movement.
 
-```bash
-cd /home/ubuntu/host/code/my-project
-
-# Run Claude Code
-claude --dangerously-skip-permissions
-
-# Or run OpenCode
-opencode
-```
-
-Changes the agent makes are immediately visible on your Mac because VirtioFS is a shared mount, not a copy.
-
-### Share a sub-path for tighter isolation
-
-If you don't want the agent to see your entire home directory, set `share_home` to a sub-path in `slicer-mac.yaml`:
-
-```yaml
-share_home: "~/code/"
-```
-
-Restart the daemon after changing this setting. The agent can only see projects under `~/code/`, not your SSH keys, cloud credentials, or dotfiles.
+Use:
+- your host filesystem access model (from your host/group config)
+- `slicer vm cp` for explicit copies into and out of ephemeral VMs
 
 ## Run headless agents non-interactively
 
