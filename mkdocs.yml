@@ -133,7 +133,7 @@ nav:
           - ZFS: storage/zfs.md
           - Devmapper: storage/devmapper.md
       - Reference:
-          - Slicer REST API: reference/api.md
+          - REST API: reference/api.md
           - Images for microVMs: reference/images.md
           - SSH access to VMs: reference/ssh.md
           - Secret management: reference/secrets.md
@@ -151,6 +151,7 @@ nav:
       - Examples:
           - Video conversion: platform/video-conversion.md
       - REST API Reference: reference/api.md
+      - OpenAPI Spec: platform/openapi.md
       - Build a custom image: platform/custom-images.md
       - Publish your own images: platform/publish-images.md
   - Slicer for Mac:

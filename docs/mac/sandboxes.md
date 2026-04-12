@@ -111,4 +111,4 @@ Restart the daemon after changing the config.
 
 - [Copy files to/from a VM](/tasks/copy-files) - use `slicer vm cp` to move files in and out of sandboxes
 - [Execute commands in a VM](/tasks/execute-commands) - run commands remotely with `slicer vm exec`
-- [Slicer REST API](/reference/api) - automate sandbox lifecycle via the API
+- [REST API](/reference/api) - automate sandbox lifecycle via the API

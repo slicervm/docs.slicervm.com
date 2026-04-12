@@ -3,6 +3,8 @@
 This page documents the HTTP API exposed by Slicer for managing micro-VMs, images, disks, and operations.
 Some endpoints will fail if a trailing slash is given, i.e. `/nodes` is documented, however `/nodes/` may return an error.
 
+An [OpenAPI 3.0 specification](/platform/openapi/) is also available for client generation and tool imports.
+
 A note on Slicer Services vs Slicer Sandboxes:
 
 * A Slicer Service is a VM launched via YAML - protected from VM deletion - disk persistent is controlled via the `persistent` flag in the YAML config. `storage: image` is persistent by default.
