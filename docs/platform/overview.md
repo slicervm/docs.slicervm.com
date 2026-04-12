@@ -1,5 +1,7 @@
 # Slicer Platform
 
+Slicer Platform is for when you want to build on top of Slicer.
+
 Slicer gives you on-demand Linux VMs through a REST API and Go SDK. You can create a VM, run commands inside it, copy files in and out, and delete it - all over HTTP.
 
 This section assumes [Slicer for Linux](/getting-started/install/), but many of the REST API examples will also work on [Slicer for Mac](/mac/overview/) if you use the `sbox` host group.
@@ -11,6 +13,34 @@ By installing and starting Slicer, you agree to the [End User License Agreement 
 Slicer runs on your hardware. Every VM is a real microVM with its own kernel - not a container dressed up as one. Unlike hosted platforms like Modal, Daytona, or Fly, there are no artificial timeouts, no per-second metering, no rate limits on the API, and no mandatory scale-to-zero. Your VMs run for as long as you need them, using as many resources as the host has available.
 
 Your data never leaves your network, there is no third-party control plane, and you pay a flat rate per [Platform license](https://slicervm.com/pricing/) regardless of how many VMs you run.
+
+## What you can do via the API
+
+| Capability | Endpoint | Details |
+|---|---|---|
+| Create a VM | `POST /hostgroup/NAME/nodes` | Specify CPU, RAM, userdata, tags |
+| Delete a VM | `DELETE /hostgroup/NAME/nodes/HOSTNAME` | Cleans up disk for ephemeral VMs |
+| List VMs | `GET /nodes` | Includes tags, status, IP, resources |
+| Execute commands | `POST /vm/HOSTNAME/exec` | Streaming stdout/stderr, exit codes |
+| Interactive shell (PTY) | `GET /vm/HOSTNAME/shell` | Full terminal session via the agent |
+| Copy files to/from VM | `POST/GET /vm/HOSTNAME/cp` | Binary or tar mode, set uid/gid/permissions |
+| Agent health | `HEAD/GET /vm/HOSTNAME/health` | Check readiness, userdata completion |
+| VM stats | `GET /nodes/stats` | CPU, memory, disk, network usage |
+| Pause / resume | `POST /vm/HOSTNAME/pause\|resume` | Freeze CPU, resume instantly |
+| Shutdown / reboot | `POST /vm/HOSTNAME/shutdown` | Graceful shutdown or reboot |
+| Secrets | `POST/GET/DELETE /secrets` | Inject credentials into VMs |
+| Serial logs | `GET /vm/HOSTNAME/logs` | Boot logs and serial console output |
+| Port forwarding | `GET /vm/HOSTNAME/forward` | TCP tunnels via the agent (also supports UNIX sockets) |
+
+Full details in the [REST API reference](/reference/api/).
+
+## Integration patterns
+
+| Pattern | When to use it | Guide |
+|---|---|---|
+| **Run tasks in Slicer** | Background jobs, crons, headless agents, batch processing | [Run a task in Slicer](/platform/ephemeral-tasks/) |
+| **Slicer per host** | Single daemon, all tenants share it, tags track ownership | [Single Slicer instance](/platform/single-instance/) |
+| **Slicer per tenant** | One daemon per tenant, UNIX sockets, isolated networking | [Instance per tenant](/platform/instance-per-tenant/) |
 
 ## What you get
 
@@ -63,10 +93,7 @@ The difference between "Slicer for Linux" and "Slicer Platform" is who is drivin
                                                 └──────────────┘
 ```
 
-There are two deployment models depending on your isolation requirements:
-
-* [Single Slicer instance](/platform/single-instance/) - one daemon, all tenants share it, use tags to track ownership
-* [Instance per tenant](/platform/instance-per-tenant/) - one daemon per tenant with its own UNIX socket and isolated network
+There are two deployment models depending on your isolation requirements. See [integration patterns](#integration-patterns) above.
 
 A typical request flow for a code execution platform:
 
@@ -80,14 +107,6 @@ A typical request flow for a code execution platform:
 8. Return the result to the user
 
 The entire flow takes seconds. Each user gets a dedicated VM with its own kernel - no shared state, no container escapes.
-
-## API surfaces
-
-Slicer exposes three ways to manage VMs programmatically:
-
-* **REST API**: HTTP endpoints for the full VM lifecycle. Works from any language. See the [API reference](/reference/api/).
-* **Go SDK**: a Go client library that wraps the REST API. See the [SDK on GitHub](https://github.com/slicervm/sdk).
-* **CLI**: `slicer vm` commands that call the same API, useful for scripting and exploration.
 
 ## Next steps
 
