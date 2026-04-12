@@ -30,12 +30,38 @@ Use sandboxes when you want fast isolation without changing your persistent envi
 +------------------------------------------------------------------+
 ```
 
+## Use cases
+
+Sandboxes are designed for short-lived workloads and experimentation:
+
+- **AI coding agents** - copy a repo in, let the agent work, copy results out, then delete if needed.
+- **CI and testing** - run builds and repeatable test suites in a clean environment.
+- **Untrusted code** - isolate risky runs from your main services.
+- **Comparison builds** - run multiple versions of tooling side-by-side without rebuilding your persistent VM.
+
+You can launch sandboxes from the CLI, [Go SDK](/platform/go-sdk/), or [REST API](/reference/api).
+
+
 ## Launch, use, and delete
 
-Launch a sandbox:
+Launch an ephemeral sandbox that is deleted when you reboot it or stop Slicer for Mac:
 
 ```bash
 slicer vm launch sbox
+```
+
+To launch a sandbox that's persistent and survives with a permanent disk:
+
+```bash
+slicer vm launch sbox --persistent
+```
+
+Launch a sandbox with memorable tags that you can query later on through the API or `slicer vm list`:
+
+```bash
+slicer vm launch sbox \
+  --tag owner=alex \
+  --tag task=k3s
 ```
 
 Check what is running:
@@ -56,38 +82,32 @@ Open an interactive shell:
 slicer vm shell sbox-1
 ```
 
-Stop and remove the sandbox when you are done:
+Stop and remove an ephemeral sandbox:
+
+```bash
+slicer vm shutdown sbox-1
+
+# Or
+slicer vm delete sbox-1
+```
+
+Stop a persistent sandbox (and retain it):
+
+```bash
+slicer vm shutdown sbox-1
+```
+
+Permanently delete a persistent sandbox:
 
 ```bash
 slicer vm delete sbox-1
 ```
 
-## Persistent sandboxes
-
-By default, sandboxes are ephemeral - they are deleted when the daemon stops. To create a sandbox that retains its disk and survives restarts, use `--persistent`:
-
-```bash
-slicer vm launch sbox --persistent
-```
-
-If the daemon restarts (e.g. after a reboot or sleep), persistent sandboxes are not automatically re-launched. To bring one back:
+Relaunch a persistent sandbox (after a `slicer vm shutdown` or running `sudo reboot` in the guest):
 
 ```bash
 slicer relaunch sbox-1
 ```
-
-This boots the VM from its existing disk. Any data written to the filesystem is still there.
-
-## Use cases
-
-Sandboxes are designed for short-lived workloads and experimentation:
-
-- **AI coding agents** - copy a repo in, let the agent work, copy results out, then delete if needed.
-- **CI and testing** - run builds and repeatable test suites in a clean environment.
-- **Untrusted code** - isolate risky runs from your main services.
-- **Comparison builds** - run multiple versions of tooling side-by-side without rebuilding your persistent VM.
-
-You can launch sandboxes from the CLI, [Go SDK](/platform/go-sdk/), or [REST API](/reference/api).
 
 ## Customise sandbox resources
 
