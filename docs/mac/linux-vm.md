@@ -104,6 +104,6 @@ Docker's socket is port-forwarded to your Mac as a Unix socket, so `docker` comm
 
 ## Next steps
 
-- [Sandboxes](/mac/launch-sandboxes) - spin up ephemeral VMs for AI agents and automation
+- [Sandboxes](/mac/sandboxes) - spin up ephemeral VMs for AI agents and automation
 - [Copy files to/from a VM](/tasks/copy-files) - use `slicer vm cp` to move files in and out
 - [Execute commands in a VM](/tasks/execute-commands) - run commands remotely with `slicer vm exec`

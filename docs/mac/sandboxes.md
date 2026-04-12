@@ -87,7 +87,7 @@ Sandboxes are designed for short-lived workloads and experimentation:
 - **Untrusted code** - isolate risky runs from your main services.
 - **Comparison builds** - run multiple versions of tooling side-by-side without rebuilding your persistent VM.
 
-You can launch sandboxes from the CLI, [Go SDK](/tasks/execute-commands-with-sdk), or [REST API](/reference/api).
+You can launch sandboxes from the CLI, [Go SDK](/platform/go-sdk/), or [REST API](/reference/api).
 
 ## Customise sandbox resources
 

@@ -147,5 +147,5 @@ The sandbox has its own kernel and filesystem. If the agent does something unexp
 
 - [Sandboxes](/mac/sandboxes) - more on launching and managing ephemeral VMs
 - [Headless OpenCode on Slicer for Linux](/examples/opencode-agent) - one-shot agent execution via userdata and the exec API
-- [Headless Cursor CLI on Slicer for Linux](/examples/cursor-cli-agent) - running Cursor's CLI agent headlessly
+- [Headless CLI-style agents on Slicer for Linux](/examples/opencode-agent) - see the OpenCode pattern for userdata-based one-shot runs
 - [Trying Claude Code with Ollama](https://slicervm.com/blog/trying-claude-code-with-ollama) - using Claude Code with a local LLM backend

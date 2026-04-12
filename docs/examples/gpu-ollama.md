@@ -8,7 +8,7 @@ What if you have multiple GPUs? Let's imagine you have a ATX tower PC with 2x Nv
 
 * Allocate both GPUs to one machine
 * Allocate each GPU to its own microVM
-* Start up with zero microVMs and [launch up to two short-lived tasks at once](/examples/run-a-task)
+* Start up with zero microVMs and [launch up to two short-lived tasks at once](/platform/ephemeral-tasks/)
 
 [![Ollama running the qwen3 model to generate a story about a microVM's first day at school](/images/ollama.png)](/images/ollama.png)
 > Ollama running the qwen3 model to generate a story about a microVM's first day at school.

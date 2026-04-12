@@ -199,5 +199,5 @@ cd ~/slicer-mac
 
 ## Next steps
 
-- [Linux VM](/mac/your-linux-vm) - mount shared folders, forward Docker and K3s
-- [Sandboxes](/mac/launch-sandboxes) - spin up ephemeral VMs
+- [Linux VM](/mac/linux-vm) - mount shared folders, forward Docker and K3s
+- [Sandboxes](/mac/sandboxes) - spin up ephemeral VMs
