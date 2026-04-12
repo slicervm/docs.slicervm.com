@@ -311,10 +311,31 @@ components:
 
     SlicerExecWriteResult:
       type: object
+      description: |
+        One NDJSON frame from a streaming exec. Typed exec frames add
+        `started` (first frame, emitted when the process is spawned) and
+        `exit` (last frame, carries exit_code). Intermediate frames carry
+        stdout or stderr chunks. Older agents may emit untyped frames that
+        mix stdout/stderr/exit_code; clients should tolerate both shapes.
       properties:
+        type:
+          type: string
+          enum: [started, stdout, stderr, exit]
+          description: Frame type (newer agents). Absent on older agents.
         timestamp:
           type: string
           format: date-time
+        started_at:
+          type: string
+          format: date-time
+          description: Present on the `started` frame only.
+        ended_at:
+          type: string
+          format: date-time
+          description: Present on the `exit` frame only.
+        pid:
+          type: integer
+          description: Present on the `started` frame only.
         stdout:
           type: string
         stderr:
@@ -323,6 +344,58 @@ components:
           type: integer
         error:
           type: string
+
+    ExecResult:
+      type: object
+      description: |
+        Buffered exec response — returned when the caller passes
+        `?buffered=true` to `POST /vm/{hostname}/exec`. A single JSON
+        document instead of an NDJSON stream.
+      required: [stdout, stderr, exit_code]
+      properties:
+        stdout:
+          type: string
+        stderr:
+          type: string
+        exit_code:
+          type: integer
+        error:
+          type: string
+          description: Non-empty when the agent could not run the command.
+
+    SlicerFSInfo:
+      type: object
+      description: Filesystem entry metadata returned by `/fs/readdir` and `/fs/stat`.
+      required: [name, type, size, mtime, mode]
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+          enum: [file, directory, symlink]
+        size:
+          type: integer
+          format: int64
+        mtime:
+          type: integer
+          format: int64
+          description: Modification time as a Unix timestamp (seconds).
+        mode:
+          type: string
+          description: Octal file mode, zero-padded (e.g. "0644").
+
+    SlicerFSMkdirRequest:
+      type: object
+      required: [path]
+      properties:
+        path:
+          type: string
+        recursive:
+          type: boolean
+          default: false
+        mode:
+          type: string
+          description: Octal mode for the created directory (e.g. "0755").
 
     SlicerAgentHealthResponse:
       type: object
@@ -420,6 +493,12 @@ paths:
 
     post:
       summary: Create a node in a host group
+      description: |
+        Optionally block the response until the in-guest agent reports ready
+        (`wait=agent`) or until cloud-init-style userdata finishes
+        (`wait=userdata`). Server-side wait removes the need for client-side
+        `/health` polling and returns a 408 on timeout (the VM is cleaned up
+        before the error is returned).
       security:
         - BearerAuth: []
       parameters:
@@ -427,6 +506,24 @@ paths:
           name: name
           required: true
           schema: { type: string }
+        - in: query
+          name: wait
+          description: |
+            Block the response until readiness. `agent` waits for agent_uptime
+            > 0 (process is ready to receive exec). `userdata` additionally
+            waits for userdata_ran == true. Omit to return as soon as the VM
+            is scheduled.
+          schema:
+            type: string
+            enum: [agent, userdata]
+        - in: query
+          name: timeout
+          description: |
+            Go-style duration (e.g. `30s`, `2m`). Only meaningful when `wait`
+            is set. Defaults to `5m`.
+          schema:
+            type: string
+            default: "5m"
       requestBody:
         required: true
         content:
@@ -455,6 +552,11 @@ paths:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
         "404":
           description: Host group not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "408":
+          description: Wait timed out before readiness; VM is cleaned up
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }

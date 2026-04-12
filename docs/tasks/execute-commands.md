@@ -45,3 +45,30 @@ Combine with local commands using pipes and STDIO:
 # Pipe local file content to VM command
 cat /etc/hostname | slicer vm exec vm-1 -- base64 --wrap 9999
 ```
+
+## Streaming vs buffered exec via the REST API
+
+The `/vm/{hostname}/exec` REST endpoint ships two response shapes:
+
+- **Streaming** (default) — NDJSON frames as output arrives. Preferred
+  for long-running commands where you want live stdout/stderr, or when
+  you want to measure process-start latency separately from first-byte
+  latency using the typed `started` frame.
+- **Buffered** — add `buffered=true` to get a single JSON document with
+  `stdout`, `stderr`, and `exit_code` once the process exits. Preferred
+  for short "run one thing, give me the result" calls; avoids the need
+  for client-side NDJSON parsing.
+
+```bash
+# Streaming (default)
+curl --unix-socket ~/slicer-mac/slicer.sock \
+  -X POST "http://localhost/vm/vm-1/exec?cmd=uname&args=-a"
+
+# Buffered
+curl --unix-socket ~/slicer-mac/slicer.sock \
+  -X POST "http://localhost/vm/vm-1/exec?buffered=true&cmd=uname&args=-a"
+# → {"stdout":"Linux vm-1 ...\n","stderr":"","exit_code":0}
+```
+
+`buffered=true` does not accept `stdin`; use the streaming endpoint if
+you need to pipe stdin data.

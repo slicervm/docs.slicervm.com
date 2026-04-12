@@ -176,6 +176,30 @@ Add a host with a custom GitHub user to override the SSH keys:
 }
 ```
 
+### Block until ready (`?wait=` and `?timeout=`)
+
+By default, `POST /hostgroup/NAME/nodes` returns as soon as the VM is
+scheduled — the in-guest agent may still be booting. Two optional query
+parameters let the server hold the response until readiness, so callers
+don't need their own poll loop on `/vm/{hostname}/health`:
+
+- `wait=agent` — block until `agent_uptime > 0` (the agent is up and can
+  accept `exec` calls).
+- `wait=userdata` — additionally block until `userdata_ran == true`
+  (the cloud-init-style userdata script has completed).
+- `timeout=30s` — Go-style duration. Defaults to `5m` when `wait` is
+  set. On timeout the VM is cleaned up and the endpoint returns **408**.
+
+```bash
+curl --unix-socket ~/slicer-mac/slicer.sock \
+  -X POST "http://localhost/hostgroup/sbox/nodes?wait=agent&timeout=30s" \
+  -H "Content-Type: application/json" \
+  -d '{"cpus":1,"ram_bytes":1073741824}'
+```
+
+Typical response latency on Slicer-for-Mac is ~450 ms for `wait=agent`
+on a 1 vCPU / 1 GiB sandbox.
+
 ## List nodes in a Host Group
 
 HTTP GET
@@ -366,10 +390,17 @@ Query parameters:
 - `stdout` (optional): enable stdout capture (true/false)
 - `stderr` (optional): enable stderr capture (true/false)
 - `permissions` (optional): permissions for the command
+- `buffered` (optional): see **Buffered exec** below.
 
 Body: stdin data (if `stdin=true`)
 
 Response: streaming newline-delimited JSON with stdout/stderr/exit_code
+
+Newer agents emit typed frames on the streaming response — `started`
+(first frame, carries `pid` and `started_at`), `stdout`, `stderr`, and
+`exit` (last frame, carries `exit_code` and `ended_at`). Older agents
+emit untyped frames that mix `stdout`/`stderr`/`exit_code` on a single
+object; clients should tolerate both shapes.
 
 Example response stream:
 
@@ -388,6 +419,87 @@ The `error` variable may also be populated if there was a problem running, start
 ```json
 {"error": "Some error message", "exit_code": 1}
 ```
+
+### Buffered exec (`?buffered=true`)
+
+For callers that don't need live output, add `buffered=true` to get a
+single JSON response instead of an NDJSON stream:
+
+```bash
+curl --unix-socket ~/slicer-mac/slicer.sock \
+  -X POST "http://localhost/vm/sbox-1/exec?buffered=true&cmd=/bin/bash&args=-lc&args=echo%20hello" \
+  -H "Content-Type: application/json"
+```
+
+Response:
+
+```json
+{ "stdout": "hello\n", "stderr": "", "exit_code": 0 }
+```
+
+The request shape is the same (query parameters, not a JSON body). The
+response does not include `started_at` / `ended_at` — those are only on
+streaming frames. `stdin` is not supported with `buffered=true`; use
+the streaming endpoint if you need to pipe stdin.
+
+## Filesystem operations
+
+HTTP endpoints under `/vm/{hostname}/fs/*` read and mutate the guest
+filesystem directly via the in-guest agent. Prefer these over shelling
+out through `/exec` — they're faster, don't depend on `ls`/`stat`/`mkdir`
+being on the guest PATH, and avoid shell-quoting hazards on unusual
+filenames.
+
+### List a directory
+
+HTTP GET
+
+`/vm/{hostname}/fs/readdir?path=/etc`
+
+Response:
+
+```json
+[
+  {"name":"hostname","type":"file","size":7,"mtime":1776024825,"mode":"0644"},
+  {"name":"ssh","type":"directory","size":4096,"mtime":1776024825,"mode":"0755"},
+  {"name":"localtime","type":"symlink","size":27,"mtime":1775348015,"mode":"0777"}
+]
+```
+
+`type` is one of `file`, `directory`, or `symlink`. `mtime` is a Unix
+timestamp in seconds; `mode` is the octal file mode.
+
+### Stat a single entry
+
+HTTP GET
+
+`/vm/{hostname}/fs/stat?path=/etc/hostname`
+
+Response: a single `SlicerFSInfo` object (same shape as one entry from
+`readdir`). Returns **404** if the path does not exist — useful as a
+cheap `exists` check.
+
+### Create a directory
+
+HTTP POST
+
+`/vm/{hostname}/fs/mkdir`
+
+Body:
+
+```json
+{ "path": "/tmp/work", "recursive": true, "mode": "0755" }
+```
+
+`recursive` and `mode` are optional.
+
+### Remove a file or directory
+
+HTTP DELETE
+
+`/vm/{hostname}/fs/remove?path=/tmp/work&recursive=true`
+
+Returns 200 on success.
 
 ## Manage secrets
 
@@ -496,6 +608,50 @@ HTTP POST
 `/vm/{hostname}/resume`
 
 Response 200: text/plain
+
+## Suspend a VM to disk (Slicer-for-Mac only, for now)
+
+HTTP POST
+
+`/vm/{hostname}/suspend`
+
+Takes a Firecracker snapshot of the VM's memory and disk state, then
+shuts down the underlying VM process. Memory is released. Use
+`/restore` to bring the VM back up from the snapshot.
+
+> Availability: currently supported on Slicer-for-Mac only. Not
+> available on the Linux daemon yet.
+
+Response 200: text/plain
+
+## Restore a VM from a snapshot (Slicer-for-Mac only, for now)
+
+HTTP POST
+
+`/vm/{hostname}/restore`
+
+Restores a previously-suspended VM from its Firecracker snapshot. The
+VM resumes with its memory and disk state intact.
+
+> Availability: currently supported on Slicer-for-Mac only. Not
+> available on the Linux daemon yet.
+
+Response 200: text/plain
+
+## Relaunch an API-launched VM
+
+HTTP POST
+
+`/vm/{hostname}/relaunch`
+
+Bring a previously-created API-launched VM back up using its existing
+disk image, without going through a fresh `POST /hostgroup/NAME/nodes`.
+Useful after an intentional shutdown when you want to resume the same
+sandbox identity rather than spin up a new one.
+
+Available on both Slicer-for-Mac and the Linux daemon.
+
+Response 200: `SlicerCreateNodeResponse`
 
 ## Forward TCP connections
 
