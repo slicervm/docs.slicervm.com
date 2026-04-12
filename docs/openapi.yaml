@@ -312,13 +312,42 @@ components:
           type: string
         permissions:
           type: string
+        buffered:
+          type: boolean
+          description: Return a single buffered response instead of streaming NDJSON.
 
     SlicerExecWriteResult:
       type: object
       properties:
+        type:
+          type: string
+        pid:
+          type: integer
+        data:
+          type: string
+        started_at:
+          type: string
+          format: date-time
+        ended_at:
+          type: string
+          format: date-time
+        signal:
+          type: string
         timestamp:
           type: string
           format: date-time
+        stdout:
+          type: string
+        stderr:
+          type: string
+        exit_code:
+          type: integer
+        error:
+          type: string
+
+    SlicerExecResult:
+      type: object
+      properties:
         stdout:
           type: string
         stderr:
@@ -408,6 +437,16 @@ paths:
           name: name
           required: true
           schema: { type: string }
+        - in: query
+          name: tag
+          required: false
+          schema: { type: string }
+          description: Exact tag match filter. Only one of `tag` and `tag_prefix` may be set.
+        - in: query
+          name: tag_prefix
+          required: false
+          schema: { type: string }
+          description: Tag prefix filter. Only one of `tag` and `tag_prefix` may be set.
       responses:
         "200":
           description: Nodes in host group
@@ -431,6 +470,20 @@ paths:
           name: name
           required: true
           schema: { type: string }
+        - in: query
+          name: wait
+          required: false
+          schema:
+            type: string
+            enum: [agent, userdata]
+          description: Wait on server side for VM readiness before returning. `agent` waits for the guest agent to report.
+            `userdata` waits for both agent readiness and userdata completion.
+        - in: query
+          name: timeout
+          required: false
+          schema:
+            type: string
+          description: Maximum time to wait for the selected readiness signal (Go duration format, e.g. `30s`, `2m`). Defaults to `5m` when `wait` is set.
       requestBody:
         required: true
         content:
@@ -459,6 +512,11 @@ paths:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
         "404":
           description: Host group not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "408":
+          description: Wait timed out before readiness; VM is cleaned up before the error is returned
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
@@ -509,6 +567,17 @@ paths:
       summary: List all nodes
       security:
         - BearerAuth: []
+      parameters:
+        - in: query
+          name: tag
+          required: false
+          schema: { type: string }
+          description: Exact tag match filter. Only one of `tag` and `tag_prefix` may be set.
+        - in: query
+          name: tag_prefix
+          required: false
+          schema: { type: string }
+          description: Tag prefix filter. Only one of `tag` and `tag_prefix` may be set.
       responses:
         "200":
           description: Nodes list
@@ -847,6 +916,116 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
 
+  /vm/{hostname}/suspend:
+    post:
+      summary: Suspend a VM to disk (Slicer-for-Mac only, for now)
+      description: |
+        Takes a Firecracker snapshot of the VM's memory and disk state, then
+        shuts down the underlying VM process. Memory is released. Pair with
+        `/restore` to bring the VM back up. Currently supported on
+        Slicer-for-Mac only.
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: hostname
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Suspend initiated
+          content:
+            text/plain:
+              schema: { type: string }
+        "404":
+          description: VM not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "501":
+          description: Not implemented on this platform
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "500":
+          description: Internal error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /vm/{hostname}/restore:
+    post:
+      summary: Restore a VM from its snapshot (Slicer-for-Mac only, for now)
+      description: |
+        Restores a previously-suspended VM from its Firecracker snapshot.
+        Memory and disk state come back intact. Currently supported on
+        Slicer-for-Mac only.
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: hostname
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Restore initiated
+          content:
+            text/plain:
+              schema: { type: string }
+        "404":
+          description: VM not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "501":
+          description: Not implemented on this platform
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "500":
+          description: Internal error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /vm/{hostname}/relaunch:
+    post:
+      summary: Relaunch an API-launched VM using its existing disk image
+      description: |
+        Bring a previously-created API-launched VM back up without going
+        through a fresh POST /hostgroup/{name}/nodes. The disk image is
+        reused so the sandbox identity is preserved. Available on both
+        Slicer-for-Mac and the Linux daemon.
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: hostname
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: VM relaunched
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SlicerCreateNodeResponse' }
+        "404":
+          description: VM not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "409":
+          description: VM is already running
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "500":
+          description: Internal error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
   /vm/{hostname}/exec:
     post:
       summary: Execute a command in the VM (streaming NDJSON)
@@ -892,6 +1071,9 @@ paths:
         - in: query
           name: permissions
           schema: { type: string }
+        - in: query
+          name: buffered
+          schema: { type: boolean }
       requestBody:
         description: Optional raw stdin stream when stdin=true.
         content:
@@ -899,8 +1081,10 @@ paths:
             schema: { type: string, format: binary }
       responses:
         "200":
-          description: Stream of JSON lines with exec output
+          description: Stream of JSON lines with exec output (default). When `buffered=true`, returns one JSON object.
           content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SlicerExecResult' }
             application/x-ndjson:
               schema: { $ref: '#/components/schemas/SlicerExecWriteResult' }
         "400":
@@ -942,6 +1126,10 @@ paths:
       responses:
         "200":
           description: File stream
+          headers:
+            X-Slicer-File-Mode:
+              description: Octal file mode of the returned file (for binary mode)
+              schema: { type: string }
           content:
             application/octet-stream:
               schema: { type: string, format: binary }
@@ -1001,6 +1189,189 @@ paths:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
         "404":
           description: VM not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "409":
+          description: VM paused
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /vm/{hostname}/fs/readdir:
+    get:
+      summary: List directory entries
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: hostname
+          required: true
+          schema: { type: string }
+        - in: query
+          name: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Directory entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    type:
+                      type: string
+                      enum: [file, directory, symlink]
+                    size:
+                      type: integer
+                      format: int64
+                    mtime:
+                      type: integer
+                      format: int64
+                    mode:
+                      type: string
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "404":
+          description: Path not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "409":
+          description: VM paused
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /vm/{hostname}/fs/stat:
+    get:
+      summary: Stat a path
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: hostname
+          required: true
+          schema: { type: string }
+        - in: query
+          name: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Path metadata
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  type:
+                    type: string
+                    enum: [file, directory, symlink]
+                  size:
+                    type: integer
+                    format: int64
+                  mtime:
+                    type: integer
+                    format: int64
+                  mode:
+                    type: string
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "404":
+          description: Path not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "409":
+          description: VM paused
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /vm/{hostname}/fs/mkdir:
+    post:
+      summary: Create a directory
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: hostname
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [path]
+              properties:
+                path:
+                  type: string
+                recursive:
+                  type: boolean
+                mode:
+                  type: string
+      responses:
+        "200":
+          description: Directory created
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "404":
+          description: VM not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "409":
+          description: VM paused
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /vm/{hostname}/fs/remove:
+    delete:
+      summary: Remove a file or directory
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: hostname
+          required: true
+          schema: { type: string }
+        - in: query
+          name: path
+          required: true
+          schema: { type: string }
+        - in: query
+          name: recursive
+          schema: { type: boolean }
+      responses:
+        "200":
+          description: Path removed
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "404":
+          description: Path not found
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
