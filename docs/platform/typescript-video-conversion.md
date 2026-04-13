@@ -2,7 +2,7 @@
 
 A full end-to-end example that uses the [TypeScript SDK](/platform/typescript-sdk/) to create a microVM, install ffmpeg, transcode a video, and stream the binary result back — without an intermediate file on the guest disk.
 
-The complete, runnable source is in [`examples/ffmpeg/`](https://github.com/slicervm/sdk-ts/tree/main/examples/ffmpeg) in the SDK repository.
+The complete, runnable source is in [`examples/ffmpeg/`](https://github.com/slicervm/sdk-ts/tree/master/examples/ffmpeg) in the SDK repository.
 
 For the Go equivalent, see [Video Conversion (Go)](/platform/video-conversion/).
 
@@ -163,4 +163,4 @@ Most of the wall time is `apt install ffmpeg`. For repeat runs:
 * [TypeScript SDK reference](/platform/typescript-sdk/) — all methods and types.
 * [Video Conversion (Go)](/platform/video-conversion/) — same workflow, Go SDK.
 * [REST API reference](/reference/api/) — the underlying HTTP endpoints.
-* [Example source on GitHub](https://github.com/slicervm/sdk-ts/tree/main/examples/ffmpeg)
+* [Example source on GitHub](https://github.com/slicervm/sdk-ts/tree/master/examples/ffmpeg)

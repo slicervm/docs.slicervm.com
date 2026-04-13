@@ -8,6 +8,47 @@ npm install @slicervm/sdk
 
 The SDK ships dual ESM + CommonJS builds with full TypeScript types. Node 18 or later is required.
 
+## Quickstart
+
+Create a VM, run a command, delete the VM:
+
+```ts
+import { SlicerClient, GiB } from '@slicervm/sdk';
+
+const client = SlicerClient.fromEnv(); // reads SLICER_URL + SLICER_TOKEN
+
+const vm = await client.vms.create(
+  'sbox',
+  { cpus: 1, ramBytes: GiB(1) },
+  { wait: 'agent', waitTimeoutSec: 60 },
+);
+console.log(`created ${vm.hostname} (${vm.ip})`);
+
+try {
+  const result = await vm.execBuffered({ command: 'uname', args: ['-a'] });
+  console.log(`exit=${result.exitCode}`);
+  console.log(result.stdout.trim());
+} finally {
+  await vm.delete();
+}
+```
+
+Run it:
+
+```bash
+SLICER_URL=~/slicer-mac/slicer.sock npx tsx run-command.ts
+```
+
+Expected output:
+
+```
+created sbox-1 (192.168.64.3)
+exit=0
+Linux sbox-1 6.12.70 #1 SMP aarch64 GNU/Linux
+```
+
+The complete runnable source — with logging, env handling, and a remote-daemon variant — is in [`examples/run-command/`](https://github.com/slicervm/sdk-ts/tree/master/examples/run-command).
+
 ## Shape
 
 The SDK has two layers:
@@ -270,7 +311,7 @@ The SDK base64-encodes secret data transparently; pass plaintext.
 ## Examples
 
 * [Video conversion with TypeScript](/platform/typescript-video-conversion/) — create a VM, install ffmpeg, transcode a video, and stream the binary result back via `stdio: 'base64'`. Full e2e walkthrough with runnable source.
-* [`examples/` in the SDK repo](https://github.com/slicervm/sdk-ts/tree/main/examples) — more runnable examples.
+* [`examples/` in the SDK repo](https://github.com/slicervm/sdk-ts/tree/master/examples) — more runnable examples.
 
 ## See also
 
