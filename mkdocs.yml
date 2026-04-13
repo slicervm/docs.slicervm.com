@@ -145,11 +145,13 @@ nav:
       - Overview: platform/overview.md
       - Quickstart: platform/quickstart.md
       - Go SDK: platform/go-sdk.md
+      - TypeScript SDK: platform/typescript-sdk.md
       - Run a task in Slicer: platform/ephemeral-tasks.md
       - Slicer per host: platform/single-instance.md
       - Slicer per tenant: platform/instance-per-tenant.md
       - Examples:
-          - Video conversion: platform/video-conversion.md
+          - Video conversion (Go): platform/video-conversion.md
+          - Video conversion (TypeScript): platform/typescript-video-conversion.md
       - REST API Reference: reference/api.md
       - OpenAPI Spec: platform/openapi.md
       - Build a custom image: platform/custom-images.md
