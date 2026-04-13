@@ -69,6 +69,15 @@ The SDK has two layers:
 
 This two-layer split keeps control-plane operations (which act on the server) cleanly separate from per-VM operations (which act on a specific VM), making the API easier to navigate as the surface grows.
 
+## Examples
+
+Runnable examples live in [`examples/` in the SDK repo](https://github.com/slicervm/sdk-ts/tree/master/examples). Each is a self-contained TypeScript project — `npm install && npm start`.
+
+* [`run-command`](https://github.com/slicervm/sdk-ts/tree/master/examples/run-command) — canonical hello-world: create a VM, run `uname -a`, delete the VM. The same code is shown inline in the Quickstart above.
+* [`nginx`](https://github.com/slicervm/sdk-ts/tree/master/examples/nginx) — install nginx via userdata, port-forward host `127.0.0.1:8080` → VM `:80`, fetch the welcome page from the host through the tunnel. Full create-to-fetch-to-teardown in ~6 seconds.
+* [`k3s`](https://github.com/slicervm/sdk-ts/tree/master/examples/k3s) — provision a single-node K3s cluster via userdata + `k3sup`, port-forward `:6443` to a local port, rewrite the kubeconfig, and run host-side `kubectl get nodes` against it. Mirrors the [Go k3s example](https://github.com/slicervm/sdk/tree/main/examples/k3s-userdata) but uses port-forwarding so guest IP routability is irrelevant.
+* [`ffmpeg`](https://github.com/slicervm/sdk-ts/tree/master/examples/ffmpeg) — full walkthrough on the [Video conversion (TypeScript)](/platform/typescript-video-conversion/) page. Streams a video into the VM via `vm.fs.writeFile`, transcodes with ffmpeg, streams the result back through `execBuffered({ stdio: 'base64' })` — no intermediate file on the guest disk.
+
 ## Connecting to the API
 
 Pass a base URL and bearer token:
@@ -307,11 +316,6 @@ The SDK base64-encodes secret data transparently; pass plaintext.
 | `client.secrets.create({ name, data, permissions?, uid?, gid? })` | Create a secret |
 | `client.secrets.patch(name, { data, ... })` | Update a secret |
 | `client.secrets.delete(name)` | Delete a secret |
-
-## Examples
-
-* [Video conversion with TypeScript](/platform/typescript-video-conversion/) — create a VM, install ffmpeg, transcode a video, and stream the binary result back via `stdio: 'base64'`. Full e2e walkthrough with runnable source.
-* [`examples/` in the SDK repo](https://github.com/slicervm/sdk-ts/tree/master/examples) — more runnable examples.
 
 ## See also
 
