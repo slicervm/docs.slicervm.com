@@ -1,10 +1,12 @@
 # Quickstart: Create a Sandbox via API
 
-This walkthrough covers the full sandbox lifecycle using curl: create a VM, wait for it, run a command, copy files, and delete it. It assumes Slicer is already [installed](/getting-started/install/) and running.
+This walkthrough covers the full sandbox lifecycle: create a VM, run a command, copy files, and delete it. It assumes Slicer is already [installed](/getting-started/install/) and running.
+
+Each step leads with the `slicer` CLI and then shows the equivalent `curl` call. Both talk to the same REST API.
 
 ## Set up a host group
 
-Create a host group with `count: 0` so no VMs are pre-allocated. The API will create them on demand.
+Create a host group with `count: 0` so no VMs are pre-allocated. The API creates them on demand.
 
 ```bash
 slicer new sandbox \
@@ -23,13 +25,13 @@ For the fastest boot times, add `--storage zfs` or `--storage devmapper` to the 
 
 ## Get the API token
 
-When authentication is enabled, Slicer writes a bearer token to disk:
+When authentication is enabled, Slicer writes a bearer token to disk. The CLI reads it automatically; `curl` callers need to supply it themselves:
 
 ```bash
 export TOKEN=$(sudo cat /var/lib/slicer/auth/token)
 ```
 
-All API calls use this token in the `Authorization` header. If you are calling from a remote host, copy the token over SSH:
+If you are calling from a remote host, copy the token over SSH:
 
 ```bash
 export TOKEN=$(ssh user@slicer-host 'sudo cat /var/lib/slicer/auth/token')
@@ -37,11 +39,19 @@ export TOKEN=$(ssh user@slicer-host 'sudo cat /var/lib/slicer/auth/token')
 
 ## Create a sandbox
 
+Block server-side until the in-guest agent is reachable, so the next command can run immediately:
+
+```bash
+slicer vm add sandbox --wait --timeout 60s
+```
+
+The equivalent `curl` passes `wait=agent` as a query parameter:
+
 ```bash
 curl -sf -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -X POST \
-  http://127.0.0.1:8080/hostgroup/sandbox/nodes \
+  "http://127.0.0.1:8080/hostgroup/sandbox/nodes?wait=agent&timeout=60s" \
   -d '{}'
 ```
 
@@ -58,58 +68,39 @@ Response:
 }
 ```
 
-To override the host group defaults for CPU or RAM:
-
-```json
-{
-  "cpus": 4,
-  "ram_gb": 8
-}
-```
-
-Hostnames are auto-assigned (`sandbox-1`, `sandbox-2`, etc.). To track which VM belongs to which user or job in your system, pass `tags`:
-
-```json
-{
-  "tags": ["user=alice", "job=convert-video-123"]
-}
-```
-
-Tags are returned when you list VMs, so your application can match VMs back to its own records.
-
-## Wait for the agent
-
-The guest agent needs to start before you can run commands or copy files. Poll the health endpoint:
+To override the host group defaults for CPU or RAM, use flags on the CLI:
 
 ```bash
-while true; do
-  curl -sf -I -H "Authorization: Bearer $TOKEN" \
-    http://127.0.0.1:8080/vm/sandbox-1/health && break
-  sleep 1
-done
+slicer vm add sandbox --wait --cpus 4 --ram-gb 8
 ```
 
-A `200` response means the agent is ready. For more detail:
+…or add them to the JSON body:
+
+```json
+{ "cpus": 4, "ram_bytes": 8589934592 }
+```
+
+CPU and RAM requests can match or be lower than the host group's defaults. Requests that exceed the defaults are rejected.
+
+Hostnames are auto-assigned (`sandbox-1`, `sandbox-2`, and so on). Use `tags` to track which VM belongs to which user or job in your system:
 
 ```bash
-curl -sf -H "Authorization: Bearer $TOKEN" \
-  http://127.0.0.1:8080/vm/sandbox-1/health
+slicer vm add sandbox --wait --tag user=alice --tag job=convert-video-123
 ```
 
 ```json
-{
-  "hostname": "sandbox-1",
-  "agent_uptime": 590528203,
-  "agent_version": "0.1.117",
-  "userdata_ran": true
-}
+{ "tags": ["user=alice", "job=convert-video-123"] }
 ```
 
-The `userdata_ran` field tells you whether the VM's boot script has finished. This is useful when you pass a `userdata` script at creation time and need to wait for it to complete before proceeding.
+Tags come back on every list response. See [VM Lifecycle](/platform/lifecycle/) for how to represent them in your product.
 
 ## Run a command
 
-Use the exec endpoint to run commands inside the VM:
+```bash
+slicer vm exec sandbox-1 uname -a
+```
+
+The equivalent `curl`:
 
 ```bash
 curl -sf -H "Authorization: Bearer $TOKEN" \
@@ -121,9 +112,13 @@ curl -sf -H "Authorization: Bearer $TOKEN" \
 {"timestamp":"2026-04-11T08:48:47Z","stdout":"Linux sandbox-1 6.1.90 #1 SMP x86_64 GNU/Linux\n"}
 ```
 
-The response is newline-delimited JSON, streamed as the command runs. Track the final `exit_code` to determine success.
+The response is newline-delimited JSON, streamed as the command runs. The final frame carries the `exit_code`.
 
-For multi-word commands, use the `shell` parameter:
+For multi-word commands, let the shell parse:
+
+```bash
+slicer vm exec sandbox-1 -- "cat /etc/os-release | head -3"
+```
 
 ```bash
 curl -sf -H "Authorization: Bearer $TOKEN" \
@@ -131,11 +126,16 @@ curl -sf -H "Authorization: Bearer $TOKEN" \
   "http://127.0.0.1:8080/vm/sandbox-1/exec?cmd=bash&args=-c&args=cat+/etc/os-release+|+head+-3&stdout=true"
 ```
 
-See [execute commands](/tasks/execute-commands/) and the [API reference](/reference/api/#execute-commands) for the full set of options including `uid`, `gid`, `cwd`, and `stdin`.
+See [execute commands](/tasks/execute-commands/) and the [API reference](/reference/api/#execute-commands) for options including `uid`, `gid`, `cwd`, and `stdin`.
 
 ## Copy files in and out
 
 Copy a file into the VM:
+
+```bash
+echo "hello from the host" > /tmp/greeting.txt
+slicer vm cp /tmp/greeting.txt sandbox-1:/tmp/greeting.txt
+```
 
 ```bash
 echo "hello from the host" | curl -sf \
@@ -146,7 +146,11 @@ echo "hello from the host" | curl -sf \
   --data-binary @-
 ```
 
-Copy a file back out:
+Copy the file back out:
+
+```bash
+slicer vm cp sandbox-1:/tmp/greeting.txt /tmp/greeting-back.txt
+```
 
 ```bash
 curl -sf -H "Authorization: Bearer $TOKEN" \
@@ -154,41 +158,59 @@ curl -sf -H "Authorization: Bearer $TOKEN" \
   "http://127.0.0.1:8080/vm/sandbox-1/cp?path=/tmp/greeting.txt&mode=binary"
 ```
 
-```
-hello from the host
-```
-
-For directories, use `mode=tar` with `Content-Type: application/x-tar`. See the [API reference](/reference/api/#copy-files-to-and-from-the-microvm) for details on uid, gid, and permissions.
+For directories, use `-r` on the CLI or `mode=tar` with `Content-Type: application/x-tar` on the API. See the [API reference](/reference/api/#copy-files-to-and-from-the-microvm) for details on uid, gid, and permissions.
 
 ## Create a sandbox with userdata
 
-Pass a shell script as `userdata` to run it on boot:
+Run a shell script at first boot, and block until it finishes with `--wait-userdata` (implies `--wait`):
+
+```bash
+cat > /tmp/setup.sh <<'EOF'
+#!/bin/bash
+set -euo pipefail
+export DEBIAN_FRONTEND=noninteractive
+apt-get update -qy
+apt-get install -qy curl
+EOF
+
+slicer vm add sandbox --wait-userdata --timeout 5m --userdata-file /tmp/setup.sh
+```
+
+The equivalent API call passes the userdata body and `wait=userdata`:
 
 ```bash
 curl -sf -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -X POST \
-  http://127.0.0.1:8080/hostgroup/sandbox/nodes \
-  -d "{\"userdata\": $(printf '#!/bin/bash\napt update -qy && apt install -qy curl' | jq -Rs .)}"
+  "http://127.0.0.1:8080/hostgroup/sandbox/nodes?wait=userdata&timeout=5m" \
+  -d "{\"userdata\": $(jq -Rs . < /tmp/setup.sh)}"
 ```
 
-Poll `/vm/HOSTNAME/health` and check `userdata_ran` to know when the script has finished.
+The daemon holds the response open via a single long-lived HTTP call into the guest agent. When it returns, your userdata has completed and the VM is ready to serve work. No client-side polling required.
 
 ## Create a persistent sandbox
 
-By default, sandboxes are ephemeral - they are destroyed when Slicer shuts down. To create a VM that survives restarts and retains its disk, pass `"persistent": true`:
+By default sandboxes are ephemeral: they are destroyed when Slicer shuts down. To create a VM that survives restarts and retains its disk, pass `--persistent`:
+
+```bash
+slicer vm add sandbox --wait --persistent
+```
 
 ```bash
 curl -sf -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -X POST \
-  http://127.0.0.1:8080/hostgroup/sandbox/nodes \
+  "http://127.0.0.1:8080/hostgroup/sandbox/nodes?wait=agent" \
   -d '{"persistent": true}'
 ```
 
-The `persistent` field is returned in list responses so your application can distinguish between ephemeral and persistent VMs.
+The `persistent` field is returned in list responses so your application can distinguish between ephemeral and persistent VMs. See [VM Lifecycle](/platform/lifecycle/) for the full semantics.
 
 ## Delete the sandbox
+
+```bash
+slicer vm delete sandbox-1 sandbox
+```
 
 ```bash
 curl -sf -H "Authorization: Bearer $TOKEN" \
@@ -202,12 +224,14 @@ curl -sf -H "Authorization: Bearer $TOKEN" \
 
 ## Wrapping up
 
-That covers the core loop: create a VM, wait for the agent, run commands, move files, delete the VM. Everything here maps to the [REST API reference](/reference/api/) and works the same from any language that can make HTTP calls.
+That covers the core loop: create a VM (blocking until it's ready), run commands, move files, delete the VM. Everything here maps to the [REST API reference](/reference/api/) and works the same from any language that can make HTTP calls.
 
 See also:
 
-* [REST API reference](/reference/api/) - full endpoint documentation
-* [Go SDK](https://github.com/slicervm/sdk) - wraps the REST API for Go programs
-* [Authentication](/reference/api/#authentication) - securing the API with bearer tokens
-* [Networking](/reference/networking/) - CIDR ranges, bridges, and routing
-* [Storage backends](/storage/overview/) - choosing between image, ZFS, and devmapper
+* [VM Lifecycle](/platform/lifecycle/): ephemeral vs persistent, tags, host group semantics
+* [REST API reference](/reference/api/)
+* [Go SDK](/platform/go-sdk/)
+* [TypeScript SDK](/platform/typescript-sdk/)
+* [Authentication](/reference/api/#authentication)
+* [Networking](/reference/networking/): CIDR ranges, bridges, and routing
+* [Storage backends](/storage/overview/): choosing between image, ZFS, and devmapper

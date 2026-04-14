@@ -144,6 +144,7 @@ nav:
   - Slicer Platform:
       - Overview: platform/overview.md
       - Quickstart: platform/quickstart.md
+      - VM Lifecycle: platform/lifecycle.md
       - Go SDK: platform/go-sdk.md
       - TypeScript SDK: platform/typescript-sdk.md
       - Run a task in Slicer: platform/ephemeral-tasks.md

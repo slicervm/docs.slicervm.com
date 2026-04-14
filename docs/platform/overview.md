@@ -26,7 +26,7 @@ Your data never leaves your network, there is no third-party control plane, and 
 | Copy files to/from VM | `POST/GET /vm/HOSTNAME/cp` | Binary or tar mode, set uid/gid/permissions |
 | Agent health | `HEAD/GET /vm/HOSTNAME/health` | Check readiness, userdata completion |
 | VM stats | `GET /nodes/stats` | CPU, memory, disk, network usage |
-| Pause / resume | `POST /vm/HOSTNAME/pause\|resume` | Freeze CPU, resume instantly |
+| Pause / resume | `POST /vm/HOSTNAME/pause`<br>`POST /vm/HOSTNAME/resume` | Freeze CPU, resume instantly |
 | Shutdown / reboot | `POST /vm/HOSTNAME/shutdown` | Graceful shutdown or reboot |
 | Secrets | `POST/GET/DELETE /secrets` | Inject credentials into VMs |
 | Serial logs | `GET /vm/HOSTNAME/logs` | Boot logs and serial console output |
