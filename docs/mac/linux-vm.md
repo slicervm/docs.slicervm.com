@@ -3,7 +3,7 @@
 Slicer for Mac has two types of VMs.
 
 1. A Persistent Linux VM named `slicer-1` - analogous to WSL2 - your *Linux twin* for macOS.
-2. Additional persistent or ephemeral VMs ["sandboxes"](/mac/sandboxes.md) can be launched into the `sbox` host group.
+2. Additional persistent or ephemeral VMs ["sandboxes"](/mac/sandboxes) can be launched into the `sbox` host group.
 
 Unlike most sandboxes that optimise for a narrow use-case, each VM is a full Linux Kernel with support for Docker, K3s, eBPF, coding agents, Go/Rust builds with systemd as the init.
 
