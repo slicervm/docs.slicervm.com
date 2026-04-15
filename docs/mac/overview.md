@@ -95,3 +95,4 @@ See [Sleep behavior](/mac/sleep) for full guidance and per-mode behavior.
 - [Linux VM](/mac/linux-vm) - configure your persistent VM, shared folders, Docker, and K3s aka `slicer-1`
 - [Sandboxes](/mac/sandboxes) - spin up and tear down VMs via API for ephemeral tasks
 - [Coding agents](/mac/coding-agents) - automation to stand up a VM with Claude Code, OpenCode, and other agents inside the VM
+- [Troubleshooting](/mac/troubleshooting) - recover from stale vmnet or DHCP state on macOS

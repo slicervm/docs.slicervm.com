@@ -41,7 +41,6 @@ Sandboxes are designed for short-lived workloads and experimentation:
 
 You can launch sandboxes from the CLI, [Go SDK](/platform/go-sdk/), or [REST API](/reference/api).
 
-
 ## Launch, use, and delete
 
 Launch an ephemeral sandbox that is deleted when you reboot it or stop Slicer for Mac:
@@ -110,6 +109,10 @@ slicer relaunch sbox-1
 ```
 
 ## Customise sandbox resources
+
+Bear in mind that `slicer-1` is already set up to use 8GB of RAM by default, so if you only have a 16GB Mac, launching two sandboxes, at 4GB of RAM each, may overcommit your system.
+
+If you only need sandboxes, you can disable `slicer-1` on start-up by setting `count: 0` in the `slicer` hostgroup, or reduce its RAM allocation.
 
 Edit the `sbox` host group in `slicer-mac.yaml` to change the default vCPU, RAM, or disk size for new sandboxes:
 

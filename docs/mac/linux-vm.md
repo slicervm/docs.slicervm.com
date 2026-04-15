@@ -1,20 +1,84 @@
-# Linux VM
+# Persistent Linux VM
 
-Your main VM is `slicer-1` in the `slicer` host group. It's a persistent arm64 Linux environment that boots with the daemon and has your Mac home folder shared in via VirtioFS. This is where you do your day-to-day Linux work - running Docker, K3s, coding agents, Go/Rust builds, and anything else you'd do on a Linux workstation.
+Slicer for Mac has two types of VMs.
 
-SSH is usually not required for normal workflows. Most tasks are faster with the Slicer CLI:
+1. A Persistent Linux VM named `slicer-1` - analogous to WSL2 - your *Linux twin* for macOS.
+2. Additional persistent or ephemeral VMs ["sandboxes"](/mac/sandboxes.md) can be launched into the `sbox` host group.
+
+Unlike most sandboxes that optimise for a narrow use-case, each VM is a full Linux Kernel with support for Docker, K3s, eBPF, coding agents, Go/Rust builds with systemd as the init.
+
+Additionally, you can share your home folder or any other folder directly into the VM via VirtioFS.
+
+A built-in guest agent can be used instead of SSH for faster, more efficient access:
 
 - `slicer vm shell slicer-1`
 - `slicer vm cp ...`
 - `slicer vm forward ...`
 
-Use SSH only when you need direct shell access outside this interface. You can add keys directly in the guest by writing to `~/.ssh/authorized_keys`:
+SSH is pre-installed, and accessible via the VM's IP address, as shown on `slicer vm list`.
+
+You can add your SSH keys to: `~/.ssh/authorized_keys`, or import them directly from GitHub:
 
 ```bash
+slicer vm shell slicer-1
+
 curl -sLS https://github.com/alexellis.keys > ~/.ssh/authorized_keys
 ```
 
+## Architecture diagram
+
+```text
+                         +----------------------------+
+                         |          slicer CLI        |
+                         |   (vm shell / vm cp / API) |
+                         +-------------+--------------+
+                                       |
+                                       v
+      +--------------------------------+-----------------------------------+
+      |              slicer-mac daemon on macOS                            |
+      |  Reads `slicer-mac.yaml` and controls local microVMs               |
+      +-----------------------+----------------------+---------------------+
+                              |                      |
+                              |                      |
+                              v                      v
+             +-----------------------------+    +----------------------------+
+             | host_group: slicer          |    | host_group: sbox           |
+             | Long-lived primary workload |    | Disposable / on-demand VMs |
+             +--------------+--------------+    +-------------+--------------+
+                            |                                |
+                            v                                v
+                     +-------------+                  +----------------+
+                     |   slicer-1  |                  |    sbox-1      |
+                     | main VM     |                  | sample sbox VM |
+                     +-------------+                  +----------------+
+```
+
+Docker's socket is port-forwarded to your Mac as a Unix socket, so `docker` commands on the Mac talk directly to the VM. K3s exposes port 6443, so `kubectl` on your Mac can target the cluster running inside `slicer-1`.
+
+## The VM lifecycle
+
+It's important to shut down persistent VMs like `slicer-1` gracefully:
+
+```bash
+slicer vm shutdown slicer-1
+slicer vm exec slicer-1 -- sudo shutdown -h 0
+```
+
+If your VM crashes or you kill slicer-mac without letting it shut down the VMs gracefully, you may need to check the disk image, which you can do via the [Troubleshooting](/mac/troubleshooting) page.
+
+If you ever want to "reset" your `slicer-1` VM, you can delete it and then relaunch it.
+
+First shut down slicer-mac.
+
+Then run `rm -rf ~/slicer-mac/slicer-1.img`
+
+Then restart slicer-mac, and you'll get the VM re-created.
+
 ## Folder sharing
+
+Folders can be shared directly into any Slicer VM by specifying paths in the slicer-mac.yaml config file or via an API request.
+
+Most of the time copying folders between the host and guest, will be fast enough and more convenient: `slicer cp -r ./source vm:~/destination`.
 
 See [Folder sharing](/mac/folder-sharing) for setup details.
 
@@ -71,36 +135,6 @@ kubectl get nodes
 ```
 
 With K3s running inside Slicer, you can test controllers locally, validate Helm charts with a real install, or try RBAC changes without touching a shared cluster.
-
-## Architecture diagram
-
-```text
-                         +----------------------------+
-                         |          slicer CLI        |
-                         |   (vm shell / vm cp / API) |
-                         +-------------+--------------+
-                                       |
-                                       v
-      +--------------------------------+-----------------------------------+
-      |              slicer-mac daemon on macOS                            |
-      |  Reads `slicer-mac.yaml` and controls local microVMs               |
-      +-----------------------+----------------------+---------------------+
-                              |                      |
-                              |                      |
-                              v                      v
-             +-----------------------------+    +----------------------------+
-             | host_group: slicer          |    | host_group: sbox           |
-             | Long-lived primary workload |    | Disposable / on-demand VMs |
-             +--------------+--------------+    +-------------+--------------+
-                            |                                |
-                            v                                v
-                     +-------------+                  +----------------+
-                     |   slicer-1  |                  |    sbox-1      |
-                     | main VM     |                  | sample sbox VM |
-                     +-------------+                  +----------------+
-```
-
-Docker's socket is port-forwarded to your Mac as a Unix socket, so `docker` commands on the Mac talk directly to the VM. K3s exposes port 6443, so `kubectl` on your Mac can target the cluster running inside `slicer-1`.
 
 ## Next steps
 

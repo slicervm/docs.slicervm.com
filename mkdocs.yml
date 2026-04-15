@@ -160,8 +160,9 @@ nav:
   - Slicer for Mac:
       - Overview: mac/overview.md
       - Installation: mac/installation.md
-      - Linux VM: mac/linux-vm.md
+      - Persistent Linux VM: mac/linux-vm.md
       - Sandboxes: mac/sandboxes.md
+      - Troubleshooting: mac/troubleshooting.md
       - Configuration:
           - Enable Rosetta: mac/rosetta.md
           - Storage: mac/storage.md

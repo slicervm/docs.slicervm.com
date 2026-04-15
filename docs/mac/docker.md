@@ -8,6 +8,8 @@ To run both together, configure Docker for Mac to use the Docker VMM option. Doc
 
 ![Docker VMM](/images/mac/docker-vmm.png)
 
+If Slicer for Mac later comes up on the wrong subnet or the VM cannot reach `192.168.64.1`, see [Troubleshooting Slicer for Mac](/mac/troubleshooting).
+
 ## Install and configure Docker in the VM
 
 You can keep Docker running inside `slicer-1` and access it from your Mac with the local Docker CLI by forwarding the VM's Unix socket.
@@ -64,3 +66,4 @@ persistent access.
 ## Next steps
 
 - [Linux VM setup](/mac/linux-vm) - broader VM setup notes, including K3s forwarding
+- [Troubleshooting](/mac/troubleshooting) - recover stale vmnet or DHCP state on macOS
