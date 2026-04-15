@@ -64,7 +64,7 @@ slicer vm shutdown slicer-1
 slicer vm exec slicer-1 -- sudo shutdown -h 0
 ```
 
-If your VM crashes or you kill slicer-mac without letting it shut down the VMs gracefully, you may need to check the disk image, which you can do via the [Troubleshooting](/mac/troubleshooting) page.
+If your VM crashes or you kill slicer-mac without letting it shut down the VMs gracefully, you may need to check the disk image. See [Check or repair a VM disk image](/mac/troubleshooting/#check-or-repair-a-vm-disk-image).
 
 If you ever want to "reset" your `slicer-1` VM, you can delete it and then relaunch it.
 

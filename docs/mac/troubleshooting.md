@@ -1,8 +1,33 @@
 # Troubleshooting Slicer for Mac
 
+## Check or repair a VM disk image
+
+If your VM crashes, the Mac sleeps at the wrong time, or `slicer-mac` is killed before the guest shuts down cleanly, the VM disk image may need a filesystem check.
+
+Check the filesystem first in read-only mode:
+
+```bash
+e2fsck -v -n ./slicer-1.img
+```
+
+If errors are found, repair them:
+
+```bash
+e2fsck -f ./slicer-1.img
+```
+
+You can install `e2fsck` on macOS via Homebrew:
+
+```bash
+brew install e2fsprogs
+```
+
 ## No Internet or LAN access from the VM
 
 One failure mode on macOS is that the VM networking gets stuck on the wrong subnet because the host-side vmnet state becomes stale.
+
+If you also run Docker Desktop, first check that it is using `Docker VMM` mode. That is the supported way to run Docker and Slicer together without subnet conflicts. See [Use Docker from macOS with the Slicer VM socket](/mac/docker).
+
 You may notice one or more of the following:
 
 - `slicer vm list` shows `slicer-1` on `192.168.64.2`, but the VM cannot reach `192.168.64.1`

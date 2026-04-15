@@ -56,18 +56,4 @@ rm -f ./slicer-1.img
 
 ## Troubleshooting
 
-If your VM crashes for some reason, or the Mac's sleep mode causes an issue with the VM, you may find the `.img` file needs to be checked or repaired with the `e2fsck` utility.
-
-Check the filesystem (read-only, no changes):
-
-```bash
-e2fsck -v -n ./slicer-1.img
-```
-
-If errors are found, repair them:
-
-```bash
-e2fsck -f ./slicer-1.img
-```
-
-You can obtain `e2fsck` by installing the `e2fsprogs` package via `brew install e2fsprogs`. Brew is available separately at: [https://brew.sh/](https://brew.sh/).
+If a VM disk image needs checking or repair, see [Check or repair a VM disk image](/mac/troubleshooting/#check-or-repair-a-vm-disk-image).

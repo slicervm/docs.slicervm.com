@@ -70,6 +70,8 @@ In a similar way, a sandbox such as `sbox-1` may have K3s installed, exposing po
 
 Slicer for Mac uses Apple's [VZNATNetworkDeviceAttachment](https://developer.apple.com/documentation/virtualization/vznatnetworkdeviceattachment). Guests access the Internet through your host.
 
+If you also run Docker Desktop on the same Mac, configure it to use `Docker VMM` mode to avoid networking conflicts with Slicer. See [Use Docker from macOS with the Slicer VM socket](/mac/docker).
+
 * The host can ingress to guests using their IP or `slicer vm forward`
 * Guests can talk to the host to access things like HTTP proxies, or a Docker pull-through cache, etc.
 * Unlike Slicer for Linux, which supports bridged mode networking, guests on Slicer for Mac cannot talk to each other, unless you install an overlay network using something like Wireguard, routing through the host.
