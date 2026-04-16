@@ -34,7 +34,6 @@ First of all, get used to it, leave it in the path we recommend (`~/slicer-mac`)
 
 The `slicer-mac` OCI bundle includes a default `slicer-mac.yaml` in the folder after install, so you can use that file directly.
 
-
 The generated `slicer-mac.yaml` has two host groups:
 
 - **`slicer`** (`count: 1`) - your persistent Linux VM, starts with the daemon
@@ -196,6 +195,20 @@ You can turn off the start-up service with:
 cd ~/slicer-mac
 ./slicer-mac uninstall
 ```
+
+## How to upgrade Slicer for Mac
+
+First update slicer, since it's an API client for `slicer-mac`, the two need to be updated in tandem.
+
+```bash
+sudo slicer update
+
+mv ~/slicer-mac/slicer-mac.yaml{,.bak}
+slicer install slicer-mac
+mv ~/slicer-mac/slicer-mac.yaml{.bak,}
+```
+
+The upgrade is actually the same command you ran to install `slicer-mac`. We just make a back of your customised `slicer-mac.yaml` file before hand, and restore it after the upgrade.
 
 ## Next steps
 
