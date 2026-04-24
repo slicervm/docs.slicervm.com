@@ -315,12 +315,31 @@ components:
         buffered:
           type: boolean
           description: Return a single buffered response instead of streaming NDJSON.
+        background:
+          type: boolean
+          description: >-
+            Launch the process detached with a per-process ring buffer. The
+            server returns 201 Created with an `exec_id` that can be used with
+            the other `/vm/{hostname}/exec/{exec_id}/...` endpoints. Stdin and
+            `buffered=true` are rejected in this mode.
+        ring_bytes:
+          type: integer
+          format: int64
+          description: >-
+            Per-process ring buffer cap in bytes when `background=true`. Zero
+            (or omitted) means the server default of 1 MiB. Server rejects
+            values larger than the agent-wide budget.
 
     SlicerExecWriteResult:
       type: object
       properties:
         type:
           type: string
+          description: >-
+            Frame type. Foreground /exec emits `started`, `stdout`, `stderr`,
+            `exit`. Background-exec log streams additionally emit `gap`
+            frames when the ring buffer has evicted history since the reader
+            last saw it.
         pid:
           type: integer
         data:
@@ -336,6 +355,157 @@ components:
         timestamp:
           type: string
           format: date-time
+        stdout:
+          type: string
+        stderr:
+          type: string
+        exit_code:
+          type: integer
+        error:
+          type: string
+        id:
+          type: integer
+          format: uint64
+          description: >-
+            Monotonic per-exec frame id. Set only on background-exec log
+            frames; absent on foreground /exec streams.
+        dropped_bytes:
+          type: integer
+          format: int64
+          description: >-
+            On `type=gap` frames: bytes evicted since the previous reader
+            cursor.
+        dropped_frames:
+          type: integer
+          description: >-
+            On `type=gap` frames: frame count evicted since the previous
+            reader cursor.
+        message:
+          type: string
+          description: On `type=gap` frames, a human-readable reason.
+
+    ExecBackgroundResponse:
+      type: object
+      description: >-
+        Response to POST /vm/{hostname}/exec?background=true. The exec_id is
+        an opaque server-chosen string — use it with the other
+        /vm/{hostname}/exec/{exec_id}/... endpoints.
+      properties:
+        exec_id:
+          type: string
+        pid:
+          type: integer
+        started_at:
+          type: string
+          format: date-time
+        ring_bytes:
+          type: integer
+          format: int64
+
+    ExecBackgroundInfo:
+      type: object
+      description: Snapshot of a single background-exec registry entry.
+      properties:
+        exec_id:
+          type: string
+        pid:
+          type: integer
+        command:
+          type: string
+        args:
+          type: array
+          items:
+            type: string
+        cwd:
+          type: string
+        uid:
+          type: integer
+          format: uint32
+        started_at:
+          type: string
+          format: date-time
+        running:
+          type: boolean
+        exit_code:
+          type: integer
+          nullable: true
+        signal:
+          type: string
+        ended_at:
+          type: string
+          format: date-time
+          nullable: true
+        bytes_written:
+          type: integer
+          format: int64
+        bytes_dropped:
+          type: integer
+          format: int64
+        next_id:
+          type: integer
+          format: uint64
+        ring_bytes:
+          type: integer
+          format: int64
+
+    ExecBackgroundKillRequest:
+      type: object
+      properties:
+        signal:
+          type: string
+          description: Signal name (TERM, KILL, INT, HUP, QUIT, USR1, USR2). Default TERM.
+        grace_ms:
+          type: integer
+          description: >-
+            Grace period (ms) before SIGTERM is escalated to SIGKILL. Default
+            5000. Ignored for non-TERM signals.
+
+    ExecBackgroundKillResponse:
+      type: object
+      properties:
+        exec_id:
+          type: string
+        pid:
+          type: integer
+        running:
+          type: boolean
+        signal_sent:
+          type: string
+
+    ExecBackgroundWaitExitResponse:
+      type: object
+      description: >-
+        Response from GET /vm/{hostname}/exec/{exec_id}/wait-exit. If
+        `timed_out=true` the process was still running when the timeout
+        elapsed; the caller may poll again.
+      properties:
+        exec_id:
+          type: string
+        running:
+          type: boolean
+        exit_code:
+          type: integer
+          nullable: true
+        signal:
+          type: string
+        ended_at:
+          type: string
+          format: date-time
+          nullable: true
+        timed_out:
+          type: boolean
+
+    ExecBackgroundDeleteResponse:
+      type: object
+      properties:
+        exec_id:
+          type: string
+        reaped:
+          type: boolean
+
+    SlicerExecResult:
+      type: object
+      properties:
         stdout:
           type: string
         stderr:
@@ -1027,8 +1197,40 @@ paths:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
 
   /vm/{hostname}/exec:
+    get:
+      summary: List background execs tracked on the VM
+      description: >-
+        Returns every background exec currently in the agent-side registry,
+        including running and exited-but-not-yet-reaped entries. Filtering
+        is client-side.
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: hostname
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: List of tracked background execs.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ExecBackgroundInfo' }
+        "404":
+          description: VM not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
     post:
-      summary: Execute a command in the VM (streaming NDJSON)
+      summary: Execute a command in the VM (streaming NDJSON or detached)
+      description: >-
+        When `background=true` the process is launched detached with a
+        per-process ring buffer and the server returns 201 with an
+        `exec_id`; subsequent interaction happens through the
+        `/vm/{hostname}/exec/{exec_id}/...` endpoints. Otherwise the
+        response streams NDJSON frames until the child exits.
       security:
         - BearerAuth: []
       parameters:
@@ -1074,6 +1276,16 @@ paths:
         - in: query
           name: buffered
           schema: { type: boolean }
+        - in: query
+          name: background
+          schema: { type: boolean }
+          description: >-
+            Launch detached and return 201 with an exec_id. Incompatible
+            with stdin=true and buffered=true.
+        - in: query
+          name: ring_bytes
+          schema: { type: integer, format: int64 }
+          description: Ring buffer cap in bytes when background=true (default 1 MiB).
       requestBody:
         description: Optional raw stdin stream when stdin=true.
         content:
@@ -1087,6 +1299,11 @@ paths:
               schema: { $ref: '#/components/schemas/SlicerExecResult' }
             application/x-ndjson:
               schema: { $ref: '#/components/schemas/SlicerExecWriteResult' }
+        "201":
+          description: Background exec launched. Returned only when `background=true`.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExecBackgroundResponse' }
         "400":
           description: Invalid request
           content:
@@ -1099,6 +1316,163 @@ paths:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
         "409":
           description: VM paused
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "503":
+          description: Agent-wide ring buffer budget exhausted (background mode).
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /vm/{hostname}/exec/{exec_id}:
+    parameters:
+      - in: path
+        name: hostname
+        required: true
+        schema: { type: string }
+      - in: path
+        name: exec_id
+        required: true
+        schema: { type: string }
+    get:
+      summary: Fetch status of a background exec
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Info snapshot.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExecBackgroundInfo' }
+        "410":
+          description: Exec was reaped.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+    delete:
+      summary: Reap a background exec
+      description: >-
+        Frees the ring buffer and removes the registry entry. Does NOT kill
+        a running process — pair with POST .../kill for stop-and-clean-up.
+        After reap, subsequent info/logs/kill/wait-exit calls return 410
+        Gone.
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Reaped.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExecBackgroundDeleteResponse' }
+        "410":
+          description: Already reaped.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /vm/{hostname}/exec/{exec_id}/logs:
+    get:
+      summary: Stream or replay a background exec's log ring
+      description: >-
+        Replays everything currently in the ring by default. With
+        `follow=true` the response stays open and streams live frames until
+        the child exits or the client disconnects. With `from_id` the
+        replay starts at that frame id; if the id has been evicted the
+        server emits a `type=gap` frame and continues from the oldest
+        available.
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: hostname
+          required: true
+          schema: { type: string }
+        - in: path
+          name: exec_id
+          required: true
+          schema: { type: string }
+        - in: query
+          name: follow
+          schema: { type: boolean }
+        - in: query
+          name: from_id
+          schema: { type: integer, format: uint64 }
+      responses:
+        "200":
+          description: NDJSON frame stream.
+          content:
+            application/x-ndjson:
+              schema: { $ref: '#/components/schemas/SlicerExecWriteResult' }
+        "410":
+          description: Exec was reaped.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /vm/{hostname}/exec/{exec_id}/kill:
+    post:
+      summary: Signal a background exec
+      description: >-
+        Sends a signal to the process group. If signal=TERM (default) and
+        the process is still running after grace_ms, the agent escalates to
+        SIGKILL.
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: hostname
+          required: true
+          schema: { type: string }
+        - in: path
+          name: exec_id
+          required: true
+          schema: { type: string }
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ExecBackgroundKillRequest' }
+      responses:
+        "200":
+          description: Signal sent (or no-op if already exited).
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExecBackgroundKillResponse' }
+        "410":
+          description: Exec was reaped.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /vm/{hostname}/exec/{exec_id}/wait-exit:
+    get:
+      summary: Long-poll until a background exec exits
+      description: >-
+        Blocks until the child exits or `timeout` seconds elapse. Default
+        timeout is 30s; cap is 600s. On timeout the caller may invoke again.
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: hostname
+          required: true
+          schema: { type: string }
+        - in: path
+          name: exec_id
+          required: true
+          schema: { type: string }
+        - in: query
+          name: timeout
+          schema: { type: integer }
+          description: Timeout in seconds (default 30, max 600).
+      responses:
+        "200":
+          description: Exit status (or `timed_out=true`).
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExecBackgroundWaitExitResponse' }
+        "410":
+          description: Exec was reaped.
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
@@ -1372,6 +1746,125 @@ paths:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
         "404":
           description: Path not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "409":
+          description: VM paused
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /vm/{hostname}/fs/watch:
+    get:
+      summary: Watch filesystem changes (Server-Sent Events)
+      description: |
+        Opens a long-lived Server-Sent Events stream of filesystem changes inside
+        the VM, backed by inotify via fsnotify. Each SSE `data:` payload is a
+        JSON `WatchEvent`; each event also carries a monotonic `id:` line.
+
+        The agent emits SSE heartbeat comments (`:\n\n`) every 15 seconds while
+        idle so proxies and NAT timeouts do not drop the connection.
+
+        `Last-Event-ID` is accepted for forward compatibility and validated
+        (must be a uint64), but the current implementation does not retain
+        events across disconnects — reconnecting always starts a fresh
+        monotonic id stream. A future release may add cross-connection
+        replay; use the field now so clients do not need to change later.
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: hostname
+          required: true
+          schema: { type: string }
+        - in: query
+          name: paths
+          description: One or more paths to watch. Repeat the parameter for multiple paths.
+          required: true
+          schema:
+            type: array
+            items: { type: string }
+          style: form
+          explode: true
+        - in: query
+          name: patterns
+          description: Optional glob patterns; matched against full path and basename.
+          schema:
+            type: array
+            items: { type: string }
+          style: form
+          explode: true
+        - in: query
+          name: events
+          description: Event types to deliver. Values — create, write, remove, rename, chmod, all. Empty defaults to all.
+          schema:
+            type: array
+            items:
+              type: string
+              enum: [create, write, remove, rename, chmod, all]
+          style: form
+          explode: true
+        - in: query
+          name: recursive
+          description: Walk directory targets and watch all subdirectories (and newly-created ones).
+          schema: { type: boolean }
+        - in: query
+          name: one_shot
+          description: Close the stream after the first event is delivered.
+          schema: { type: boolean }
+        - in: query
+          name: debounce
+          description: Go duration (e.g. 200ms). Coalesces bursts per type+path. Default 200ms.
+          schema: { type: string }
+        - in: query
+          name: timeout
+          description: Go duration. If set, closes the stream after this duration.
+          schema: { type: string }
+        - in: query
+          name: max_events
+          description: Close the stream after this many events have been delivered.
+          schema: { type: integer }
+        - in: query
+          name: uid
+          schema: { type: integer, format: uint32 }
+        - in: header
+          name: Last-Event-ID
+          description: Last event id observed on a previous connection; accepted for forward compatibility.
+          schema: { type: string }
+      responses:
+        "200":
+          description: "SSE event stream. Each event has `id:`, `event: watch`, and a JSON `data:` payload."
+          content:
+            text/event-stream:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    format: uint64
+                  type:
+                    type: string
+                    enum: [create, write, remove, rename, chmod]
+                  path:
+                    type: string
+                  timestamp:
+                    type: string
+                    format: date-time
+                  size:
+                    type: integer
+                    format: int64
+                  isDir:
+                    type: boolean
+                  message:
+                    type: string
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "404":
+          description: VM not found
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
