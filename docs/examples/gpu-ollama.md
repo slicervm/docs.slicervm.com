@@ -23,6 +23,8 @@ There a three differences to the other examples we've seen so far:
 2. `hypervisor: qemu` - [QEMU](https://www.qemu.org/) is used instead of Firecracker, to enable VFIO passthrough of a PCI device
 3. `image` - a separate Kernel and root filesystem is required for QEMU
 
+It's also worth thinking about the `storage_size` before going further. The example has expanded the default to `40G` which is sample for a small to medium model, but if you want to download multiple models, you should consider increasing this number.
+
 The following to `gpu.yaml`, make sure you update `vcpu` and `ram_gb`
 
 ```yaml
@@ -30,7 +32,7 @@ config:
   host_groups:
   - name: gpu
     storage: image
-    storage_size: 80G
+    storage_size: 40G
     count: 1
     vcpu: 16
     ram_gb: 64
@@ -153,14 +155,14 @@ sudo systemctl daemon-reload && \
 Next, pull a model and try out a prompt:
 
 ```bash
-ollama run qwen3:latest
+ollama run qwen3.5:0.8b
 ```
 
 You can also connect to the Ollama API from your host machine by using the VM's IP directly:
 
 ```bash
 curl -SLs http://192.168.137.2:11434/api/generate -d '{
-  "model": "qwen3:latest",
+  "model": "qwen3.5:0.8b",
   "prompt":"Why is the sky blue?"
 }'
 ```
