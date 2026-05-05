@@ -89,7 +89,7 @@ Then inside the VM:
 ```bash
 sudo slicer-agent proxy tunnel add pg \
     --listen 127.0.0.1:5432 \
-    --target db.internal.example.com:5432
+    db.internal.example.com:5432
 ```
 
 Then you can connect with i.e. `psql`:
