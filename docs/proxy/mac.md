@@ -123,7 +123,7 @@ You'll get an error about not being able to resolve DNS.
 Then execute a command with the proxy credentials, and see it pass through the proxy:
 
 ```bash
-slicer vm exec --env HTTPS_PROXY="https://proxy:$PROXY_TOKEN@192.168.222.1:3129" sbox-1 -- curl -iSL https://wikipedia.org
+slicer vm exec --env HTTPS_PROXY="https://proxy:$PROXY_TOKEN@192.168.64.1:3129" sbox-1 -- curl -iSL https://wikipedia.org
 ```
 
 You'll see a redirect asking to go to www.wikipedia.org, which means it's working as designed.
