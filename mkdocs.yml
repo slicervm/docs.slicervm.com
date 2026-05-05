@@ -164,8 +164,8 @@ nav:
     - Overview: proxy/overview.md
     - Setup for Mac: proxy/mac.md
     - Setup for Linux: proxy/linux.md
-    - Secret injection: proxy/secret-injection.md
-    - Transparent Proxying: proxy/transparent.md
+    - Secret Injection: proxy/secret-injection.md
+    - Transparent Proxy Helper: proxy/transparent.md
   - Mac:
       - Overview: mac/overview.md
       - Installation: mac/installation.md
