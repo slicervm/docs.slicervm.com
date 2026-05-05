@@ -543,6 +543,150 @@ components:
         userdata_ran:
           type: boolean
 
+    # ---------------------------------------------------------------------
+    # Slicer egress proxy admin: clients, upstream-credential secrets,
+    # and per-client allow rules. The proxy injects a bound secret onto
+    # the inner request when an allow rule matches, so real upstream
+    # credentials never need to enter a guest VM.
+    # ---------------------------------------------------------------------
+
+    ProxyClient:
+      type: object
+      description: A proxy access token holder. Each rule is keyed by a client name.
+      properties:
+        name:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+      required: [name, created_at]
+
+    CreateProxyClientRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        token:
+          type: string
+          description: Optional. When set, registers this literal as the client's token. When omitted, the proxy mints a high-entropy `spt_…` token and returns it once.
+      required: [name]
+
+    ProxyClientCreated:
+      type: object
+      description: Returned only by client create. The token is shown once and never returned by any other endpoint.
+      properties:
+        name:
+          type: string
+        token:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+      required: [name, token, created_at]
+
+    ProxySecret:
+      type: object
+      description: An upstream credential. The `value` is never returned by list/get endpoints.
+      properties:
+        name:
+          type: string
+        host:
+          type: string
+        type:
+          type: string
+          description: Credential type. Empty is treated as `bearer` for backwards-compat.
+          enum: [bearer, basic]
+        created_at:
+          type: string
+          format: date-time
+      required: [name, host, created_at]
+
+    CreateProxySecretRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        host:
+          type: string
+        type:
+          type: string
+          description: Credential type. Default `bearer`.
+          enum: [bearer, basic]
+        value:
+          type: string
+          description: For `bearer`, the raw token. For `basic`, the value must be in `user:pass` form (the proxy base64-encodes it on the inner request).
+      required: [name, host, value]
+
+    ProxyAllowRule:
+      type: object
+      properties:
+        host:
+          type: string
+          description: Exact host (`api.github.com`), suffix-wildcard (`*.github.com`), or `*` for any.
+        secret:
+          type: string
+          description: Secret name to inject when this rule matches. Omit for pass-through allow.
+        methods:
+          type: array
+          items: { type: string }
+          description: |
+            Optional HTTP-method filter. When set, the rule only matches
+            requests whose method is in the list (case-insensitive).
+            Omitted or empty = any method.
+        paths:
+          type: array
+          items: { type: string }
+          description: |
+            Optional path filter. Each entry is an exact path
+            (`/system/info`), `*` (any), or a suffix glob `<prefix>/*`
+            matching anything strictly under the prefix. Omitted or
+            empty = any path.
+        passthrough:
+          type: boolean
+          description: |
+            When true the proxy splices TCP both ways at CONNECT time
+            without terminating TLS — no MITM, no inner-request
+            inspection. The guest does **not** need to trust the proxy
+            CA on a passthrough host, so cert-pinned clients work
+            unchanged. The cost is no method/path/status visibility;
+            the audit log carries host, port, byte counts, and
+            duration. Mutually exclusive with `secret`, `methods`,
+            and `paths`.
+        expires:
+          type: string
+          format: date-time
+          description: Optional rule expiry; expired rules are skipped on lookup and GC'd.
+      required: [host]
+
+    AddProxyAllowRequest:
+      type: object
+      properties:
+        client:
+          type: string
+        host:
+          type: string
+        secret:
+          type: string
+        methods:
+          type: array
+          items: { type: string }
+          description: Optional HTTP-method filter (see `ProxyAllowRule.methods`).
+        paths:
+          type: array
+          items: { type: string }
+          description: Optional path filter (see `ProxyAllowRule.paths`).
+        passthrough:
+          type: boolean
+          description: |
+            When true the proxy splices TCP without TLS termination
+            (see `ProxyAllowRule.passthrough`). Mutually exclusive
+            with `secret`, `methods`, `paths`; the server returns
+            400 if combined.
+        ttl_seconds:
+          type: integer
+          description: Optional TTL applied at create time. 0 (or omitted) = never expires.
+      required: [client, host]
+
 paths:
   /info:
     get:
@@ -1950,6 +2094,230 @@ paths:
       responses:
         "200":
           description: Prometheus metrics text
+          content:
+            text/plain:
+              schema: { type: string }
+
+  /proxy/v1/clients:
+    get:
+      summary: List slicer-proxy clients
+      description: |
+        Returns all registered proxy clients. Tokens are never returned by
+        any list endpoint; lost-token recovery is delete + create.
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: List of clients
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ProxyClient' }
+    post:
+      summary: Create a slicer-proxy client
+      description: |
+        Mints a new client. The returned token is shown once and is the
+        only way to authenticate against the data-plane CONNECT listener.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateProxyClientRequest' }
+      responses:
+        "201":
+          description: Client created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ProxyClientCreated' }
+        "400":
+          description: Missing or invalid name
+          content:
+            text/plain:
+              schema: { type: string }
+        "409":
+          description: Client name or supplied token already exists
+          content:
+            text/plain:
+              schema: { type: string }
+
+  /proxy/v1/clients/{name}:
+    get:
+      summary: List a client's allow rules in declaration order
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Client's rules
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ProxyAllowRule' }
+        "404":
+          description: Unknown client
+          content:
+            text/plain:
+              schema: { type: string }
+    delete:
+      summary: Delete a client (revokes token + drops every rule the client owned)
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema: { type: string }
+      responses:
+        "204":
+          description: Client deleted
+        "404":
+          description: Unknown client
+          content:
+            text/plain:
+              schema: { type: string }
+
+  /proxy/v1/secrets:
+    get:
+      summary: List slicer-proxy secrets (values never returned)
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: List of secrets
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ProxySecret' }
+    post:
+      summary: Register an upstream credential
+      description: |
+        The plaintext credential is stored on the proxy and injected into
+        the inner request when an allow rule references this secret. With
+        type=bearer, value is the raw token. With type=basic, value must
+        be in user:pass form (the proxy base64-encodes it).
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateProxySecretRequest' }
+      responses:
+        "201":
+          description: Secret created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ProxySecret' }
+        "400":
+          description: Missing required fields, unsupported type, or basic value not in user:pass form
+          content:
+            text/plain:
+              schema: { type: string }
+        "409":
+          description: Secret name already exists
+          content:
+            text/plain:
+              schema: { type: string }
+
+  /proxy/v1/secrets/{name}:
+    delete:
+      summary: Delete a secret
+      description: |
+        Allow rules that reference a deleted secret stop matching until
+        the secret is recreated or the rule is rewritten — they do not
+        fall through to pass-through allow.
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema: { type: string }
+      responses:
+        "204":
+          description: Secret deleted
+        "404":
+          description: Unknown secret
+          content:
+            text/plain:
+              schema: { type: string }
+
+  /proxy/v1/allows:
+    post:
+      summary: Add an allow rule
+      description: |
+        First-match-wins by declaration order. Rules with `secret` set
+        strip the client-supplied Authorization header and replace it
+        with a secret-derived header on the inner request. Rules without
+        `secret` are pass-through allows (audit + MITM, no header swap).
+
+        Multiple rules per host are allowed when `methods` or `paths`
+        differ — typically used to bind a privileged secret to a narrow
+        admin path (e.g. `/system/*`) and a separate pass-through rule
+        for everything else on the same host. Add the most specific
+        (narrowest) rule first.
+
+        CONNECT itself is restricted to ports 80 and 443 regardless of
+        rule shape — opening tunnels to ssh/postgres-style ports on an
+        otherwise allowed host is denied at the proxy.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AddProxyAllowRequest' }
+      responses:
+        "201":
+          description: Rule added
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ProxyAllowRule' }
+        "400":
+          description: Unknown client, unknown secret, or missing fields
+          content:
+            text/plain:
+              schema: { type: string }
+        "409":
+          description: An exact-duplicate rule (same host, methods and paths) already exists for this client
+          content:
+            text/plain:
+              schema: { type: string }
+
+  /proxy/v1/allows/{client}/{host}:
+    delete:
+      summary: Remove an allow rule
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: client
+          required: true
+          schema: { type: string }
+        - in: path
+          name: host
+          required: true
+          description: URL-escaped upstream host (e.g. `api.github.com`).
+          schema: { type: string }
+      responses:
+        "204":
+          description: Rule removed
+        "400":
+          description: Malformed path
+          content:
+            text/plain:
+              schema: { type: string }
+        "404":
+          description: No matching rule
           content:
             text/plain:
               schema: { type: string }

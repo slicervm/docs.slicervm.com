@@ -91,7 +91,7 @@ markdown_extensions:
   - pymdownx.tilde
 
 nav:
-  - Slicer for Linux:
+  - Linux:
       - Introduction: index.md
       - Contact us: contact.md
       - Getting Started:
@@ -123,6 +123,7 @@ nav:
           - Copy files to/from a VM: tasks/copy-files.md
           - Execute commands in a VM: tasks/execute-commands.md
           - Expose ports from a VM: tasks/expose-ports.md
+          - Intercept VM egress: tasks/intercept-egress.md
           - Build a custom root filesystem: tasks/custom-image.md
           - Logs & Monitoring: tasks/monitoring.md
           - Share files over NFS: tasks/share-files-with-nfs.md
@@ -138,12 +139,12 @@ nav:
           - Images for microVMs: reference/images.md
           - SSH access to VMs: reference/ssh.md
           - Secret management: reference/secrets.md
-          - Per-host-group CA trust: reference/ca-trust.md
+          - Custom Certificate Authority: reference/ca-trust.md
           - Serial Over SSH (SOS): reference/sos.md
           - Networking: reference/networking.md
           - VFIO Passthrough: reference/vfio.md
           - Troubleshooting: reference/troubleshooting.md
-  - Slicer Platform:
+  - Platform:
       - Overview: platform/overview.md
       - Quickstart: platform/quickstart.md
       - VM Lifecycle: platform/lifecycle.md
@@ -159,7 +160,12 @@ nav:
       - OpenAPI Spec: platform/openapi.md
       - Build a custom image: platform/custom-images.md
       - Publish your own images: platform/publish-images.md
-  - Slicer for Mac:
+  - Proxy:
+    - Overview: proxy/overview.md
+    - Setup for Mac: proxy/mac.md
+    - Setup for Linux: proxy/linux.md
+    - Secret injection: proxy/secret-injection.md
+  - Mac:
       - Overview: mac/overview.md
       - Installation: mac/installation.md
       - Persistent Linux VM: mac/linux-vm.md
