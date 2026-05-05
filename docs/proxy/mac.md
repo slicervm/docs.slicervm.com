@@ -106,10 +106,7 @@ slicer proxy allow audit-test --host '*'
 Then launch a VM:
 
 ```bash
-# slicer vm launch --tag role=audit-test
-
-VM created
-  Hostname: sbox-1
+slicer vm launch --tag role=audit-test
 ```
 
 Execute a command without any proxy credentials, and see it blocked:
@@ -128,3 +125,18 @@ slicer vm exec --env HTTPS_PROXY="https://proxy:$PROXY_TOKEN@192.168.64.1:3129" 
 
 You'll see a redirect asking to go to www.wikipedia.org, which means it's working as designed.
 
+## Reset and rotate the CA
+
+Remove the generated CA and key file for the host group:
+
+```bash
+rm -rf .slicer/ca/sbox
+```
+
+Remove the proxy's leaf certificate and key file:
+
+```bash
+rm -rf proxy.cert proxy.key
+```
+
+Then re-run the tutorial from the beginning.

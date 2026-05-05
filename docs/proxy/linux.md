@@ -123,3 +123,18 @@ sudo  slicer vm exec \
 
 You'll see a redirect asking to go to www.wikipedia.org, which means it's working as designed.
 
+## Reset and rotate the CA
+
+Remove the generated CA and key file for the host group:
+
+```bash
+sudo rm -rf .slicer/ca/sbox
+```
+
+Remove the proxy's leaf certificate and key file:
+
+```bash
+sudo rm -rf proxy.cert proxy.key
+```
+
+Then re-run the tutorial from the beginning.
