@@ -47,17 +47,19 @@ sudo slicer ca init --hostgroup sbox
 
 This will write a private key and public certificate to `./.slicer/ca/sbox/`.
 
-## Create a dummy adapter for the proxy
+## Bind address and dummy adapter setup
 
-Since there is no bridge or stable IP address for the proxy in "isolated" networking mode, we need to create a "dummy adapter" on the host, and bind the proxy to that instead.
+Since there is no bridge or stable IP address for the proxy in "isolated" networking mode, bind the proxy to a host-only address that the isolated VMs are allowed to reach.
 
-```bash
-sudo ip link add name proxy0 type dummy
-sudo ip address add 192.168.222.1/24 dev proxy0
-sudo ip link set proxy0 up
-```
+On Linux, `slicer proxy up --bind` can set this up for you:
 
-This will create a dummy adapter named `proxy0` with the IP address `192.168.222.1/24`.
+* If `--bind` is a concrete IPv4 address, such as `192.168.222.1`, Slicer checks whether a local adapter already owns it. If not, Slicer creates or updates a per-IP dummy adapter with `192.168.222.1/32`.
+* If `--bind` is a CIDR, such as `192.168.222.1/24`, Slicer creates or updates the per-IP dummy adapter with that exact prefix and then listens on `192.168.222.1`.
+* If the address already exists on another local adapter, Slicer leaves networking alone and just binds the proxy listener.
+
+The automatic dummy adapter setup requires `CAP_NET_ADMIN`, so run the proxy with `sudo`.
+
+The generated adapter name is stable for the bind IP, so more than one proxy instance can run with different bind addresses.
 
 ## Start slicer and the proxy
 
