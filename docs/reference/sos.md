@@ -79,7 +79,7 @@ When you connect, you'll be logged in as the `root` user.
 
 ```bash
 Connecting to: vm-1
-Welcome to Ubuntu 22.04.5 LTS (GNU/Linux 5.10.240 x86_64)
+Welcome to Ubuntu 22.04.5 LTS (GNU/Linux 6.1.90 x86_64)
 
  * Documentation:  https://help.ubuntu.com
  * Management:     https://landscape.canonical.com

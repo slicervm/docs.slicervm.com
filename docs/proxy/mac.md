@@ -85,6 +85,8 @@ This will start the proxy on the host, and allow VMs to access it via the NAT ga
 
 One key setting is `--deny-cidr 192.168.1.0/24` - this blocks the proxy from contacting the local LAN range on the host. You may also wish to include other ranges here, including 127.0.0.1.
 
+For discovering the exact HTTPS paths a workload tries to reach before you create allow rules, see [strict and audit modes](/proxy/overview/#strict-and-audit-modes).
+
 Now, start up Slicer in the other terminal:
 
 ```bash

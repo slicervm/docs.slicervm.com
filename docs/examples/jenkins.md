@@ -181,7 +181,7 @@ $ sudo slicer vm shell jenkins-master-1
 
 Connecting to VM: jenkins-master-1
 Connected! Press Ctrl+] to exit.
-Welcome to Ubuntu 22.04.5 LTS (GNU/Linux 5.10.240 x86_64)
+Welcome to Ubuntu 22.04.5 LTS (GNU/Linux 6.1.90 x86_64)
 
 root@jenkins-master-1:/root# cat /home/ubuntu/jenkins-admin.txt
 
@@ -275,7 +275,7 @@ By pre-loading the JRE, we can speed up Jenkins slave startup times by skipping 
 This image is available via CI/CD as: [`ghcr.io/openfaasltd/slicer-slave:latest`](https://ghcr.io/openfaasltd/slicer-slave:latest)
 
 ```Dockerfile
-FROM ghcr.io/openfaasltd/slicer-systemd:5.10.240-x86_64-latest
+FROM ghcr.io/openfaasltd/slicer-systemd:6.1.90-x86_64-latest
 
 RUN apt-get update -qy && \
   apt-get install -qy  --no-install-recommends \
@@ -318,7 +318,7 @@ Then build and publish the image to your own container registry.
 Edit your `jenkins-slaves.yaml` file to use your custom image:
 
 ```diff
--  image: "ghcr.io/openfaasltd/slicer-systemd:5.10.240-x86_64-latest"
+-  image: "ghcr.io/openfaasltd/slicer-systemd:6.1.90-x86_64-latest"
 +  image: "ghcr.io/openfaasltd/slicer-slave-docker:latest"
 ```
 

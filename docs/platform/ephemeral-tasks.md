@@ -129,7 +129,7 @@ To optimise the boot time further for one-shot use-cases, the SSH host key regen
 You can derive your own image to use, with this disabled:
 
 ```
-FROM ghcr.io/openfaasltd/slicer-systemd:5.10.240-x86_64-latest
+FROM ghcr.io/openfaasltd/slicer-systemd:6.1.90-x86_64-latest
 
 RUN systemctl disable regen-ssh-host-keys &&
     systemctl disable ssh && \

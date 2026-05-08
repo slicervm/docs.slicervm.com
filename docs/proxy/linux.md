@@ -82,29 +82,8 @@ Now, start up Slicer in the other terminal:
 sudo slicer up ./slicer.yaml
 ```
 
-## Audit mode for discovering rules
+For discovering the exact HTTPS paths a workload tries to reach before you create allow rules, see [strict and audit modes](/proxy/overview/#strict-and-audit-modes).
 
-By default, `slicer proxy up` runs in strict mode. Unknown TLS `CONNECT` requests are denied early, so the logs can only show the target host and port.
-
-When you are porting a workload to Slicer Proxy and need to discover the exact HTTPS paths it requests, start the proxy in audit mode:
-
-```bash
-sudo slicer proxy up \
-    --hostgroup sbox \
-    --bind 192.168.222.1 \
-    --deny-cidr 192.168.1.0/24 \
-    --mode=audit
-```
-
-Audit mode still denies by default. For unknown HTTPS requests, it accepts the connection far enough to terminate TLS with the Slicer Proxy CA, logs the first inner method and path, then returns `403` without forwarding upstream.
-
-For example:
-
-```text
-deny client=reviewfn method=GET scheme=https host=api.example.com port=443 path=/v1/models mode=audit reason=no-rule
-```
-
-If the client does not trust the Slicer Proxy CA, or pins the upstream certificate, audit mode fails closed: the request is not forwarded and the proxy can only log the host/TLS handshake failure.
 
 ## Test the setup in audit mode only
 

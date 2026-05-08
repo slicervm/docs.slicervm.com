@@ -22,7 +22,7 @@ First, refer to the image you want to customise - whether it's for aarch64 or x8
 Then create a Dockerfile with a `FROM` line specifying the base image you want to use. For example:
 
 ```Dockerfile
-FROM ghcr.io/openfaasltd/slicer-systemd:5.10.240-x86_64-latest
+FROM ghcr.io/openfaasltd/slicer-systemd:6.1.90-x86_64-latest
 ```
 
 If you wanted to install Nginx and have it start automatically, with a website you've created, you could add the following lines to your Dockerfile.
@@ -38,11 +38,11 @@ Nginx will run in systemd, we should not try to change the CMD instruction.
 Then build and publish the image to your own registry:
 
 ```bash
-docker build -t docker.io/alexellis2/slicer-nginx:5.10.240-x86_64 .
-docker push docker.io/alexellis2/slicer-nginx:5.10.240-x86_64
+docker build -t docker.io/alexellis2/slicer-nginx:6.1.90-x86_64 .
+docker push docker.io/alexellis2/slicer-nginx:6.1.90-x86_64
 ```
 
-Then edit your Slicer YAML and replace the `image:` with `docker.io/alexellis2/slicer-nginx:5.10.240-x86_64`.
+Then edit your Slicer YAML and replace the `image:` with `docker.io/alexellis2/slicer-nginx:6.1.90-x86_64`.
 
 If you wanted Docker to be pre-installed into all your VMs, with the default user already set up for access, you could write:
 

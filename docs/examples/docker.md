@@ -67,7 +67,7 @@ WantedBy=multi-user.target
 ```
 
 ```bash
-FROM ghcr.io/openfaasltd/slicer-systemd:5.10.240-x86_64-latest
+FROM ghcr.io/openfaasltd/slicer-systemd:6.1.90-x86_64-latest
 
 RUN curl -fsSL https://get.docker.com | sh && \
     usermod -aG docker ubuntu

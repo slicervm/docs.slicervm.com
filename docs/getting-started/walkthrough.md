@@ -30,7 +30,7 @@ config:
 
   github_user: alexellis
 
-  image: "ghcr.io/openfaasltd/slicer-systemd:5.10.240-x86_64-latest"
+  image: "ghcr.io/openfaasltd/slicer-systemd:6.1.90-x86_64-latest"
 
   hypervisor: firecracker
 
