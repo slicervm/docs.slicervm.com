@@ -12,6 +12,13 @@ The transparent proxy helper uses iptables, so requires the regular non-min imag
 
 Set up "slicer proxy" using the instructions for [Linux](/proxy/linux) or [mac](/proxy/mac) - paying special attention to the DNS servers. Both most be set to `127.0.0.1` for this to work.
 
+The proxy server IP is fixed on macOS, and on Linux it can be changed:
+
+* Linux defaults to: `192.168.222.1`
+* macOS defaults to: `192.168.64.1`
+
+Change any examples in this guide accordingly.
+
 ## Example with apt-get update and install
 
 Start with a Slicer config similar to [the Linux guide](/proxy/linux), with the host group of `sbox` and the daemon already running.
@@ -56,20 +63,6 @@ VM=$(slicer vm launch sbox --userdata-file userdata.sh --wait-userdata --json | 
 
 slicer vm exec "$VM" -- systemctl is-active nginx
 slicer vm exec "$VM" -- curl -sS http://localhost | head -3
-```
-
-You can also use explicit environment variables when setting up the proxy helper:
-
-```bash
-cat > userdata.sh <<EOF
-#!/bin/bash
-set -eux
-
-export HTTPS_PROXY="https://proxy:${PROXY_TOKEN}@192.168.222.1:3129"
-export HTTP_PROXY="http://proxy:${PROXY_TOKEN}@192.168.222.1:3128"
-
-/usr/local/bin/slicer-agent proxy install
-EOF
 ```
 
 The `slicer-agent proxy install` command needs root privileges, so if you want to install it outside of userdata, you need to run the command with `sudo`.
