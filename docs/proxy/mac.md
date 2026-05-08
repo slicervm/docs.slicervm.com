@@ -72,7 +72,7 @@ slicer proxy up \
     --hostgroup sbox \
     --bind 0.0.0.0 \
     --san 192.168.64.1 \
-    --seal-key-file .slicer/mk \
+    --seal-key-file ./.slicer/proxy/mk \
     --deny-cidr 192.168.1.0/24
 ```
 
