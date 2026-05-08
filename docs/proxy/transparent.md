@@ -12,21 +12,10 @@ The transparent proxy helper uses iptables, so requires the regular non-min imag
 
 Set up "slicer proxy" using the instructions for [Linux](/proxy/linux) or [macOS](/proxy/mac) - paying special attention to the DNS servers. Both most be set to `127.0.0.1` for this to work.
 
-The proxy server IP is fixed on macOS, and on Linux it can be changed. The platform defaults are:
+The proxy server IP is fixed on macOS, and on Linux it can be changed:
 
-=== "Linux"
-
-    ```bash
-    PROXY_IP=192.168.222.1
-    ```
-
-=== "macOS"
-
-    ```bash
-    PROXY_IP=192.168.64.1
-    ```
-
-Change any examples in this guide accordingly.
+* Linux defaults to: `192.168.222.1`
+* macOS defaults to: `192.168.64.1`
 
 ## Example with apt-get update and install
 
