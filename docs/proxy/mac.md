@@ -32,6 +32,7 @@ The below is a partial snippet, to show the changes you need to make.
       network:
         mode: nat
         gateway: 192.168.64.1/24
++       dns_servers: ["127.0.0.1", "127.0.0.1"]
         # Default is no managed PF filtering. To force sbox traffic through a
         # host proxy, opt in with:
 -       # allow:
@@ -45,6 +46,10 @@ The below is a partial snippet, to show the changes you need to make.
 +       drop:
 +         - 0.0.0.0/0
 ```
+
+* For the networking layer, we enable default deny for all traffic, and only allow the proxy endpoint to be reached on specific ports. If you leave this off, VMs may be able to connect to the SSH port for instance on the host.
+* We make sure the DNS servers (which are now blocked), redirect to localhost for a quick rejection. When you start running the [transparent proxy](/proxy/transparent), the helper will redirect DNS queries to slicer proxy on the host.
+* We enable CA generation and injection. Without this setting, the certificates minted by the proxy would not be trusted by the guest VMs.
 
 If slicer-mac is already running, you'll need to shut down your VMs gracefully, and restart the daemon with the new config.
 
