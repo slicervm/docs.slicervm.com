@@ -10,12 +10,21 @@ The transparent proxy helper uses iptables, so requires the regular non-min imag
 
 ## Pre-reqs
 
-Set up "slicer proxy" using the instructions for [Linux](/proxy/linux) or [mac](/proxy/mac) - paying special attention to the DNS servers. Both most be set to `127.0.0.1` for this to work.
+Set up "slicer proxy" using the instructions for [Linux](/proxy/linux) or [macOS](/proxy/mac) - paying special attention to the DNS servers. Both most be set to `127.0.0.1` for this to work.
 
-The proxy server IP is fixed on macOS, and on Linux it can be changed:
+The proxy server IP is fixed on macOS, and on Linux it can be changed. The platform defaults are:
 
-* Linux defaults to: `192.168.222.1`
-* macOS defaults to: `192.168.64.1`
+=== "Linux"
+
+    ```bash
+    PROXY_IP=192.168.222.1
+    ```
+
+=== "macOS"
+
+    ```bash
+    PROXY_IP=192.168.64.1
+    ```
 
 Change any examples in this guide accordingly.
 
@@ -41,20 +50,37 @@ slicer proxy allow web-1 --host security.ubuntu.com \
     --method GET --path '/ubuntu/*'
 ```
 
-Create a userdata script to install the proxy helper and install nginx through it:
+Create a userdata script to install the proxy helper and install nginx through it. Pick the tab that matches the host platform you're running Slicer on:
 
-```bash
-cat > userdata.sh <<EOF
-#!/bin/bash
-set -eux
+=== "Linux"
 
-/usr/local/bin/slicer-agent proxy install \
-    192.168.222.1 --token ${PROXY_TOKEN}
+    ```bash
+    cat > userdata.sh <<EOF
+    #!/bin/bash
+    set -eux
 
-DEBIAN_FRONTEND=noninteractive apt-get update -y
-DEBIAN_FRONTEND=noninteractive apt-get install -y nginx
-EOF
-```
+    /usr/local/bin/slicer-agent proxy install \
+        192.168.222.1 --token ${PROXY_TOKEN}
+
+    DEBIAN_FRONTEND=noninteractive apt-get update -y
+    DEBIAN_FRONTEND=noninteractive apt-get install -y nginx
+    EOF
+    ```
+
+=== "macOS"
+
+    ```bash
+    cat > userdata.sh <<EOF
+    #!/bin/bash
+    set -eux
+
+    /usr/local/bin/slicer-agent proxy install \
+        192.168.64.1 --token ${PROXY_TOKEN}
+
+    DEBIAN_FRONTEND=noninteractive apt-get update -y
+    DEBIAN_FRONTEND=noninteractive apt-get install -y nginx
+    EOF
+    ```
 
 Launch the VM, blocking until the userdata script has finished, then check the status of the nginx service and make a request to it:
 
