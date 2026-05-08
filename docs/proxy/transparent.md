@@ -8,6 +8,10 @@ Note: Slicer on Linux may require the `sudo` command when talking to the API.
 
 The transparent proxy helper uses iptables, so requires the regular non-min images. We will update the min image to be compatible in a future release.
 
+## Pre-reqs
+
+Set up "slicer proxy" using the instructions for [Linux](/proxy/linux) or [mac](/proxy/mac) - paying special attention to the DNS servers. Both most be set to `127.0.0.1` for this to work.
+
 ## Example with apt-get update and install
 
 Start with a Slicer config similar to [the Linux guide](/proxy/linux), with the host group of `sbox` and the daemon already running.
@@ -165,4 +169,3 @@ CMD ["nginx", "-g", "daemon off;"]
 ```
 
 Without the step to update the CA certificates, the build will fail with a certificate error.
-
