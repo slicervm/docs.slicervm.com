@@ -14,7 +14,7 @@ config:
   - name: sbox
     count: 0
     ca:
-        generate: true
+      generate: true
     network:
       mode: isolated
       drop: ["0.0.0.0/0"]
@@ -76,10 +76,10 @@ This will start the proxy on the host, and allow VMs to access it via the `192.1
 
 One key setting is `--deny-cidr 192.168.1.0/24` - this blocks the proxy from contacting the local LAN range on the host. You may also wish to include other ranges here, including 127.0.0.1.
 
-Now, start up Slicer in the other terminal:
+Now, start up Slicer in the other terminal (`slicer.yaml` requires no argument, it's a default name):
 
 ```bash
-sudo slicer up ./slicer.yaml
+sudo slicer up
 ```
 
 For discovering the exact HTTPS paths a workload tries to reach before you create allow rules, see [strict and audit modes](/proxy/overview/#strict-and-audit-modes).
