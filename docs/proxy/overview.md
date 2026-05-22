@@ -5,7 +5,7 @@ Slicer's proxy lets you inspect and filter HTTP requests egressing your microVMs
 ## Features
 
 * Log and audit outgoing HTTP(s) requests
-* Inject credentials into outgoing requests - Basic Auth, Bearer Token, OAuth - Claude, Claude Code, and GitHub Copilot
+* Inject credentials into outgoing requests - Bearer Token, Basic Auth, and adopted OAuth for Claude Code, Codex (ChatGPT), GitHub Copilot, xAI Grok, GitHub App user tokens, and GitHub App installation tokens
 * Block specific domains, URLs, paths, and methods
 * Rule expiry - set a TTL for rules to automatically expire after a certain time
 * Passthrough mode for unmodified requests, or TCP access such as Postgresql or SSH
