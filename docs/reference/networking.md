@@ -1,16 +1,5 @@
 # Networking modes for Slicer microVMs
 
-Table of contents:
-
-* [Bridge Networking](#bridge-networking)
-* [CNI Networking](#cni-networking)
-* [Isolated Mode Networking](#isolated-mode-networking)
-  * [Quick start](#quick-start)
-  * [Specifying an explicit range](#specifying-an-explicit-range)
-  * [Drop and allow rules](#drop-and-allow-rules)
-  * [Firewall](#firewall)
-  * [Additional configuration for Netplan](#additional-configuration-for-netplan)
-
 The Firecracker, QEMU, and Cloud Hypervisors use TAP devices for networking. A Linux TAP operates at Layer 2 (Data Link Layer), one end is attached to the microVM, and the other end is attached to the host system.
 
 Slicer supports multiple networking modes for microVMs, each with their own pros and cons. Generally, you should use the default option (Bridge Networking) unless you have specific requirements that need a different mode.
@@ -19,11 +8,13 @@ See `slicer new --help` to generate a Slicer config with bridge-based networking
 
 How do you pick?
 
-* Bridge networking is the default - use it when you want to get started. It lets VMs talk to each other, so it's ideal for K3s where nodes need direct IP to IP access. The host can ingress to VMs via their IP.
+* [Bridge networking](#bridge-networking) is the default - use it when you want to get started. It lets VMs talk to each other, so it's ideal for K3s where nodes need direct IP to IP access. The host can ingress to VMs via their IP.
 
-* Isolated networking is best when you're running appliances that are connected to the Internet, and can run untrusted workloads, or for other multi-tenant services. You can block VMs from egressing to specific IPs or entire CIDRs like your LAN i.e. `192.168.0.0/24`. There is no ingress available other via `slicer forward` or via network tunnels such as [Inlets](https://inlets.dev).
+* [Macvtap networking](#macvtap-networking-direct-lan-access) places VMs directly on your LAN as if they were physical machines. Use it for homelab clusters, appliances like Pi-hole, or any long-running services that need to be first-class citizens on your network. Supports both DHCP (router-assigned IPs) and static IP pools. Note that the host itself cannot reach VMs by IP in this mode.
 
-* CNI mode is generally not recommended or required, but enables additional networking modes, and shares a single pool of IPs across all Slicer daemons running in this mode.
+* [Isolated networking](#isolated-mode-networking) is best when you're running appliances that are connected to the Internet, and can run untrusted workloads, or for other multi-tenant services. You can block VMs from egressing to specific IPs or entire CIDRs like your LAN i.e. `192.168.0.0/24`. There is no ingress available other than via `slicer forward` or via network tunnels such as [Inlets](https://inlets.dev).
+
+* [CNI mode](#cni-networking) is generally not recommended or required, but enables additional networking modes, and shares a single pool of IPs across all Slicer daemons running in this mode.
 
 ## Bridge Networking
 
@@ -44,6 +35,14 @@ Cons:
 
 Example with IPs allocated from the subnet automatically:
 
+```bash
+slicer new vm \
+  --count=3 \
+  --cidr=192.168.137.0/24
+```
+
+This generates:
+
 ```yaml
 config:
   host_groups:
@@ -55,7 +54,18 @@ config:
       gateway: 192.168.137.1/24
 ```
 
-To assign from a static list of IP addresses, use the `addresses` field, and make sure the `gateway` is in the same subnet:
+To specify a custom IP range within the subnet, use the `--range` flag:
+
+```bash
+slicer new vm \
+  --count=3 \
+  --cidr=192.168.137.0/24 \
+  --range=192.168.137.20-192.168.137.80
+```
+
+This adds a `range: 192.168.137.20-192.168.137.80` field to the network configuration in the YAML.
+
+Alternatively, to assign from a static list of IP addresses, use the `addresses` field in YAML:
 
 ```yaml
 config:
@@ -244,3 +254,156 @@ Then reload and restart Slicer and the isolated network mode microVMs:
 sudo chmod 644 /etc/systemd/network/00-veth-ignore.network
 sudo systemctl restart systemd-networkd
 ```
+
+## Macvtap Networking (Direct LAN Access)
+
+Macvtap mode connects VMs directly to your LAN, making them appear as native network devices alongside your physical machines. The VMs can obtain IP addresses from your router's DHCP server, or you can configure a static IP pool managed by Slicer.
+
+This mode works well for:
+
+- K3s Kubernetes clusters - [Single-node or multi-node clusters](../examples/ha-k3s.md) that need stable, long-running infrastructure
+- Network appliances - [Pi-hole for ad-blocking and DNS](../examples/pihole-adblock.md), DNS servers, DHCP servers
+- Authentication and identity services - Keycloak, LDAP servers, Active Directory
+- Server-type workloads - Any service that benefits from being a native LAN device
+
+Pros:
+
+* VMs appear as native devices on your LAN with direct IP addresses
+* Works with existing network infrastructure (router DHCP, DNS)
+* No need to configure routes on other LAN devices to reach VMs
+* Supports both DHCP and static IP allocation
+* Stable MAC addresses enable DHCP reservations
+
+Cons:
+
+* Host cannot directly reach VMs via their network IP (macvtap architecture limitation)
+
+### Requirements and Configuration
+
+**Image Requirements:**
+
+Macvtap networking requires standard Slicer images. Min images do not contain the DHCP client package (`isc-dhcp-client` on Ubuntu) by default. While the package can be added if needed, the standard image is preferred for this networking mode.
+
+Both arm64 and x86_64 architectures are supported.
+
+**Parent Network Interface:**
+
+Macvtap requires a parent host network interface to attach VMs to your LAN. By default, Slicer automatically selects the host's primary network interface by querying the kernel routing table to determine which interface is used for outbound internet traffic.
+
+If you need to explicitly select a different interface, you can override the automatic selection:
+
+- In YAML: Add `parent: eth1` to the `network:` section
+- With `slicer new`: Use the `--parent=eth1` flag
+
+Example overriding the parent interface:
+
+```bash
+slicer new lan \
+  --net=macvtap \
+  --parent=eth1 \
+  --count=1 \
+> lan.yaml
+```
+
+This generates:
+
+```yaml
+config:
+  host_groups:
+    - name: lan
+      count: 1
+      network:
+        mode: macvtap
+        parent: eth1
+```
+
+### DHCP mode
+
+In DHCP mode, your router's DHCP server assigns IP addresses to VMs automatically. The VMs appear as regular network devices on your LAN.
+
+To generate a config with DHCP mode:
+
+```bash
+slicer new lan \
+  --net=macvtap \
+  --count=1 \
+> lan.yaml
+
+sudo -E slicer up lan.yaml
+```
+
+The generated YAML:
+
+```yaml
+config:
+  host_groups:
+    - name: lan
+      count: 1
+      network:
+        mode: macvtap
+```
+
+After the VMs boot, use `slicer list` to see the IP addresses assigned by your router's DHCP server.
+
+### Static IP pool mode
+
+Static IP pool mode gives you predictable, stable IP addresses for your VMs.
+
+When you specify a gateway CIDR, Slicer automatically allocates IPs from the `.220-.254` range (35 addresses) at the end of your subnet. This range can be overridden using the `--range` flag to specify a custom pool.
+
+```bash
+# Example LAN: 192.168.1.0/24, gateway: 192.168.1.1
+# Slicer will allocate 192.168.1.220-192.168.1.254
+slicer new lan \
+  --net=macvtap \
+  --cidr=192.168.1.0/24 \
+  --count=1 \
+> lan.yaml
+
+sudo -E slicer up lan.yaml
+```
+
+The generated YAML:
+
+```yaml
+config:
+  host_groups:
+    - name: lan
+      count: 1
+      network:
+        mode: macvtap
+        gateway: 192.168.1.1/24
+```
+
+To use a custom range, add the `--range` flag with a start-end format (e.g., `--range=192.168.1.100-192.168.1.200`) which will add a `range:` field to the generated YAML.
+
+> **Important:** 
+> - Make sure the IP range is outside your router's DHCP pool to avoid conflicts
+> - Replace `192.168.1.0/24` with your actual LAN CIDR in the command above
+> - **`slicer new` assumes the gateway is at `.1` of the supplied CIDR.** If your router's gateway uses a different address (e.g., `.254`), edit the `gateway:` field in the generated YAML before running `slicer up`
+
+For full control over IP allocation, you can manually specify each IP address using the `addresses:` field:
+
+```yaml
+config:
+  host_groups:
+    - name: lan
+      count: 3
+      network:
+        mode: macvtap
+        gateway: 192.168.1.1/24
+        addresses:
+          - 192.168.1.200
+          - 192.168.1.201
+          - 192.168.1.202
+```
+
+### MAC address reservations
+
+Slicer generates stable MAC addresses for each VM based on the VM's hostname. This means the same VM name always gets the same MAC address across restarts.
+
+Once you know a VM's MAC address, you can create a DHCP reservation in your router to make the IP address "static" even when using DHCP mode. This gives you the flexibility of DHCP with the predictability of static IPs.
+
+To find a VM's MAC address:
+- Check your router's DHCP client list
+- Run `ip link` inside the VM to view network interface details
