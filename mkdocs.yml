@@ -123,6 +123,7 @@ nav:
       - Tasks:
           - Customise with userdata: tasks/userdata.md
           - Copy files to/from a VM: tasks/copy-files.md
+          - Worktrees: tasks/worktrees.md
           - Execute commands in a VM: tasks/execute-commands.md
           - Expose ports from a VM: tasks/expose-ports.md
           - Intercept VM egress: tasks/intercept-egress.md
