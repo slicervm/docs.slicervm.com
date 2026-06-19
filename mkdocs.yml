@@ -135,6 +135,7 @@ nav:
           - Overview: storage/overview.md
           - ZFS: storage/zfs.md
           - Devmapper: storage/devmapper.md
+          - Update a VM's kernel: storage/update-kernel.md
       - Reference:
           - REST API: reference/api.md
           - YAML Config: reference/config.md
