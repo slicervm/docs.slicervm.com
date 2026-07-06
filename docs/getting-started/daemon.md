@@ -113,7 +113,7 @@ This is useful for planned host maintenance, such as upgrading the host
 kernel and rebooting without losing in-memory VM state, long-running shell
 sessions, or background processes inside the VM.
 
-To enable it on an existing service, update the `ExecStart` line and make
+To enable it add the `--suspend-on-shutdown` to `ExecStart` and make
 sure the stop timeout gives Slicer enough time to suspend the VMs:
 
 ```diff

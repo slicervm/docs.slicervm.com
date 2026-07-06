@@ -1232,12 +1232,12 @@ paths:
 
   /vm/{hostname}/suspend:
     post:
-      summary: Suspend a VM to disk (Slicer-for-Mac only, for now)
+      summary: Suspend a VM to disk
       description: |
         Takes a Firecracker snapshot of the VM's memory and disk state, then
         shuts down the underlying VM process. Memory is released. Pair with
-        `/restore` to bring the VM back up. Currently supported on
-        Slicer-for-Mac only.
+        `/restore` to bring the VM back up. Supported on Slicer-for-Mac,
+        and on Linux when the Slicer daemon is using the Firecracker hypervisor.
       security:
         - BearerAuth: []
       parameters:
@@ -1269,11 +1269,11 @@ paths:
 
   /vm/{hostname}/restore:
     post:
-      summary: Restore a VM from its snapshot (Slicer-for-Mac only, for now)
+      summary: Restore a VM from its snapshot
       description: |
         Restores a previously-suspended VM from its Firecracker snapshot.
-        Memory and disk state come back intact. Currently supported on
-        Slicer-for-Mac only.
+        Memory and disk state come back intact. Supported on Slicer-for-Mac,
+        and on Linux when the Slicer daemon is using the Firecracker hypervisor.
       security:
         - BearerAuth: []
       parameters:
