@@ -609,7 +609,7 @@ HTTP POST
 
 Response 200: text/plain
 
-## Suspend a VM to disk (Slicer-for-Mac only, for now)
+## Suspend a VM to disk
 
 HTTP POST
 
@@ -619,12 +619,12 @@ Takes a Firecracker snapshot of the VM's memory and disk state, then
 shuts down the underlying VM process. Memory is released. Use
 `/restore` to bring the VM back up from the snapshot.
 
-> Availability: currently supported on Slicer-for-Mac only. Not
-> available on the Linux daemon yet.
+> Availability: supported on Slicer-for-Mac, and on Linux when the Slicer
+> daemon is using the Firecracker hypervisor.
 
 Response 200: text/plain
 
-## Restore a VM from a snapshot (Slicer-for-Mac only, for now)
+## Restore a VM from a snapshot
 
 HTTP POST
 
@@ -633,8 +633,8 @@ HTTP POST
 Restores a previously-suspended VM from its Firecracker snapshot. The
 VM resumes with its memory and disk state intact.
 
-> Availability: currently supported on Slicer-for-Mac only. Not
-> available on the Linux daemon yet.
+> Availability: supported on Slicer-for-Mac, and on Linux when the Slicer
+> daemon is using the Firecracker hypervisor.
 
 Response 200: text/plain
 

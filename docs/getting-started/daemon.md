@@ -101,3 +101,27 @@ sudo journalctl --output=cat --since yesterday -u vm
 To stop the service run `sudo systemctl stop vm`, and to prevent it loading on start-up run: `sudo systemctl disable vm`.
 
 You can create multiple Slicer services to run different sets of VMs or configurations on the same host.
+
+## Preserve VM state across host reboots
+
+If you use the Firecracker hypervisor, you can add `--suspend-on-shutdown`
+to `slicer up` so that Slicer suspends running VMs to disk when the daemon
+is stopped. On the next daemon start, Slicer automatically restores the VMs
+that were suspended by the shutdown path.
+
+This is useful for planned host maintenance, such as upgrading the host
+kernel and rebooting without losing in-memory VM state, long-running shell
+sessions, or background processes inside the VM.
+
+To enable it on an existing service, update the `ExecStart` line and make
+sure the stop timeout gives Slicer enough time to suspend the VMs:
+
+```diff
+- ExecStart=sudo /usr/local/bin/slicer up ./slicer.yaml
++ ExecStart=sudo /usr/local/bin/slicer up ./slicer.yaml --suspend-on-shutdown
+- TimeoutStopSec=30
++ TimeoutStopSec=120
+```
+
+If suspend fails, Slicer falls back to its normal graceful or forceful
+shutdown behavior.

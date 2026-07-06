@@ -125,3 +125,8 @@ See the [API reference](/reference/api) for endpoint documentation.
 | `hypervisor` | string | `firecracker` | `firecracker` or `cloud-hypervisor` |
 | `graceful_shutdown` | bool | `true` | Send ACPI shutdown before killing VMs |
 | `pci` | map | | PCI device passthrough. See [VFIO docs](/reference/vfio) |
+
+When running Slicer as a daemon with Firecracker, you can also pass
+`--suspend-on-shutdown` to `slicer up` to suspend running VMs when the daemon
+stops and automatically restore them on the next daemon start. See [Preserve
+VM state across host reboots](/getting-started/daemon/#preserve-vm-state-across-host-reboots).
