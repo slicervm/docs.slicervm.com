@@ -151,6 +151,7 @@ nav:
       - Overview: platform/overview.md
       - Quickstart: platform/quickstart.md
       - VM Lifecycle: platform/lifecycle.md
+      - Build once, fork many: platform/cold-fork.md
       - Go SDK: platform/go-sdk.md
       - TypeScript SDK: platform/typescript-sdk.md
       - Run a task in Slicer: platform/ephemeral-tasks.md

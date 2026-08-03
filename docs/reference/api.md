@@ -619,8 +619,8 @@ Takes a Firecracker snapshot of the VM's memory and disk state, then
 shuts down the underlying VM process. Memory is released. Use
 `/restore` to bring the VM back up from the snapshot.
 
-> Availability: supported on Slicer-for-Mac, and on Linux when the Slicer
-> daemon is using the Firecracker hypervisor.
+> Availability: supported for persistent Firecracker VMs in Slicer and
+> Slicer for Mac.
 
 Response 200: text/plain
 
@@ -633,10 +633,72 @@ HTTP POST
 Restores a previously-suspended VM from its Firecracker snapshot. The
 VM resumes with its memory and disk state intact.
 
-> Availability: supported on Slicer-for-Mac, and on Linux when the Slicer
-> daemon is using the Firecracker hypervisor.
+> Availability: supported for persistent Firecracker VMs in Slicer and
+> Slicer for Mac.
 
 Response 200: text/plain
+
+## Describe a VM
+
+HTTP GET
+
+`/vm/{hostname}`
+
+Returns the VM's configuration, fork lineage, and effective network policy.
+
+Response 200: `SlicerVMDescription`
+
+## Commit a VM
+
+HTTP POST
+
+`/vm/{hostname}/commit`
+
+The VM must be stopped and persistent. The optional JSON body accepts
+`tags` (an array of strings), `labels` (a string map), and `cache_key`.
+
+Response 200: `SlicerCommitResponse`
+
+## List VM commits
+
+HTTP GET
+
+`/vm/commits`
+
+Optional query parameters: repeatable `tag`, `cache_key`, `source`, and
+`mode`.
+
+Response 200: an array of `SlicerCommitInfo`
+
+## Fork a committed VM
+
+HTTP POST
+
+`/vm/commits/{commit_id}/fork`
+
+Fork always waits for the guest agent to finalise the child's identity. The
+optional `timeout` query parameter sets the readiness timeout. The optional
+JSON body accepts `tags` and an isolated-network `network` override with
+`allow` and `drop` arrays. Network overrides require an isolated host group.
+
+The hostname is allocated by Slicer and returned in the response.
+
+If agent readiness exceeds `timeout`, Slicer returns 408 and rolls the child
+back. If it cannot confirm that the VM process stopped, the failed state is
+left intact for inspection. Guest readiness or identity-finalisation failures
+return 502.
+
+Response 200: `SlicerForkResponse`
+
+## Delete a VM commit
+
+HTTP DELETE
+
+`/vm/commits/{commit_id}`
+
+The commit cannot be deleted while a source VM or forked child still uses it.
+
+Response 200: `SlicerCommitDeleteResponse`
 
 ## Relaunch an API-launched VM
 

@@ -57,6 +57,7 @@ The SDK has two layers:
 
 * `client.hostGroups` — list host groups, list VMs within a group.
 * `client.vms` — create, attach, list, and collect stats for VMs across host groups.
+* `client.commits` — list, fork, and delete committed VM parents.
 * `client.secrets` — create, list, update, delete secrets.
 
 **Per-VM operations — on the `VM` handle returned from `client.vms.create()` or `client.vms.get()`.** Everything you do to a single VM is a method on its handle:
@@ -234,7 +235,7 @@ await vm.pause();
 await vm.resume();
 ```
 
-Suspend writes a snapshot to disk (Slicer for Mac; Linux support in progress). `relaunch()` restarts an API-created VM from its existing disk (requires `persistent: true` at creation time):
+Suspend writes a persistent Firecracker VM's snapshot to disk in Slicer or Slicer for Mac. `relaunch()` restarts an API-created VM from its existing disk (requires `persistent: true` at creation time):
 
 ```ts
 await vm.suspend();
@@ -283,6 +284,14 @@ The SDK base64-encodes secret data transparently; pass plaintext.
 | `client.vms.list({ tag?, tagPrefix? })` | List all VMs |
 | `client.vms.stats()` | Per-VM CPU / memory / disk stats |
 
+### Commits
+
+| Method | Description |
+|--------|-------------|
+| `client.commits.list(opts?)` | List or filter committed parents |
+| `client.commits.fork(commitId, opts?)` | Fork with tags or an isolated-network override |
+| `client.commits.delete(commitId)` | Delete an unused committed parent |
+
 ### VM handle — `vm.*`
 
 | Method | Description |
@@ -293,11 +302,20 @@ The SDK base64-encodes secret data transparently; pass plaintext.
 | `vm.waitForAgent(opts?)` | Poll until the agent responds |
 | `vm.waitForUserdata(opts?)` | Poll until userdata completes |
 | `vm.logs()` | Serial console logs |
+| `vm.describe()` | Configuration, fork lineage, and effective network policy |
+| `vm.commit(opts?)` | Commit a stopped, persistent VM and return a `CommittedVM` |
 | `vm.pause() / resume()` | Pause or resume the VM in memory |
-| `vm.suspend() / restore()` | Snapshot to/from disk (Mac) |
+| `vm.suspend() / restore()` | Snapshot a persistent Firecracker VM to/from disk |
 | `vm.shutdown(req?) / relaunch()` | Shut down or relaunch a persistent VM |
 | `vm.delete()` | Delete the VM |
 | `vm.fs.*` | Filesystem operations (below) |
+
+### Committed VM — `committed.*`
+
+| Method | Description |
+|--------|-------------|
+| `committed.fork(opts?)` | Fork and return a `VM` handle |
+| `committed.forkRaw(opts?)` | Fork and return the raw response |
 
 ### VM filesystem — `vm.fs.*`
 
