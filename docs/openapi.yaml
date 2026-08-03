@@ -209,10 +209,8 @@ components:
 
     SlicerCreateNodeRequest:
       type: object
-      description: Combined from LaunchParams and SDK request.
+      description: Public parameters for allocator-led VM creation.
       properties:
-        hostname:
-          type: string
         ip:
           type: string
         ram_bytes:
@@ -232,8 +230,6 @@ components:
           type: array
           items:
             type: string
-        protected:
-          type: boolean
         userdata:
           type: string
         tags:
@@ -248,6 +244,8 @@ components:
           type: array
           items:
             type: string
+        network:
+          $ref: '#/components/schemas/SlicerForkNetworkPolicy'
 
     SlicerCreateNodeResponse:
       type: object
@@ -263,6 +261,131 @@ components:
           format: date-time
         arch:
           type: string
+
+    SlicerResolvedNetworkPolicy:
+      type: object
+      required: [allow, drop]
+      properties:
+        allow:
+          type: array
+          items: { type: string }
+        drop:
+          type: array
+          items: { type: string }
+
+    SlicerVMNetworkDescription:
+      type: object
+      required: [host_group, effective]
+      properties:
+        mode: { type: string }
+        policy_source:
+          type: string
+          enum: [host_group, mixed, vm]
+        host_group:
+          $ref: '#/components/schemas/SlicerResolvedNetworkPolicy'
+        override:
+          $ref: '#/components/schemas/SlicerForkNetworkPolicy'
+        effective:
+          $ref: '#/components/schemas/SlicerResolvedNetworkPolicy'
+
+    SlicerVMDescription:
+      allOf:
+        - $ref: '#/components/schemas/NodeResponse'
+        - type: object
+          required: [network]
+          properties:
+            storage: { type: string }
+            image: { type: string }
+            commit_id: { type: string }
+            parent_commit_id: { type: string }
+            network:
+              $ref: '#/components/schemas/SlicerVMNetworkDescription'
+
+    SlicerCommitRequest:
+      type: object
+      properties:
+        tags:
+          type: array
+          items: { type: string }
+        labels:
+          type: object
+          additionalProperties: { type: string }
+        cache_key:
+          type: string
+          description: Caller-owned unique key used to find or reuse a commit.
+
+    SlicerCommitResponse:
+      type: object
+      properties:
+        hostname: { type: string }
+        commit_id: { type: string }
+        status: { type: string, enum: [committed] }
+        parent_status: { type: string, enum: [stopped] }
+        mode: { type: string, enum: [disk] }
+        tags:
+          type: array
+          items: { type: string }
+        labels:
+          type: object
+          additionalProperties: { type: string }
+        cache_key: { type: string }
+      required: [hostname, commit_id, status, parent_status, mode]
+
+    SlicerCommitInfo:
+      type: object
+      properties:
+        commit_id: { type: string }
+        source_hostname: { type: string }
+        source_host_group: { type: string }
+        created_at: { type: string, format: date-time }
+        mode: { type: string, enum: [disk] }
+        tags:
+          type: array
+          items: { type: string }
+        labels:
+          type: object
+          additionalProperties: { type: string }
+        cache_key: { type: string }
+      required: [commit_id, source_hostname, source_host_group, created_at, mode]
+
+    SlicerForkNetworkPolicy:
+      type: object
+      description: Isolated-network overrides for the child VM.
+      properties:
+        allow:
+          type: array
+          items: { type: string }
+        drop:
+          type: array
+          items: { type: string }
+
+    SlicerForkRequest:
+      type: object
+      properties:
+        tags:
+          type: array
+          items: { type: string }
+        network:
+          $ref: '#/components/schemas/SlicerForkNetworkPolicy'
+
+    SlicerForkResponse:
+      type: object
+      properties:
+        hostname: { type: string, description: Allocated hostname of the forked VM. }
+        source_hostname: { type: string, description: Source VM hostname. }
+        commit_id: { type: string }
+        status: { type: string, enum: [forked] }
+        parent_status: { type: string, enum: [unchanged] }
+        child_status: { type: string, enum: [running] }
+        mode: { type: string, enum: [disk] }
+      required: [hostname, source_hostname, commit_id, status, child_status, mode]
+
+    SlicerCommitDeleteResponse:
+      type: object
+      properties:
+        commit_id: { type: string }
+        status: { type: string, enum: [deleted] }
+      required: [commit_id, status]
 
     SlicerDeleteResponse:
       type: object
@@ -841,7 +964,7 @@ paths:
           description: Defaults to reboot unless hypervisor is cloud-hypervisor.
       responses:
         "200":
-          description: Shutdown initiated
+          description: Shutdown completed for a Firecracker shutdown request; otherwise initiated
           content:
             text/plain:
               schema:
@@ -922,8 +1045,8 @@ paths:
       description: |
         Takes a Firecracker snapshot of the VM's memory and disk state, then
         shuts down the underlying VM process. Memory is released. Pair with
-        `/restore` to bring the VM back up. Supported on Slicer-for-Mac,
-        and on Linux when the Slicer daemon is using the Firecracker hypervisor.
+        `/restore` to bring the VM back up. Supported for persistent
+        Firecracker VMs in Slicer and Slicer for Mac.
       security:
         - BearerAuth: []
       parameters:
@@ -958,8 +1081,8 @@ paths:
       summary: Restore a VM from its snapshot
       description: |
         Restores a previously-suspended VM from its Firecracker snapshot.
-        Memory and disk state come back intact. Supported on Slicer-for-Mac,
-        and on Linux when the Slicer daemon is using the Firecracker hypervisor.
+        Memory and disk state come back intact. Supported for persistent
+        Firecracker VMs in Slicer and Slicer for Mac.
       security:
         - BearerAuth: []
       parameters:
@@ -1022,6 +1145,202 @@ paths:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
         "500":
           description: Internal error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /vm/{hostname}:
+    get:
+      summary: Describe a VM
+      description: Returns VM lineage plus host-group, override, and effective network policy.
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: hostname
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: VM description
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SlicerVMDescription' }
+        "404":
+          description: VM not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /vm/{hostname}/commit:
+    post:
+      summary: Commit a stopped persistent VM disk
+      description: Creates an immutable disk parent for Firecracker cold forks.
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: hostname
+          required: true
+          schema: { type: string }
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SlicerCommitRequest' }
+      responses:
+        "200":
+          description: VM committed
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SlicerCommitResponse' }
+        "400":
+          description: VM or storage is not eligible for a cold commit
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "404":
+          description: Persistent VM not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "409":
+          description: VM is running, backing is missing, or cache key is in use
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "500":
+          description: Internal error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /vm/commits:
+    get:
+      summary: List committed VM parents
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: tag
+          description: Repeat to require every supplied tag.
+          schema:
+            type: array
+            items: { type: string }
+          style: form
+          explode: true
+        - in: query
+          name: cache_key
+          schema: { type: string }
+        - in: query
+          name: source
+          schema: { type: string }
+        - in: query
+          name: mode
+          schema: { type: string, enum: [disk] }
+      responses:
+        "200":
+          description: Matching commits, newest first
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/SlicerCommitInfo' }
+        "500":
+          description: Internal error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /vm/commits/{commit_id}/fork:
+    post:
+      summary: Fork a committed VM disk
+      description: Firecracker-only. Waits for the child agent to finalise a unique guest identity.
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: commit_id
+          required: true
+          schema: { type: string }
+        - in: query
+          name: wait
+          schema: { type: string, enum: [agent], default: agent }
+        - in: query
+          name: timeout
+          schema: { type: string, default: 30s }
+          description: |
+            Maximum time to wait for agent readiness. On expiry Slicer returns
+            408 and rolls back the child. If the VM process cannot be confirmed
+            stopped, its failed state is left intact for inspection.
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SlicerForkRequest' }
+      responses:
+        "200":
+          description: Child forked and ready
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SlicerForkResponse' }
+        "400":
+          description: Invalid network policy, wait mode, or unsupported host group
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "404":
+          description: Commit not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "409":
+          description: Child already exists or commit backing is missing
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "408":
+          description: Agent readiness timed out; child rollback was attempted
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "502":
+          description: Guest agent readiness or identity finalisation failed
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "500":
+          description: Internal or launch error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /vm/commits/{commit_id}:
+    delete:
+      summary: Delete an unused committed VM parent
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: commit_id
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Commit deleted
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SlicerCommitDeleteResponse' }
+        "404":
+          description: Commit not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "409":
+          description: Persistent source or child VMs still use the commit
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "500":
+          description: Internal or storage cleanup error
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }

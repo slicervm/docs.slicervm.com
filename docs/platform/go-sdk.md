@@ -187,11 +187,24 @@ err = client.ResumeVM(ctx, node.Hostname)
 | `ListVMs(ctx)` | List all VMs across host groups |
 | `GetHostGroups(ctx)` | List host groups |
 | `GetHostGroupNodes(ctx, groupName)` | List VMs in a host group |
+| `DescribeVM(ctx, hostname)` | Get configuration, fork lineage, and effective network policy |
 | `PauseVM(ctx, hostname)` | Pause a running VM |
 | `ResumeVM(ctx, hostname)` | Resume a paused VM |
 | `Shutdown(ctx, hostname, request)` | Shutdown or reboot a VM |
 | `GetVMStats(ctx, hostname)` | Get CPU, memory, and disk stats |
 | `GetVMLogs(ctx, hostname, lines)` | Get serial console logs |
+
+### Cold fork operations
+
+| Method | Description |
+|--------|-------------|
+| `CommitVM(ctx, hostname)` | Commit a stopped, persistent VM |
+| `CommitVMWithOptions(ctx, hostname, opts)` | Commit with tags, labels, or a cache key |
+| `ListCommits(ctx, opts)` | List or filter committed parents |
+| `ForkCommittedVM(ctx, commitID)` | Fork a committed parent |
+| `ForkCommittedVMWithOptions(ctx, commitID, opts)` | Fork with tags or an isolated-network override |
+| `committed.Fork(ctx, opts)` | Fork the `SlicerCommittedVM` returned by `CommitVM` |
+| `DeleteCommit(ctx, commitID)` | Delete an unused committed parent |
 
 ### Guest operations
 
