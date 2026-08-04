@@ -373,7 +373,7 @@ components:
         secrets:
           type: array
           items: { type: string }
-          description: Replaces inherited secret grants. An empty array clears grants and blots inherited secret files.
+          description: Replaces inherited secret grants. An empty array clears grants and removes inherited secret files.
         persistent:
           type: boolean
           default: true
