@@ -289,7 +289,7 @@ The SDK base64-encodes secret data transparently; pass plaintext.
 | Method | Description |
 |--------|-------------|
 | `client.commits.list(opts?)` | List or filter committed parents |
-| `client.commits.fork(commitId, opts?)` | Fork with tags or an isolated-network override |
+| `client.commits.fork(commitId, opts?)` | Fork with lifecycle, resources, fix-ups, metadata, secrets, wait, or network overrides |
 | `client.commits.delete(commitId)` | Delete an unused committed parent |
 
 ### VM handle — `vm.*`
@@ -314,8 +314,10 @@ The SDK base64-encodes secret data transparently; pass plaintext.
 
 | Method | Description |
 |--------|-------------|
-| `committed.fork(opts?)` | Fork and return a `VM` handle |
+| `committed.fork(opts?)` | Fork with optional overrides and return a `VM` handle |
 | `committed.forkRaw(opts?)` | Fork and return the raw response |
+
+`VMForkOptions` supports `wait`, `waitTimeoutSec`, `persistent`, `vcpu`, `ramBytes`, `fixups`, `tags`, `tagMode`, `secrets`, and `network`. Forks wait for agent readiness and guest finalisation by default. Use `wait: 'none'` for launch acknowledgement only, `persistent: false` for ephemeral storage, or `fixups: []` when throughput matters more than unique guest identity.
 
 ### VM filesystem — `vm.fs.*`
 

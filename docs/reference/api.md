@@ -676,17 +676,30 @@ HTTP POST
 
 `/vm/commits/{commit_id}/fork`
 
-Fork always waits for the guest agent to finalise the child's identity. The
-optional `timeout` query parameter sets the readiness timeout. The optional
-JSON body accepts `tags` and an isolated-network `network` override with
-`allow` and `drop` arrays. Network overrides require an isolated host group.
+Fork waits for guest-agent readiness and finalisation by default. Set
+`wait=none` to acknowledge launch without waiting; if asynchronous
+finalisation later fails, the daemon removes the forked VM. The optional
+`timeout` query parameter sets the readiness and finalisation timeout.
+
+The optional JSON body accepts:
+
+* `vcpu` and `ram_bytes` to scale down within the source host group's limits.
+* `persistent` (default `true`); set it to `false` for an ephemeral fork.
+* `fixups`: `hostname`, `machine-id`, and `ssh-host-keys`. Omit the field for
+  all correctness fix-ups, or pass an empty array to disable them. The special
+  values `all` and `none` are also accepted when used alone.
+* `tags` with `tag_mode` set to `append` (default) or `replace`.
+* `secrets` to replace inherited grants; an empty array clears the grants and
+  removes their files during finalisation.
+* An isolated-network `network` override with `allow` and `drop` arrays.
+
+Network overrides require an isolated host group.
 
 The hostname is allocated by Slicer and returned in the response.
 
-If agent readiness exceeds `timeout`, Slicer returns 408 and rolls the child
-back. If it cannot confirm that the VM process stopped, the failed state is
-left intact for inspection. Guest readiness or identity-finalisation failures
-return 502.
+When waiting, a readiness timeout returns 408 and rolls the forked VM back. If
+Slicer cannot confirm that the VM process stopped, it leaves the failed state
+intact for inspection. Guest readiness or finalisation failures return 502.
 
 Response 200: `SlicerForkResponse`
 
@@ -696,7 +709,7 @@ HTTP DELETE
 
 `/vm/commits/{commit_id}`
 
-The commit cannot be deleted while a source VM or forked child still uses it.
+The commit cannot be deleted while a source VM or forked VM still uses it.
 
 Response 200: `SlicerCommitDeleteResponse`
 
