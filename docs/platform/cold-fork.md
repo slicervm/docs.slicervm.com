@@ -2,9 +2,9 @@
 
 Cold forking starts new microVMs from the disk state of a stopped, persistent VM.
 
-Use it when the VM needs an expensive setup step before each job: installing a compiler, downloading dependencies, pulling container images, or preparing an agent. Set up one builder, commit its disk, then fork as many clean children as you need.
+Use it when the VM needs an expensive setup step before each job: installing a compiler, downloading dependencies, pulling container images, or preparing an agent. Set up one builder, commit its disk, then fork as many clean VMs as you need.
 
-Only disk state is committed. Each child boots normally with its own hostname, machine ID, and network identity.
+Only disk state is committed. Each forked VM boots normally with its own hostname, machine ID, and network identity by default.
 
 ## Requirements
 
@@ -15,9 +15,9 @@ Cold fork currently requires:
 * Bridge or isolated networking
 * A stopped, persistent source VM
 
-Network overrides on `slicer vm fork`, including `--allow`, `--no-allow`, and `--drop`, require isolated networking. Cold forking itself also works with bridge networking, but the child inherits the host group's network policy unchanged.
+Network overrides on `slicer vm fork`, including `--allow`, `--no-allow`, and `--drop`, require isolated networking. Cold forking itself also works with bridge networking, but the forked VM inherits the host group's network policy unchanged.
 
-Forked children are persistent. Delete them explicitly when the job is complete.
+The CLI creates persistent forked VMs by default. Pass `--rm` for an ephemeral fork whose cloned storage is discarded when the VM stops or is deleted.
 
 ## Create an empty host group
 
@@ -55,7 +55,7 @@ BUILDER=$(slicer vm add runners \
 echo "$BUILDER"
 ```
 
-The response contains the allocated hostname. Install and prepare everything that should be present in each child. For example:
+The response contains the allocated hostname. Install and prepare everything that should be present in each forked VM. For example:
 
 ```bash
 slicer vm exec "$BUILDER" -- \
@@ -95,19 +95,20 @@ cmt-runnersx1-a1b2c3d4e5f6a7b8
 
 The source VM remains stopped. A committed source cannot be committed again with different metadata; create another persistent builder when you need a different base.
 
-## Fork a child
+## Fork a VM
 
 To inherit the host group's existing network policy:
 
 ```bash
-RUNNER=$(slicer vm fork "$COMMIT" --tag role=runner --quiet)
+RUNNER=$(slicer vm fork "$COMMIT" --wait --tag role=runner --quiet)
 ```
 
-For a child with no egress, clear the inherited allow list and drop everything else:
+For a forked VM with no egress, clear the inherited allow list and drop everything else:
 
 ```bash
 JOB=arkade-run-$(cat /proc/sys/kernel/random/uuid)
 RUNNER=$(slicer vm fork "$COMMIT" \
+  --wait \
   --tag role=runner \
   --tag "job=$JOB" \
   --no-allow \
@@ -121,7 +122,7 @@ echo "$RUNNER"
 
 The DROP is enforced on the Slicer host, outside the guest. A root process inside the VM cannot remove it with `iptables`, ignore it by opening a raw socket, or bypass it by unsetting a proxy variable.
 
-The fork command returns after `slicer-agent` has finalised the child's identity. If the client disconnects while waiting, the daemon continues the fork. Recover the allocated hostname through the unique job tag, then describe it:
+The CLI returns as soon as the VM starts unless you pass `--wait`. The examples use `--wait` so `slicer-agent` has finalised the VM's identity before the next command runs. If the client disconnects, the daemon continues the fork. Recover the allocated hostname through the unique job tag, then describe it:
 
 ```bash
 RUNNER=$(slicer vm list --json | jq -r --arg tag "job=$JOB" \
@@ -129,9 +130,40 @@ RUNNER=$(slicer vm list --json | jq -r --arg tag "job=$JOB" \
 slicer vm describe "$RUNNER"
 ```
 
-## Use and delete the child
+## Control fork behaviour
 
-The child inherits the compiler, source tree, vendored dependencies, and Go build cache from the builder. Change one line and rebuild:
+By default, Slicer fixes the hostname, machine ID, and SSH host keys. SSH host-key work is skipped when `sshd` is not installed; otherwise Slicer follows the image's configured `HostKey` paths.
+
+For maximum throughput when duplicated guest identity is acceptable, skip every fix-up and do not wait:
+
+```bash
+RUNNER=$(slicer vm fork "$COMMIT" \
+  --no-fixups \
+  --rm \
+  --quiet)
+```
+
+You can also select individual fix-ups, scale CPU and RAM down within the source host group's limits, replace inherited tags, and replace or clear inherited secret grants:
+
+```bash
+RUNNER=$(slicer vm fork "$COMMIT" \
+  --wait \
+  --fixup hostname \
+  --fixup machine-id \
+  --cpu 1 \
+  --ram-mb 512 \
+  --replace-tags \
+  --tag role=runner \
+  --no-secrets \
+  --rm \
+  --quiet)
+```
+
+`--no-secrets` also removes inherited secret files during finalisation. Omitting tag, secret, network, CPU, or RAM options inherits the committed VM's launch configuration. Userdata is disk state and is not run again on a fork.
+
+## Use and delete the VM
+
+The forked VM inherits the compiler, source tree, vendored dependencies, and Go build cache from the builder. Change one line and rebuild:
 
 ```bash
 slicer vm exec "$RUNNER" -- \
@@ -142,7 +174,7 @@ slicer vm exec "$RUNNER" -- \
    /usr/local/go/bin/go build -mod=vendor -o ./arkade"
 ```
 
-Delete the child when the job is complete:
+Delete the VM when the job is complete:
 
 ```bash
 slicer vm delete "$RUNNER"
@@ -176,7 +208,7 @@ if [ -z "$COMMIT" ]; then
     --quiet)
 fi
 
-RUNNER=$(slicer vm fork "$COMMIT" --tag role=runner --quiet)
+RUNNER=$(slicer vm fork "$COMMIT" --wait --tag role=runner --quiet)
 ```
 
 The caller owns the cache key. Include the inputs which make the builder result reusable, such as the toolchain version, dependency lock-file digest, or setup-script version. Change the key to invalidate the cached result.
@@ -196,7 +228,7 @@ slicer vm commit list --cache-key arkade-go-v1
 slicer vm commit list --source "$BUILDER"
 ```
 
-Delete a committed parent when neither its source VM nor any forked child uses it:
+Delete a committed parent when neither its source VM nor any forked VM uses it:
 
 ```bash
 slicer vm commit delete "$COMMIT"
@@ -209,7 +241,7 @@ Cold fork and suspend solve different problems:
 * `slicer vm commit` records disk state from a stopped VM. Each fork is a new VM which boots from that state.
 * `slicer vm suspend` records memory, disk, and device state. `slicer vm restore` resumes the same VM later.
 
-Persistent Firecracker VMs in Slicer, and VMs in Slicer for Mac, can suspend and restore today. A suspended VM cannot yet be forked into several children.
+Persistent Firecracker VMs in Slicer, and VMs in Slicer for Mac, can suspend and restore today. A suspended VM cannot yet be forked into several VMs.
 
 ## Cold fork or a custom image?
 

@@ -201,10 +201,11 @@ err = client.ResumeVM(ctx, node.Hostname)
 | `CommitVM(ctx, hostname)` | Commit a stopped, persistent VM |
 | `CommitVMWithOptions(ctx, hostname, opts)` | Commit with tags, labels, or a cache key |
 | `ListCommits(ctx, opts)` | List or filter committed parents |
-| `ForkCommittedVM(ctx, commitID)` | Fork a committed parent |
-| `ForkCommittedVMWithOptions(ctx, commitID, opts)` | Fork with tags or an isolated-network override |
-| `committed.Fork(ctx, opts)` | Fork the `SlicerCommittedVM` returned by `CommitVM` |
+| `ForkCommittedVM(ctx, commitID, options...)` | Fork with defaults or functional options |
+| `committed.Fork(ctx, options...)` | Fork the `SlicerCommittedVM` returned by `CommitVM` |
 | `DeleteCommit(ctx, commitID)` | Delete an unused committed parent |
+
+Fork options include `WithVCPU`, `WithRAMBytes`, `WithTags`, `WithReplaceTags`, `WithSecrets`, `WithNetwork`, `WithPersistent`, `WithEphemeral`, `WithFixups`, `WithWait`, and `WithTimeout`. Omitting options keeps the correctness-first persistent default; `WithFixups()` disables guest identity fix-ups, and `WithWait(SlicerForkWaitNone)` returns after launch acknowledgement.
 
 ### Guest operations
 

@@ -350,7 +350,7 @@ components:
 
     SlicerForkNetworkPolicy:
       type: object
-      description: Isolated-network overrides for the child VM.
+      description: Isolated-network overrides for the forked VM.
       properties:
         allow:
           type: array
@@ -365,6 +365,34 @@ components:
         tags:
           type: array
           items: { type: string }
+          description: Tags to append, or to replace when tag_mode is replace.
+        tag_mode:
+          type: string
+          enum: [append, replace]
+          default: append
+        secrets:
+          type: array
+          items: { type: string }
+          description: Replaces inherited secret grants. An empty array clears grants and blots inherited secret files.
+        persistent:
+          type: boolean
+          default: true
+          description: Set false to discard cloned storage when the VM stops or is deleted.
+        fixups:
+          type: array
+          items:
+            type: string
+            enum: [all, none, hostname, machine-id, ssh-host-keys]
+          description: Omit for all correctness fix-ups. Pass an empty array, or none by itself, to disable them; all and none must be used alone.
+        vcpu:
+          type: integer
+          minimum: 1
+          description: vCPU count, up to the source host-group limit.
+        ram_bytes:
+          type: integer
+          format: int64
+          minimum: 1
+          description: RAM in bytes, up to the source host-group limit.
         network:
           $ref: '#/components/schemas/SlicerForkNetworkPolicy'
 
@@ -376,9 +404,10 @@ components:
         commit_id: { type: string }
         status: { type: string, enum: [forked] }
         parent_status: { type: string, enum: [unchanged] }
-        child_status: { type: string, enum: [running] }
+        child_status: { type: string, enum: [starting, running] }
         mode: { type: string, enum: [disk] }
-      required: [hostname, source_hostname, commit_id, status, child_status, mode]
+        persistent: { type: boolean }
+      required: [hostname, source_hostname, commit_id, status, child_status, mode, persistent]
 
     SlicerCommitDeleteResponse:
       type: object
@@ -1254,7 +1283,7 @@ paths:
   /vm/commits/{commit_id}/fork:
     post:
       summary: Fork a committed VM disk
-      description: Firecracker-only. Waits for the child agent to finalise a unique guest identity.
+      description: Firecracker-only. Waits for agent readiness and guest finalisation by default. With wait=none, acknowledges launch while finalisation continues asynchronously.
       security:
         - BearerAuth: []
       parameters:
@@ -1264,21 +1293,22 @@ paths:
           schema: { type: string }
         - in: query
           name: wait
-          schema: { type: string, enum: [agent], default: agent }
+          schema: { type: string, enum: [agent, none], default: agent }
         - in: query
           name: timeout
           schema: { type: string, default: 30s }
           description: |
-            Maximum time to wait for agent readiness. On expiry Slicer returns
-            408 and rolls back the child. If the VM process cannot be confirmed
-            stopped, its failed state is left intact for inspection.
+            Maximum time for agent readiness and guest finalisation. When
+            waiting, expiry returns 408 and rolls back the forked VM. If the VM
+            process cannot be confirmed stopped, its failed state is left
+            intact for inspection.
       requestBody:
         content:
           application/json:
             schema: { $ref: '#/components/schemas/SlicerForkRequest' }
       responses:
         "200":
-          description: Child forked and ready
+          description: VM forked; child_status is running when waited or starting for launch acknowledgement
           content:
             application/json:
               schema: { $ref: '#/components/schemas/SlicerForkResponse' }
@@ -1293,12 +1323,12 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
         "409":
-          description: Child already exists or commit backing is missing
+          description: Allocated VM state already exists or commit backing is missing
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
         "408":
-          description: Agent readiness timed out; child rollback was attempted
+          description: Agent readiness or finalisation timed out; VM rollback was attempted
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
@@ -1335,7 +1365,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
         "409":
-          description: Persistent source or child VMs still use the commit
+          description: Persistent source or forked VMs still use the commit
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
