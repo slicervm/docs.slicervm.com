@@ -9,7 +9,9 @@ Slicer is a long lived process that can be run in the foreground or as a daemon 
 Config files can be copy and pasted from the docs, or you can generate one from a template by running the below, where `vm` is the name of the hostgroup.
 
 ```bash
-slicer new vm > vm-image.yaml
+mkdir -p ~/slicer
+cd ~/slicer
+slicer new vm > slicer.yaml
 ```
 
 The default configuration uses a Linux bridge for networking, a disk image for storage, and the Firecracker hypervisor.
@@ -53,7 +55,8 @@ The `storage: image` setting means a disk image will be cloned from the root fil
 Now, open a new terminal window, or ideally launch `tmux` so you can leave the binary running in the background.
 
 ```bash
-sudo slicer up ./vm-image.yaml
+cd ~/slicer
+sudo slicer up ./slicer.yaml
 ```
 
 Having customised the `github_user` to your own username, your SSH keys will have been fetched from your profile, and preinstalled into the VM.

@@ -16,12 +16,12 @@ You can run one or many Slicer daemons in this way, just make sure the host grou
 Let's say you wanted to create a service for a hostgroup named "vm":
 
 ```bash
-mkdir -p ~/vm/
-cd ~/vm/
-slicer new vm > ./slicer.yaml
+mkdir -p ~/slicer
+cd ~/slicer
+slicer new vm --socket ./slicer.sock > ./slicer.yaml
 ```
 
-To listen on a UNIX port instead, use `slicer new vm --api-auth=false --api-bind ./slicer.sock > ./slicer.yaml`.
+To listen on TCP instead, use `slicer new vm --api-bind 127.0.0.1 --api-port 8080 > ./slicer.yaml`.
 
 Install and start the service:
 
@@ -62,16 +62,11 @@ export USER=alex
 echo "$USER ALL=(ALL) NOPASSWD: /usr/local/bin/slicer" | sudo tee /etc/sudoers.d/$USER-slicer
 ```
 
-Assuming you went for the UNIX socket option, you could run i.e.
+The CLI looks for an explicit `--url/--socket` flag or `SLICER_URL` environment variable
+first. Without either, it tries `~/slicer/slicer.sock`, then falls back to
+`http://127.0.0.1:8080`.
 
-```bash
-sudo slicer --url ~/vm/slicer.sock vm list
-HOSTNAME                  IP              RAM          CPUS     STATUS     CREATED              TAGS                
---------                  --              ---          ----     ------     -------              -----               
-vm-1                      192.168.137.2   4GiB         2        Running    2026-02-27 16:30:53      
-```
-
-For the TCP option (with the default port of 8080), you'd run:
+To list VMs run:
 
 ```bash
 sudo slicer vm list
