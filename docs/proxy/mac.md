@@ -29,10 +29,10 @@ The below is a partial snippet, to show the changes you need to make.
       sleep_action: prevent
       share_home: ""
       userdata: ""
++     dns_servers: ["127.0.0.1", "127.0.0.1"]
       network:
         mode: nat
         gateway: 192.168.64.1/24
-+       dns_servers: ["127.0.0.1", "127.0.0.1"]
         # Default is no managed PF filtering. To force sbox traffic through a
         # host proxy, opt in with:
 -       # allow:
