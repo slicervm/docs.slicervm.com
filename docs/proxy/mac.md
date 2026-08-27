@@ -7,6 +7,18 @@ On a macOS host, there are two host groups for Slicer.
 
 Just like on Linux, "slicer proxy" is an additional daemon that runs alongside Slicer.
 
+## Before you start: check the macOS Application Firewall
+
+If **System Settings → Network → Firewall → Options → Block all incoming connections** is turned on, the proxy still completes the TCP handshake, but the connection dies before any data reaches it. Requests from `127.0.0.1` work fine (the firewall doesn't filter loopback), but anything else — the NAT gateway IP, a guest VM — fails silently with nothing in the proxy's own logs, since the firewall intercepts below the application layer. This is easy to miss because it isn't third-party software; it ships with macOS, and security-conscious users often have it turned on deliberately.
+
+Check it with:
+
+```bash
+/usr/libexec/ApplicationFirewall/socketfilterfw --getblockall
+```
+
+If it reports `enabled`, either turn it off, or explicitly allow the `slicer` binary under **Firewall → Options**, then restart the proxy.
+
 You will be responsible for starting and configuring the proxy and we recommend running it inside the same working folder as your Slicer daemon in the `~/slicer-mac` folder.
 
 First, edit `slicer-mac.yaml`, and make sure the CA and networking options are uncommented in the `sbox` host group section.
