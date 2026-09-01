@@ -224,6 +224,8 @@ components:
           type: boolean
         disk_image:
           type: string
+          deprecated: true
+          description: Rejected via the API; the disk image is always <hostname>.img.
         import_user:
           type: string
         ssh_keys:
