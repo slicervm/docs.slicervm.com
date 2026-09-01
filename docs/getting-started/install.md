@@ -28,7 +28,7 @@ The installer sets up [Firecracker](https://firecracker-microvm.github.io), [QEM
 
 **Setup the license key**
 
-If you have a subscription for Slicer Individual, Team or Platform, then you'll have received a license key via email. Save it to `~/.slicer/LICENSE`. This license will not expire, so long as your subscription remains active.
+If you have a [trial or subscription for](https://slicervm.com/pricing/) Slicer Individual, Team or Platform, then you'll have received a license key via email. Save it to `~/.slicer/LICENSE`. This license will not expire, so long as your subscription remains active.
 
 > Note for GitHub Sponsors (not Polar): after installation, you should run `slicer activate` to link your GitHub account to your Slicer installation. The keys for sponsors last for 30 days, but can be refreshed using the same command.
 
@@ -111,4 +111,3 @@ curl -sLS https://get.slicervm.com | sudo bash -s -- \
 ```
 
 The `--devmapper` and `--zfs` flags can be used together to enable both storage backends.
-
