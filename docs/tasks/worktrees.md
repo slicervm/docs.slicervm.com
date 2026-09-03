@@ -19,7 +19,7 @@ cd ~/src/myrepo
 slicer worktree push --launch .
 
 # Open a shell in the VM and work there
-slicer worktree shell vm-1
+slicer vm shell vm-1
 
 # Pull commits back and fast-forward your host branch
 slicer worktree pull vm-1 .
@@ -33,6 +33,12 @@ To push into an existing VM instead:
 ```bash
 slicer worktree push vm-1 .
 ```
+
+!!! note "More than one host group?"
+    `--launch` auto-selects the host group only when the daemon has exactly
+    one. If several exist — the default on Slicer for Mac, which ships with
+    `slicer` and `sbox` — pass `--hostgroup`, e.g.
+    `slicer worktree push --launch --hostgroup sbox .`
 
 ## Push a worktree into a VM
 
@@ -50,7 +56,7 @@ cd ../myrepo-feature
 slicer worktree push --launch .
 
 # Open a shell in the VM and work there
-slicer worktree shell vm-1
+slicer vm shell vm-1
 
 # Pull commits back and fast-forward your host branch
 slicer worktree pull vm-1 .
@@ -70,20 +76,15 @@ slicer worktree push vm-1 .
 
 ## Use a worktree with agent sandbox commands
 
-Agent commands (`slicer opencode`, `slicer claude`, `slicer codex`, and others) boot a VM and install a coding agent, see [Sandboxing Coding Agents](/examples/coding-agents). When run without a path argument they skip copying any code into the VM, giving you a clean environment ready to receive a worktree.
-
-Use `slicer worktree push` to sync the worktree into the VM afterwards:
+Agent commands (`slicer opencode`, `slicer claude`, `slicer codex`, and others) boot a VM and install a coding agent, see [Sandboxing Coding Agents](/examples/coding-agents). For a git repository, pass `--worktree` (alias `--wt`) to provision the VM, push the current worktree in with a working, self-contained `.git`, install the agent into that path, and attach — all in one command:
 
 ```bash
-# Provision VM only — coding agent installed, no code copied in
-# Take note of the VM name
-slicer opencode
+cd ~/src/myrepo
 
-# Push the worktree into the vm
-slicer worktree push vm-1 .
+# Launch a VM with the agent and the current worktree. Take note of the VM name
+slicer opencode --worktree .
 
-# Attach and let the agent work
-slicer opencode vm-1
+# ...let the agent work and commit in the VM...
 
 # Pull commits back and fast-forward your host branch
 slicer worktree pull vm-1 .
@@ -92,4 +93,18 @@ slicer worktree pull vm-1 .
 git push
 ```
 
-Passing a path directly to an agent command (e.g. `slicer opencode .`) copies the working directory into the VM but does not have an easy command to re-sync commits back to your host. Use `slicer worktree push` whenever the checkout is a git worktree.
+To reuse a VM you provisioned earlier, push into it explicitly:
+
+```bash
+# Provision VM only — coding agent installed, no code copied in
+# Take note of the VM name
+slicer opencode
+
+# Push the worktree into the VM
+slicer worktree push vm-1 .
+
+# Attach and let the agent work
+slicer opencode vm-1
+```
+
+Passing a plain path to an agent command (e.g. `slicer opencode .`) copies the working directory into the VM but does not have an easy command to re-sync commits back to your host. Use `--worktree`, or `slicer worktree push` for an existing VM, whenever the checkout is a git repository.
