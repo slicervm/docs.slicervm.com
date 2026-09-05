@@ -83,7 +83,7 @@ Edit `/etc/containerd-zvol-grpc/config.toml` and replace the volume size with th
 
 ```diff
 root_path="/var/lib/containerd-zvol-grpc"
-dataset="your-zpool/snapshots"
+dataset="slicer_zpool/snapshots"
 -volume_size="30G"
 +volume_size="40G"
 fs_type="ext4"
@@ -94,3 +94,98 @@ Finally restart the zvol-snapshotter service:
 ```bash
 sudo systemctl restart zvol-snapshotter
 ```
+
+!!! warning "New size only applies to newly pulled images"
+    Changing the volume size does not resize existing images and VMs. The new size only takes effect when images are pulled after the configuration change.
+
+    To apply the new size to existing images, stop slicer, remove images and snapshots, then pull again. Any data stored on VMs using ZFS storage will be lost.
+
+    ```bash
+    sudo slicer images wipe
+    sudo slicer disk wipe-snapshots --snapshotter zvol
+    ```
+## Troubleshooting
+
+The examples below use the default ZFS pool `slicer_zpool` and dataset `slicer_zpool/snapshots`. You can find the dataset configured for your installation in `/etc/containerd-zvol-grpc/config.toml`.
+
+### Inspecting snapshotter state
+
+Check what snapshots containerd knows about:
+
+```bash
+sudo ctr -n slicer snapshots --snapshotter zvol ls
+sudo ctr -n slicer snapshots --snapshotter zvol info <key>
+```
+
+Check the ZFS side:
+
+```bash
+sudo zfs list -r -t all slicer_zpool/snapshots
+```
+
+Check the zvol-snapshotter logs:
+
+```bash
+sudo journalctl -u zvol-snapshotter -e
+```
+
+### Out-of-sync state between containerd and ZFS
+
+If containerd's metadata and ZFS datasets get out of sync (e.g. orphaned ZFS volumes with no matching containerd metadata), there are two reset options. Try the least destructive option first.
+
+#### Option 1: Remove images and snapshots
+
+This will only affect VMs using ZFS storage. Other VMs and data remain intact.
+
+1. Stop any running slicer instance.
+2. Remove images:
+
+    ```bash
+    sudo slicer images wipe
+    ```
+
+3. Remove snapshots (requires the zvol-snapshotter to be running):
+
+    ```bash
+    sudo slicer disk wipe-snapshots --snapshotter zvol
+    ```
+
+4. Restart the zvol-snapshotter:
+
+    ```bash
+    sudo systemctl restart zvol-snapshotter
+    ```
+
+#### Option 2: Full reset
+
+If option 1 does not resolve the issue, a full reset of the ZFS datasets, snapshotter metadata and containerd is required. This will reset everything.
+
+1. Stop the zvol-snapshotter:
+
+    ```bash
+    sudo systemctl stop zvol-snapshotter
+    ```
+
+2. Clean ZFS datasets:
+
+    ```bash
+    sudo zfs destroy -r slicer_zpool/snapshots
+    sudo zfs create slicer_zpool/snapshots
+    ```
+
+3. Wipe snapshotter metadata and restart:
+
+    ```bash
+    sudo rm -rf /var/lib/containerd-zvol-grpc/metadata.db
+    sudo systemctl start zvol-snapshotter
+    ```
+
+3. Full containerd wipe:
+
+    Stop containerd and remove its metadata database:
+
+    ```bash
+    sudo systemctl stop containerd
+    sudo rm -rf /var/lib/containerd/
+    sudo systemctl start containerd
+    ```
