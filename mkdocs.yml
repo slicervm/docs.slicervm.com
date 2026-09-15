@@ -157,6 +157,7 @@ nav:
       - Run a task in Slicer: platform/ephemeral-tasks.md
       - Slicer per host: platform/single-instance.md
       - Slicer per tenant: platform/instance-per-tenant.md
+      - Benchmark VM launches: platform/benchmark-vm-launches.md
       - Examples:
           - Video conversion (Go): platform/video-conversion.md
           - Video conversion (TypeScript): platform/typescript-video-conversion.md
