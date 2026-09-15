@@ -28,3 +28,12 @@ Table of image tags:
 | Rocky Linux 9      | `ghcr.io/openfaasltd/slicer-systemd-rocky9:5.10.240-x86_64-latest`  |                                                                |                                                              | `slicer` |
 | Arch Linux         | `ghcr.io/openfaasltd/slicer-systemd-archlinux:6.1.90-x86_64-latest` |                                                                |                                                              | `slicer` |
 The most tested and stable images for *x86_64* are based upon the `5.10.x` Kernel. Feel free to use the `6.9.x` Kernels and report any discrepancies you may find.
+
+## Minimal image
+
+The minimal image is designed for fast VM launches and is selected by the
+`--min` flag on `slicer new`:
+
+```text
+ghcr.io/openfaasltd/slicer-systemd-min:6.1.90-x86_64-latest
+```
