@@ -1426,7 +1426,11 @@ paths:
           name: buffered
           schema: { type: boolean }
       requestBody:
-        description: Optional raw stdin stream when stdin=true.
+        description: >-
+          Optional raw stdin stream when stdin=true. Newer agents send the
+          exit frame and end the response when the command exits, even if
+          this body is still open; older agents wait for it to reach EOF
+          before reporting the exit.
         content:
           application/octet-stream:
             schema: { type: string, format: binary }

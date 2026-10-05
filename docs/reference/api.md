@@ -392,7 +392,11 @@ Query parameters:
 - `permissions` (optional): permissions for the command
 - `buffered` (optional): see **Buffered exec** below.
 
-Body: stdin data (if `stdin=true`)
+Body: stdin data (if `stdin=true`). The exit frame is sent and the
+response ends when the command exits, even if the body is still open.
+Older agents wait for the body to reach EOF before reporting the exit, so
+a client that holds an idle stdin stream open sees no exit frame until it
+disconnects.
 
 Response: streaming newline-delimited JSON with stdout/stderr/exit_code
 
