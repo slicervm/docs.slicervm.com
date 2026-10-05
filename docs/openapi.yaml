@@ -1206,7 +1206,12 @@ paths:
   /vm/{hostname}/commit:
     post:
       summary: Commit a stopped persistent VM disk
-      description: Creates an immutable disk parent for Firecracker cold forks.
+      description: >-
+        Creates an immutable disk parent for Firecracker cold forks. A cold
+        fork snapshots the VM's **disk only** — never CPU or RAM state — so
+        the source VM must be **shut down first** (a running VM returns 409).
+        Anything a fork should inherit must be written to a real on-disk path,
+        not tmpfs paths like /tmp which are cleared on shutdown.
       security:
         - BearerAuth: []
       parameters:
@@ -1285,7 +1290,14 @@ paths:
   /vm/commits/{commit_id}/fork:
     post:
       summary: Fork a committed VM disk
-      description: Firecracker-only. Waits for agent readiness and guest finalisation by default. With wait=none, acknowledges launch while finalisation continues asynchronously.
+      description: >-
+        Firecracker-only. Boots a new VM from a committed disk parent. The
+        child inherits the parent's **disk state only** — it is a fresh boot,
+        not a resumed memory/CPU snapshot. Set an environment up once, commit
+        it, then fork it many times to branch from an identical starting
+        point. Waits for agent readiness and guest finalisation by default;
+        with wait=none, acknowledges launch while finalisation continues
+        asynchronously.
       security:
         - BearerAuth: []
       parameters:
