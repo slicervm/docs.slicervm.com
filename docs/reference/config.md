@@ -51,7 +51,6 @@ Each entry in `host_groups` defines a group of identically-configured VMs.
 | `ram_bytes` | int | | RAM in bytes (alternative to `ram_gb`) |
 | `storage` | string | `devmapper` | Storage backend: `image`, `devmapper`, or `zfs` |
 | `storage_size` | string | | Disk size, e.g. `25G` or `512M`. Required for `image` storage |
-| `persistent` | bool | `false` | Keep root filesystem after VM shutdown |
 | `userdata` | string | | Inline cloud-init user data |
 | `userdata_file` | string | | Path to a cloud-init user data file |
 | `dns_servers` | list | `["8.8.8.8", "1.1.1.1"]` | DNS servers for VMs |
