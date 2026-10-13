@@ -345,10 +345,10 @@ k3s-helm/
       export DEBIAN_FRONTEND=noninteractive
       apt-get update -qy
       apt-get install -qy --no-install-recommends inotify-tools
-    
+
       arkade get k3sup kubectl helm --path /usr/local/bin
       chmod +x /usr/local/bin/*
-    
+
       mkdir -p /home/ubuntu/.kube
       k3sup install --local --local-path /home/ubuntu/.kube/config
       chown -R ubuntu:ubuntu /home/ubuntu/.kube
