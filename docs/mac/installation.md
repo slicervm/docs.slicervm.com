@@ -6,7 +6,7 @@ Slicer for Mac is available on all Slicer license tiers. We've tested on macOS S
 
 You need three binaries: `slicer-mac` (the daemon), `slicer` (the CLI client), and `slicer-tray` (the menu bar app).
 
-If you have the Invididual tier, then first, install the `slicer` CLI and activate your license:
+If you have the Individual tier, then first, install the `slicer` CLI and activate your license:
 
 ```bash
 curl -sLS https://get.slicervm.com | sudo bash
@@ -37,7 +37,7 @@ The `slicer-mac` OCI bundle includes a default `slicer-mac.yaml` in the folder a
 The generated `slicer-mac.yaml` has two host groups:
 
 - **`slicer`** (`count: 1`) - your persistent Linux VM, starts with the daemon
-- **`sbox`** (`count: 0`) - ephemeral sandboxes, launched on demand for things like coding agents.
+- **`sbox`** (`count: 0`) - sandboxes, launched on demand for things like coding agents.
 
 ```yaml
 config:
@@ -45,7 +45,7 @@ config:
     - name: slicer
       count: 1
       vcpu: 4
-      ram_gb: 8
+      ram_gb: 4
       storage_size: 15G
       share_home: "~/" # Set to "" to disable sharing
       rosetta: true
@@ -57,12 +57,12 @@ config:
       vcpu: 2
       ram_gb: 4
       storage_size: 15G
-      rosetta: true
+      rosetta: false
       network:
         mode: nat
         gateway: 192.168.64.1/24
 
-  image: "ghcr.io/openfaasltd/slicer-systemd-arm64-avz:latest"
+  image: "ghcr.io/openfaasltd/slicer-systemd-2404-arm64-avz:6.12.70-aarch64-avz-latest"
   hypervisor: apple
 
   api:
@@ -107,7 +107,7 @@ cd ~/slicer-mac
 By default, shells open in Terminal.app. For Ghostty or another terminal:
 
 ```bash
-slicer-tray --terminal "ghostty"
+./slicer-tray --terminal "ghostty"
 ```
 
 ## Set up the Slicer CLI
@@ -168,7 +168,7 @@ cd ~/slicer-mac
 ./slicer-mac install
 ```
 
-Once running in the backgroud, you can use the `slicer-tray service` commands to manage it.
+Once running in the background, you can use the `slicer-mac service` commands to manage it.
 
 The `daemon` service is `slicer-mac` itself, and the `tray` service is the `slicer-tray` menu bar helper.
 
@@ -208,9 +208,9 @@ slicer install slicer-mac
 mv ~/slicer-mac/slicer-mac.yaml{.bak,}
 ```
 
-The upgrade is actually the same command you ran to install `slicer-mac`. We just make a back of your customised `slicer-mac.yaml` file before hand, and restore it after the upgrade.
+The upgrade is actually the same command you ran to install `slicer-mac`. We just make a backup of your customised `slicer-mac.yaml` file before hand, and restore it after the upgrade.
 
 ## Next steps
 
 - [Linux VM](/mac/linux-vm) - mount shared folders, forward Docker and K3s
-- [Sandboxes](/mac/sandboxes) - spin up ephemeral VMs
+- [Sandboxes](/mac/sandboxes) - spin up VMs on demand

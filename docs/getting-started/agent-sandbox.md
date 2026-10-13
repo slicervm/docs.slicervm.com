@@ -51,7 +51,7 @@ Attach:          slicer opencode vm-4
 To delete:       slicer vm delete vm-4
 ```
 
-You get a fresh VM with the agent installed and logged in, and nothing else copied from your machine. Attach to it whenever you're ready:
+You get a fresh VM with the agent installed and logged in, and nothing else copied from your machine. On Slicer for Mac, sandboxes go into the `sbox` host group. Attach to it whenever you're ready:
 
 ```bash
 slicer opencode vm-4
