@@ -212,6 +212,8 @@ mv ~/slicer-mac/slicer-mac.yaml{.bak,}
 
 The upgrade is actually the same command you ran to install `slicer-mac`. We just make a backup of your customised `slicer-mac.yaml` file before hand, and restore it after the upgrade.
 
+Upgrading doesn't refresh the VM image that Slicer for Mac has already cached, so new sandboxes keep starting from it, along with its older guest agent. An outdated guest agent can make newer CLI features fail, i.e. `slicer vm cp -r` from a VM reporting `copy response did not include cp-v1 metadata`. To pick up the latest image, see [Rebuild or reset local state](/mac/storage#rebuild-or-reset-local-state). Existing VMs such as `slicer-1` keep their own disk until you recreate them.
+
 ## Next steps
 
 - [Linux VM](/mac/linux-vm) - mount shared folders, forward Docker and K3s
