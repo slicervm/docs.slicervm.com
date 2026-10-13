@@ -28,7 +28,7 @@ If you are building a product or internal system on top of Slicer - embedding sa
 
 ## Our own use-cases
 
-Slicer was developed internally at OpenFaaS Ltd and has been used across product, platform, and support work.
+Slicer was developed internally at OpenFaaS Ltd, and has been used across product, platform, and support work since 2022.
 
 * Booting Kubernetes clusters for Helm chart and platform validation in minutes.
 * Reproducing customer issues quickly in disposable lab environments.
