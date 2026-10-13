@@ -34,7 +34,7 @@ First of all, get used to it, leave it in the path we recommend (`~/slicer-mac`)
 
 The `slicer-mac` OCI bundle includes a default `slicer-mac.yaml` in the folder after install, so you can use that file directly.
 
-The generated `slicer-mac.yaml` has two host groups:
+The included `slicer-mac.yaml` has two host groups:
 
 - **`slicer`** (`count: 1`) - your persistent Linux VM, starts with the daemon
 - **`sbox`** (`count: 0`) - sandboxes, launched on demand for things like coding agents.
@@ -45,10 +45,10 @@ config:
     - name: slicer
       count: 1
       vcpu: 4
-      ram_gb: 4
+      ram_gb: 8
       storage_size: 15G
       share_home: "~/" # Set to "" to disable sharing
-      rosetta: true
+      rosetta: false
       network:
         mode: nat
         gateway: 192.168.64.1/24
@@ -75,11 +75,13 @@ Need Rosetta for x86_64 binaries? Follow [Enable Rosetta](/mac/rosetta).
 
 Run the daemon. The first run pulls and prepares the VM image automatically.
 
-If you ever need to regenerate the `slicer-mac.yaml` file, you can do so with the command below:
+If you want to replace it with a fresh configuration generated from the CLI
+defaults, use the command below and review the output before overwriting your
+current file:
 
 ```bash
 cd ~/slicer-mac
-./slicer-mac new > slicer-mac.yaml
+./slicer-mac new > slicer-mac.yaml.new
 ```
 
 ## Start the daemon
