@@ -147,10 +147,10 @@ slicer vm list
 slicer vm shell sbox-1
 
 # Copy a file in
-slicer vm cp ~/file.txt sbox-1:~/
+slicer vm cp ~/file.txt sbox-1:~/file.txt
 
 # Use that file, remotely via exec:
-slicer vm exec sbox-1 -- stat ~/file.txt
+slicer vm exec sbox-1 -- "stat ~/file.txt"
 
 # Delete that VM
 slicer vm delete sbox-1

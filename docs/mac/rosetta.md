@@ -28,7 +28,7 @@ slicer vm cp ./enable-rosetta.sh slicer-1:~/
 ```
 
 ```bash
-slicer vm exec slicer-1 -- bash ~/enable-rosetta.sh
+slicer vm exec slicer-1 -- "bash ~/enable-rosetta.sh"
 ```
 
 Keep this off unless you need x86_64 compatibility.
