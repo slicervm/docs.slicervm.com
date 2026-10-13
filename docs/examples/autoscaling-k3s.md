@@ -61,7 +61,7 @@ Then start up the control plane nodes:
 ```bash
 # Deploy control plane
 sudo slicer up ./k3s-cp.yaml
-sudo slicer vm list --json > devices.json
+slicer vm list --json > devices.json
 ```
 ## Step 1.1: Install K3s on the control plane nodes
 
@@ -641,10 +641,10 @@ On the host managing `k3s-agents-1`, you would run:
 
 ```bash
 # Show the available nodes
-sudo slicer vm list --url http://127.0.0.1:8081/nodes
+slicer vm list --url http://127.0.0.1:8081
 
 # Get a root shell into node 1
-sudo slicer vm exec --url http://127.0.0.1:8081/nodes k3s-agents-1-1
+slicer vm shell --url http://127.0.0.1:8081 --uid 0 k3s-agents-1-1
 ```
 
 From there you can check the logs of the `k3s` service via `sudo journalctl -u k3s -f`.

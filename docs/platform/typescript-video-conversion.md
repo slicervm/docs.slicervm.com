@@ -1,6 +1,6 @@
 # Example: Video Conversion (TypeScript)
 
-A full end-to-end example that uses the [TypeScript SDK](/platform/typescript-sdk/) to create a microVM, install ffmpeg, transcode a video, and stream the binary result back — without an intermediate file on the guest disk.
+A full end-to-end example that uses the [TypeScript SDK](/platform/typescript-sdk/) to create a microVM, install ffmpeg, transcode a video, and stream the binary result back - without an intermediate file on the guest disk.
 
 The complete, runnable source is in [`examples/ffmpeg/`](https://github.com/slicervm/sdk-ts/tree/master/examples/ffmpeg) in the SDK repository.
 
@@ -9,8 +9,8 @@ For the Go equivalent, see [Video Conversion (Go)](/platform/video-conversion/).
 ## What this demonstrates
 
 - `client.vms.create()` returning a `VM` handle that owns all per-VM operations.
-- `vm.fs.writeFile()` — binary-safe file upload via native fs endpoints.
-- `vm.execBuffered({ stdio: 'base64' })` — binary output streamed back as a `Buffer`, no second file copy.
+- `vm.fs.writeFile()` - binary-safe file upload via native fs endpoints.
+- `vm.execBuffered({ stdio: 'base64' })` - binary output streamed back as a `Buffer`, no second file copy.
 - Server-side `wait: 'agent'` so the VM is ready the moment `create()` returns.
 - Deterministic cleanup in a `finally` block.
 
@@ -42,7 +42,7 @@ npm install -D tsx typescript @types/node
 
 ## Get an input video
 
-The example works with any video file. If you don't have one handy, generate a synthetic 3-second test pattern with ffmpeg — it's pure generated output, no copyright, and always reproducible:
+The example works with any video file. If you don't have one handy, generate a synthetic 3-second test pattern with ffmpeg - it's pure generated output, no copyright, and always reproducible:
 
 ```bash
 ffmpeg -f lavfi -i testsrc=duration=3:size=640x480:rate=24 \
@@ -145,11 +145,11 @@ Expected:
 → wrote output.mp4 (43121 bytes)
 ```
 
-Verify the result with `ffprobe output.mp4` — it should report H.264 at 720p.
+Verify the result with `ffprobe output.mp4` - it should report H.264 at 720p.
 
 ## Why `stdio: 'base64'`?
 
-The default wire format for `exec` is UTF-8 text, which mangles arbitrary binary through JSON string escaping. `stdio: 'base64'` tells the daemon to base64-encode stdout/stderr frames; the SDK decodes them into `Buffer` values transparently. Without it you'd need to write the MP4 to a file in the VM and fetch it with a second `vm.fs.readFile` call — twice the disk I/O and a second round-trip.
+The default wire format for `exec` is UTF-8 text, which mangles arbitrary binary through JSON string escaping. `stdio: 'base64'` tells the daemon to base64-encode stdout/stderr frames; the SDK decodes them into `Buffer` values transparently. Without it you'd need to write the MP4 to a file in the VM and fetch it with a second `vm.fs.readFile` call - twice the disk I/O and a second round-trip.
 
 ## Speeding this up
 
@@ -160,7 +160,7 @@ Most of the wall time is `apt install ffmpeg`. For repeat runs:
 
 ## See also
 
-* [TypeScript SDK reference](/platform/typescript-sdk/) — all methods and types.
-* [Video Conversion (Go)](/platform/video-conversion/) — same workflow, Go SDK.
-* [REST API reference](/reference/api/) — the underlying HTTP endpoints.
+* [TypeScript SDK reference](/platform/typescript-sdk/) - all methods and types.
+* [Video Conversion (Go)](/platform/video-conversion/) - same workflow, Go SDK.
+* [REST API reference](/reference/api/) - the underlying HTTP endpoints.
 * [Example source on GitHub](https://github.com/slicervm/sdk-ts/tree/master/examples/ffmpeg)

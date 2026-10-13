@@ -47,37 +47,37 @@ exit=0
 Linux sbox-1 6.12.70 #1 SMP aarch64 GNU/Linux
 ```
 
-The complete runnable source — with logging, env handling, and a remote-daemon variant — is in [`examples/run-command/`](https://github.com/slicervm/sdk-ts/tree/master/examples/run-command).
+The complete runnable source - with logging, env handling, and a remote-daemon variant - is in [`examples/run-command/`](https://github.com/slicervm/sdk-ts/tree/master/examples/run-command).
 
 ## Shape
 
 The SDK has two layers:
 
-**Control plane — namespaced on `SlicerClient`.** These operate on the Slicer server itself, not any particular VM:
+**Control plane - namespaced on `SlicerClient`.** These operate on the Slicer server itself, not any particular VM:
 
-* `client.hostGroups` — list host groups, list VMs within a group.
-* `client.vms` — create, attach, list, and collect stats for VMs across host groups.
-* `client.commits` — list, fork, and delete committed VM parents.
-* `client.secrets` — create, list, update, delete secrets.
+* `client.hostGroups` - list host groups, list VMs within a group.
+* `client.vms` - create, attach, list, and collect stats for VMs across host groups.
+* `client.commits` - list, fork, and delete committed VM parents.
+* `client.secrets` - create, list, update, delete secrets.
 
-**Per-VM operations — on the `VM` handle returned from `client.vms.create()` or `client.vms.get()`.** Everything you do to a single VM is a method on its handle:
+**Per-VM operations - on the `VM` handle returned from `client.vms.create()` or `client.vms.get()`.** Everything you do to a single VM is a method on its handle:
 
-* `vm.exec()` / `vm.execBuffered()` — run commands.
-* `vm.fs.*` — read/write files, list directories, tar transfer.
-* `vm.pause()` / `resume()` / `suspend()` / `restore()` / `shutdown()` / `relaunch()` — lifecycle.
-* `vm.health()` / `waitForAgent()` / `logs()` — observability.
-* `vm.delete()` — teardown.
+* `vm.exec()` / `vm.execBuffered()` - run commands.
+* `vm.fs.*` - read/write files, list directories, tar transfer.
+* `vm.pause()` / `resume()` / `suspend()` / `restore()` / `shutdown()` / `relaunch()` - lifecycle.
+* `vm.health()` / `waitForAgent()` / `logs()` - observability.
+* `vm.delete()` - teardown.
 
 This two-layer split keeps control-plane operations (which act on the server) cleanly separate from per-VM operations (which act on a specific VM), making the API easier to navigate as the surface grows.
 
 ## Examples
 
-Runnable examples live in [`examples/` in the SDK repo](https://github.com/slicervm/sdk-ts/tree/master/examples). Each is a self-contained TypeScript project — `npm install && npm start`.
+Runnable examples live in [`examples/` in the SDK repo](https://github.com/slicervm/sdk-ts/tree/master/examples). Each is a self-contained TypeScript project - `npm install && npm start`.
 
-* [`run-command`](https://github.com/slicervm/sdk-ts/tree/master/examples/run-command) — canonical hello-world: create a VM, run `uname -a`, delete the VM. The same code is shown inline in the Quickstart above.
-* [`nginx`](https://github.com/slicervm/sdk-ts/tree/master/examples/nginx) — install nginx via userdata, port-forward host `127.0.0.1:8080` → VM `:80`, fetch the welcome page from the host through the tunnel. Full create-to-fetch-to-teardown in ~6 seconds.
-* [`k3s`](https://github.com/slicervm/sdk-ts/tree/master/examples/k3s) — provision a single-node K3s cluster via userdata + `k3sup`, port-forward `:6443` to a local port, rewrite the kubeconfig, and run host-side `kubectl get nodes` against it. Mirrors the [Go k3s example](https://github.com/slicervm/sdk/tree/main/examples/k3s-userdata) but uses port-forwarding so guest IP routability is irrelevant.
-* [`ffmpeg`](https://github.com/slicervm/sdk-ts/tree/master/examples/ffmpeg) — full walkthrough on the [Video conversion (TypeScript)](/platform/typescript-video-conversion/) page. Streams a video into the VM via `vm.fs.writeFile`, transcodes with ffmpeg, streams the result back through `execBuffered({ stdio: 'base64' })` — no intermediate file on the guest disk.
+* [`run-command`](https://github.com/slicervm/sdk-ts/tree/master/examples/run-command) - canonical hello-world: create a VM, run `uname -a`, delete the VM. The same code is shown inline in the Quickstart above.
+* [`nginx`](https://github.com/slicervm/sdk-ts/tree/master/examples/nginx) - install nginx via userdata, port-forward host `127.0.0.1:8080` → VM `:80`, fetch the welcome page from the host through the tunnel. Full create-to-fetch-to-teardown in ~6 seconds.
+* [`k3s`](https://github.com/slicervm/sdk-ts/tree/master/examples/k3s) - provision a single-node K3s cluster via userdata + `k3sup`, port-forward `:6443` to a local port, rewrite the kubeconfig, and run host-side `kubectl get nodes` against it. Mirrors the [Go k3s example](https://github.com/slicervm/sdk/tree/main/examples/k3s-userdata) but uses port-forwarding so guest IP routability is irrelevant.
+* [`ffmpeg`](https://github.com/slicervm/sdk-ts/tree/master/examples/ffmpeg) - full walkthrough on the [Video conversion (TypeScript)](/platform/typescript-video-conversion/) page. Streams a video into the VM via `vm.fs.writeFile`, transcodes with ffmpeg, streams the result back through `execBuffered({ stdio: 'base64' })` - no intermediate file on the guest disk.
 
 ## Connecting to the API
 
@@ -129,7 +129,7 @@ console.log(`hostname=${vm.hostname} ip=${vm.ip}`);
 The guest agent starts after the VM boots. You can either block server-side by passing `wait: 'agent'`, or poll from the client with `vm.waitForAgent()`:
 
 ```ts
-// Server-side wait — the daemon holds the response open until the agent is
+// Server-side wait - the daemon holds the response open until the agent is
 // reachable, then returns a ready VM handle.
 const vm = await client.vms.create(
   'sandbox',
@@ -179,7 +179,7 @@ require('node:fs').writeFileSync('./logs.tar', r.stdout);
 
 Streaming `exec()` with `stdio: 'base64'` populates `frame.stdoutBytes` / `frame.stderrBytes` / `frame.dataBytes` as decoded Buffers alongside the base64 string fields.
 
-`exec()` supports `stdin` for commands that read input; `execBuffered()` does not — use the streaming variant for stdin.
+`exec()` supports `stdin` for commands that read input; `execBuffered()` does not - use the streaming variant for stdin.
 
 ## File operations
 
@@ -292,7 +292,7 @@ The SDK base64-encodes secret data transparently; pass plaintext.
 | `client.commits.fork(commitId, opts?)` | Fork with lifecycle, resources, fix-ups, metadata, secrets, wait, or network overrides |
 | `client.commits.delete(commitId)` | Delete an unused committed parent |
 
-### VM handle — `vm.*`
+### VM handle - `vm.*`
 
 | Method | Description |
 |--------|-------------|
@@ -310,7 +310,7 @@ The SDK base64-encodes secret data transparently; pass plaintext.
 | `vm.delete()` | Delete the VM |
 | `vm.fs.*` | Filesystem operations (below) |
 
-### Committed VM — `committed.*`
+### Committed VM - `committed.*`
 
 | Method | Description |
 |--------|-------------|
@@ -319,7 +319,7 @@ The SDK base64-encodes secret data transparently; pass plaintext.
 
 `VMForkOptions` supports `wait`, `waitTimeoutSec`, `persistent`, `vcpu`, `ramBytes`, `fixups`, `tags`, `tagMode`, `secrets`, and `network`. Forks wait for agent readiness and guest finalisation by default. Use `wait: 'none'` for launch acknowledgement only, `persistent: false` for ephemeral storage, or `fixups: []` when throughput matters more than unique guest identity.
 
-### VM filesystem — `vm.fs.*`
+### VM filesystem - `vm.fs.*`
 
 | Method | Description |
 |--------|-------------|
@@ -339,8 +339,8 @@ The SDK base64-encodes secret data transparently; pass plaintext.
 
 ## See also
 
-* [SDK source on GitHub](https://github.com/slicervm/sdk-ts) — issues, releases, changelog
+* [SDK source on GitHub](https://github.com/slicervm/sdk-ts) - issues, releases, changelog
 * [`@slicervm/sdk` on npm](https://www.npmjs.com/package/@slicervm/sdk)
-* [Go SDK](/platform/go-sdk/) — same API, idiomatic Go
-* [REST API reference](/reference/api/) — the underlying HTTP endpoints
-* [Quickstart](/platform/quickstart/) — curl-based walkthrough of the same lifecycle
+* [Go SDK](/platform/go-sdk/) - same API, idiomatic Go
+* [REST API reference](/reference/api/) - the underlying HTTP endpoints
+* [Quickstart](/platform/quickstart/) - curl-based walkthrough of the same lifecycle

@@ -23,8 +23,8 @@ For every OAuth type the proxy holds the refresh material and rotates the access
 
 The credential value comes from one of:
 
-* `--value <literal>` — convenient for short tokens but the value appears in shell history.
-* `--value-file <path>` — preferred; the file is read once and trailing whitespace and newlines are stripped.
+* `--value <literal>` - convenient for short tokens but the value appears in shell history.
+* `--value-file <path>` - preferred; the file is read once and trailing whitespace and newlines are stripped.
 
 Pass `--force` to overwrite an existing secret with the same name. Allow rules keep referencing the same secret name.
 
@@ -107,7 +107,7 @@ Slicer Proxy adopts OAuth credentials rather than intercepting the OAuth 2.0 flo
 2. Injects the current access token into matching upstream requests.
 3. Refreshes the access token in the background when it nears expiry.
 
-The VM only ever sees `HTTPS_PROXY=...` — it never touches the OAuth refresh token or the access token.
+The VM only ever sees `HTTPS_PROXY=...` - it never touches the OAuth refresh token or the access token.
 
 ### Claude Code
 
@@ -212,7 +212,7 @@ The emitted JSON looks like:
 
 This type signs a GitHub App JWT on the proxy, mints an **installation access token**, and injects it as `Authorization: Basic base64(x-access-token:<installation-token>)`. Use it to let a VM `git clone` / `git push` against private repositories without ever holding a Personal Access Token or App private key.
 
-The credential is supplied as YAML. With `private_key_file`, only the path is stored in proxy state — the PEM stays on disk on the host. With inline `private_key`, the PEM is stored in proxy state.
+The credential is supplied as YAML. With `private_key_file`, only the path is stored in proxy state - the PEM stays on disk on the host. With inline `private_key`, the PEM is stored in proxy state.
 
 ```yaml
 # gh-app.yaml

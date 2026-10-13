@@ -1,7 +1,7 @@
 # Intercept VM egress
 
-When an agent runs inside a slicer VM — a coding agent, a scripted
-task, anything making outbound HTTP(S) calls — you often want a
+When an agent runs inside a slicer VM - a coding agent, a scripted
+task, anything making outbound HTTP(S) calls - you often want a
 gatekeeper between it and the public internet. Typical reasons:
 
 - **Block specific domains.** No `wikipedia.org` from sandboxes.
@@ -14,7 +14,7 @@ industry-standard forward proxy; configured to terminate TLS with a
 CA slicer has already generated, it can see the plaintext URL of
 every HTTPS request the VM makes and apply ACLs against it. The VM
 auto-trusts the on-the-fly leaf certs Squid mints because slicer
-injected the signing CA into its trust store at boot — no `-k`, no
+injected the signing CA into its trust store at boot - no `-k`, no
 per-agent config.
 
 ## Prereqs
@@ -22,7 +22,7 @@ per-agent config.
 - **Squid with TLS support** on the host. On Debian/Ubuntu:
   `sudo apt install squid-openssl` (the `squid` package without TLS
   won't do SSL-bump). On Fedora/RHEL: `sudo dnf install squid`.
-- Slicer with a host group configured for an isolated network — this
+- Slicer with a host group configured for an isolated network - this
   walkthrough uses the bridge gateway `192.168.137.1` as the proxy IP.
 
 ## Slicer config
@@ -47,14 +47,14 @@ slicer new agents --cidr 192.168.137.0/24 --count 0 \
 +      dns_servers: ["127.0.0.1"]
 ```
 
-`dns_servers: ["127.0.0.1"]` makes VM-side DNS fail locally — no
+`dns_servers: ["127.0.0.1"]` makes VM-side DNS fail locally - no
 lookups leak out onto the host network. Squid handles all DNS for
 proxied traffic.
 
 Start the daemon:
 
 ```sh
-sudo -E slicer up ./agents.yaml
+sudo slicer up ./agents.yaml
 ```
 
 Slicer creates the CA at `./.slicer/ca/agents/ca.{crt,key}`.
@@ -99,13 +99,13 @@ http_port 3129 \
 sslcrtd_program /usr/lib/squid/security_file_certgen -s /var/spool/squid/ssl_db -M 4MB
 sslcrtd_children 5
 
-# Bump everything — terminate the client's TLS with a leaf we mint,
+# Bump everything - terminate the client's TLS with a leaf we mint,
 # see the plaintext request, then re-encrypt to the upstream.
 acl step1 at_step SslBump1
 ssl_bump peek step1
 ssl_bump bump all
 
-# Ban list — matches on the CONNECT target / Host header.
+# Ban list - matches on the CONNECT target / Host header.
 acl banned dstdomain .wikipedia.org
 
 http_access deny banned
@@ -134,10 +134,10 @@ Inside the VM:
 export HTTPS_PROXY=https://192.168.137.1:3129
 export NODE_EXTRA_CA_CERTS=/runner/ca.crt   # Node-only; see reference
 
-# Allowed — 200, TLS validates cleanly:
+# Allowed - 200, TLS validates cleanly:
 curl -sS -o /dev/null -w '%{http_code}\n' https://example.com/
 
-# Banned — Squid replies 403 with an error page signed by slicer's CA:
+# Banned - Squid replies 403 with an error page signed by slicer's CA:
 curl -sS -o /dev/null -w '%{http_code}\n' https://en.wikipedia.org/
 ```
 
@@ -145,7 +145,7 @@ Expected:
 
 - `example.com` → `200`, TLS validated by the slicer CA slicer
   already installed into `/etc/ssl/certs/` at first boot.
-- `wikipedia.org` → `403` from Squid. No TLS complaints — Squid
+- `wikipedia.org` → `403` from Squid. No TLS complaints - Squid
   presents a leaf signed by the same trusted CA, the agent sees a
   normal HTTP error response rather than a connection drop.
 
@@ -166,9 +166,9 @@ the URL path (visible because Squid terminated the TLS).
 
 ## See also
 
-- [Trusted CAs in VMs](../reference/ca-trust.md) — schema, BYO-CA
+- [Trusted CAs in VMs](../reference/ca-trust.md) - schema, BYO-CA
   option, per-runtime env vars, revocation.
-- [Squid SSL-bump documentation][squid-bump] — peek, splice, bump
+- [Squid SSL-bump documentation][squid-bump] - peek, splice, bump
   semantics and the `step` ACL model.
 
 [squid-bump]: https://wiki.squid-cache.org/Features/SslPeekAndSplice

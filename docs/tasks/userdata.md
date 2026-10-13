@@ -1,4 +1,4 @@
-# Userdata for Slicer VMs
+# Userdata for microVMs
 
 Userdata can be used to customise VMs on first boot. Another option is to [build a custom image](/tasks/custom-image).
 
@@ -97,7 +97,7 @@ curl -sLSf http://127.0.0.1:8080/hostgroup/agents/nodes \
 Or you can use the CLI for more convenience:
 
 ```bash
-sudo slicer vm add \
+slicer vm add \
     --userdata ./userdata.sh
 ```
 

@@ -1,6 +1,6 @@
 # PiHole Adblocker Example with Slicer
 
-PiHole is a common adblocker for home networks. This example shows how to run PiHole in a Slicer VM.
+PiHole is a common adblocker for home networks. This example shows how to run PiHole in a microVM.
 
 You can use a regular PC like an N100 or a Raspberry Pi.
 

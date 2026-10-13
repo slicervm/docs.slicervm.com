@@ -1,6 +1,6 @@
 # Sandboxing Coding Agents
 
-You can run coding agents like [Claude Code](https://code.claude.com/docs/en/overview), [OpenCode](https://opencode.ai/), and [Amp](https://amp.dev/) inside Slicer VMs.
+You can run coding agents like [Claude Code](https://code.claude.com/docs/en/overview), [OpenCode](https://opencode.ai/), and [Amp](https://amp.dev/) inside Slicer microVMs.
 This page applies to both Slicer for Linux and Slicer for Mac.
 
 Running an agent inside a VM means you don't need to grant broad permissions on your host CLI. The agent gets its own kernel and filesystem, and can't touch your SSH keys, cloud credentials, or browser sessions.
@@ -37,7 +37,7 @@ Available agent commands:
 
 If your agent (for example, Pi or Hermes) is not listed above, request support in the Discord, or use `slicer workspace` and install and configure your agent via a bash script or userdata.
 
-To launch a new Slicer VM for Claude:
+To launch a new VM for Claude:
 
 ```bash
 mkdir -p ~/dev/
@@ -131,7 +131,7 @@ slicer vm launch sbox
 slicer vm cp ./my-project sbox-1:/home/ubuntu/my-project
 
 # Run the agent
-slicer vm exec --uid 1000 --cwd /home/ubuntu/my-project sbox-1 -- \
+slicer vm exec --cwd /home/ubuntu/my-project sbox-1 -- \
   claude --dangerously-skip-permissions -p "Write tests for main.go"
 
 # Copy results out
