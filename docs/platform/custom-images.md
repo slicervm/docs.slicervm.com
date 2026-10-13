@@ -72,7 +72,7 @@ If you are building on a Mac with Apple Silicon, Docker defaults to arm64 images
 Options:
 
 * Use `docker buildx build --platform linux/amd64` to cross-compile locally. This works but is slower due to QEMU emulation inside Docker Desktop.
-* Build on a matching architecture: an x86_64 Linux machine, a CI runner, or a Slicer VM itself.
+* Build on a matching architecture: an x86_64 Linux machine, a CI runner, or a VM launched with Slicer.
 
 If all your Slicer hosts are arm64 (e.g. Raspberry Pi, Ampere), the reverse applies - build for `linux/arm64`.
 

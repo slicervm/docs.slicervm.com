@@ -84,13 +84,13 @@ sudo slicer up ./slicer0.yaml
 Copy the Slicer license from the server into the slicer0 VM:
 
 ```bash
-sudo slicer vm cp ~/.slicer/LICENSE slicer0-1:/home/ubuntu/.slicer/LICENSE
+slicer vm cp ~/.slicer/LICENSE slicer0-1:/home/ubuntu/.slicer/LICENSE
 ```
 
 Connect to the slicer0 VM using `slicer vm shell`:
 
 ```bash
-sudo slicer vm shell --uid 1000 slicer0-1
+slicer vm shell slicer0-1
 ```
 
 Enable KVM by loading the kernel modules:
@@ -133,13 +133,13 @@ You can connect to using `slicer vm shell`.
 Connect to a slicer0 VM:
 
 ```bash
-sudo slicer vm shell slicer0-1 --uid 1000 
+slicer vm shell slicer0-1
 ```
 
 Next run the shell command again from with the slicer0 shell to connect the any slicer1 nested VMs:
 
 ```bash
-sudo slicer vm shell slicer1-1 --uid 1000
+sudo slicer vm shell slicer1-1
 ```
 
 ### Routing to nested VMs over the LAN

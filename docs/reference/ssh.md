@@ -39,7 +39,7 @@ config:
 
 ### Using the `userdata` field to set up SSH keys
 
-You can also use the `userdata` field to set up SSH keys, as shown in the [Userdata for Slicer VMs](/tasks/userdata) page.
+You can also use the `userdata` field to set up SSH keys, as shown in the [Userdata for microVMs](/tasks/userdata) page.
 
 ```yaml
 config:

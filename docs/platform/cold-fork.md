@@ -35,7 +35,7 @@ slicer new runners \
 Start Slicer:
 
 ```bash
-sudo -E slicer up slicer.yaml
+sudo slicer up slicer.yaml
 ```
 
 The generated isolated host group allows egress by default. The builder can download packages and dependencies before its disk is committed.

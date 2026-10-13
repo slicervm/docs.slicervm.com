@@ -355,7 +355,7 @@ sudo slicer up ./router.yaml
 You can then connect and start viewing the logs from the DHCP/DNS server:
 
 ```bash
-sudo slicer vm shell --uid 1000 router-1
+slicer vm shell router-1
 
 # Then within the microVM:
 sudo journalctl -u dnsmasq --since today -f
@@ -468,7 +468,7 @@ Next, make sure the Raspberry Pi is plugged into the network interface on the Sl
 From the Slicer host, open a shell into the microVM:
 
 ```bash
-sudo slicer vm shell --uid 1000 router-1
+slicer vm shell router-1
 ```
 
 You can either find the IP given out from the `journalctl` command we ran earlier, or use nmap to discover the Raspberry Pi on the network:

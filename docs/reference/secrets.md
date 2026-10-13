@@ -170,7 +170,7 @@ slicer vm launch --secret=my-secret
 
 ## Sync secrets after VM boot.
 
-If secrets have been added, updated or removed after a VM has been started, they can be re-synced by running the following command in the Slicer VM:
+If secrets have been added, updated or removed after a VM has been started, they can be re-synced by running the following command in the VM:
 
 ```bash
 sudo slicer-agent secrets sync

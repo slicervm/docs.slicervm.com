@@ -132,7 +132,7 @@ Cons:
 
 ### Quick start
 
-The easiest way to use isolated mode is with `slicer new` — no IP range is needed:
+The easiest way to use isolated mode is with `slicer new` - no IP range is needed:
 
 ```bash
 slicer new sandbox --net=isolated
@@ -157,7 +157,7 @@ config:
         drop: ["192.168.1.0/24"]
 ```
 
-This is safe to use with multiple Slicer daemons running on the same host — each hostgroup name hashes to a different subnet, and Slicer checks for IP collisions on host interfaces before assigning each `/30` block, skipping any that are already in use.
+This is safe to use with multiple Slicer daemons running on the same host - each hostgroup name hashes to a different subnet, and Slicer checks for IP collisions on host interfaces before assigning each `/30` block, skipping any that are already in use.
 
 ### Specifying an explicit range
 
@@ -329,7 +329,7 @@ slicer new lan \
   --count=1 \
 > lan.yaml
 
-sudo -E slicer up lan.yaml
+sudo slicer up lan.yaml
 ```
 
 The generated YAML:
@@ -360,7 +360,7 @@ slicer new lan \
   --count=1 \
 > lan.yaml
 
-sudo -E slicer up lan.yaml
+sudo slicer up lan.yaml
 ```
 
 The generated YAML:

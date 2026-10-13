@@ -9,7 +9,7 @@ Just like on Linux, "slicer proxy" is an additional daemon that runs alongside S
 
 ## Before you start: check the macOS Application Firewall
 
-If **System Settings → Network → Firewall → Options → Block all incoming connections** is turned on, the proxy still completes the TCP handshake, but the connection dies before any data reaches it. Requests from `127.0.0.1` work fine (the firewall doesn't filter loopback), but anything else — the NAT gateway IP, a guest VM — fails silently with nothing in the proxy's own logs, since the firewall intercepts below the application layer. This is easy to miss because it isn't third-party software; it ships with macOS, and security-conscious users often have it turned on deliberately.
+If **System Settings → Network → Firewall → Options → Block all incoming connections** is turned on, the proxy still completes the TCP handshake, but the connection dies before any data reaches it. Requests from `127.0.0.1` work fine (the firewall doesn't filter loopback), but anything else - the NAT gateway IP, a guest VM - fails silently with nothing in the proxy's own logs, since the firewall intercepts below the application layer. This is easy to miss because it isn't third-party software; it ships with macOS, and security-conscious users often have it turned on deliberately.
 
 Check it with:
 

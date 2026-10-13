@@ -1,13 +1,13 @@
 # Remote Docker builds
 
-[BuildKit](https://docs.docker.com/build/buildkit/) is a modern backend that powers Docker's build engine. This example shows how to set up a dedicated BuildKit instance in a Slicer VM for isolated, remote container builds.
+[BuildKit](https://docs.docker.com/build/buildkit/) is a modern backend that powers Docker's build engine. This example shows how to set up a dedicated BuildKit instance in a microVM for isolated, remote container builds.
 
 !!! note
     Whilst Slicer could be used to design a multi-tenant container builder this example is not intended for that use case.
 
     The setup in this example is intended for use by a developer for building images with a faster remote machine, or a different OS/architecture to their machine.
 
-Using a remote BuildKit instance in a Slicer VM provides several benefits:
+Using a remote BuildKit instance in a VM provides several benefits:
 
 - **Isolation**: Build processes are completely isolated from your host system
 - **Resource control**: Dedicated CPU and memory resources for builds
@@ -122,7 +122,7 @@ docker buildx create \
 
 #### Add VM to known hosts
 
-First, add the Slicer VM to your SSH known hosts to avoid connection issues:
+First, add the VM to your SSH known hosts to avoid connection issues:
 
 ```bash
 # Replace with your actual VM IP if different
@@ -131,7 +131,7 @@ ssh-keyscan 192.168.137.2 >> ~/.ssh/known_hosts
 
 #### Create the remote builder
 
-Create a new buildx builder instance that connects to your Slicer VM:
+Create a new buildx builder instance that connects to your VM:
 
 ```bash
 # Create a new builder named 'slicer' using the remote driver
@@ -199,7 +199,7 @@ If you're having trouble connecting to the remote builder:
 1. **Check VM status**: Ensure the VM is running and BuildKit service is active
    ```bash
    # Open a shell in the VM and check service status
-   slicer vm shell buildkit-1 --uid 1000
+   slicer vm shell buildkit-1
    sudo systemctl status buildkitd
    ```
 
@@ -215,7 +215,7 @@ If you're having trouble connecting to the remote builder:
 
 ## Further thoughts
 
-This was a basic example to demonstrate how to run BuildKit isolated in a Slicer VM. Some ideas to explore further:
+This was a basic example to demonstrate how to run BuildKit isolated in a VM. Some ideas to explore further:
 
 - **TCP connection**: Run BuildKit over TCP with mTLS in the VM to avoid SSH key management
 - **Ephemeral VMs**: Use the [Slicer REST API](/reference/api/) to provision temporary VMs for each build, then destroy them.

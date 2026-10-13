@@ -116,7 +116,7 @@ Execute a command without any proxy credentials, and see it blocked.
 Pass `--max-time` to `curl` so it fails fast instead of waiting on DNS retries:
 
 ```bash
-sudo slicer vm exec sbox-1 -- curl -iSL --max-time 3 https://wikipedia.org
+slicer vm exec sbox-1 -- curl -iSL --max-time 3 https://wikipedia.org
 ```
 
 You'll get an error about not being able to resolve DNS (`curl: (6) Could not resolve host: wikipedia.org`).
@@ -124,7 +124,7 @@ You'll get an error about not being able to resolve DNS (`curl: (6) Could not re
 Then execute a command with the proxy credentials, and see it pass through the proxy:
 
 ```bash
-sudo slicer vm exec \
+slicer vm exec \
     --env HTTPS_PROXY="https://proxy:$PROXY_TOKEN@192.168.222.1:3129" \
     sbox-1 -- curl -iSL https://wikipedia.org
 ```
