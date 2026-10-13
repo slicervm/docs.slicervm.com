@@ -4,29 +4,41 @@
 
 If your VM crashes, the Mac sleeps at the wrong time, or `slicer-mac` is killed before the guest shuts down cleanly, the VM disk image may need a filesystem check.
 
-Check the filesystem first in read-only mode:
+Install `e2fsck` via Homebrew. The formula isn't linked onto your `PATH`, so call it by its full path:
 
 ```bash
-e2fsck -v -n ./slicer-1.img
+brew install e2fsprogs
+E2FSCK=$(brew --prefix e2fsprogs)/sbin/e2fsck
+```
+
+Stop Slicer for Mac, then check the filesystem in read-only mode:
+
+```bash
+cd ~/slicer-mac
+$E2FSCK -v -n ./slicer-1.img
 ```
 
 If errors are found, repair them:
 
 ```bash
-e2fsck -f ./slicer-1.img
+$E2FSCK -f ./slicer-1.img
 ```
 
-You can install `e2fsck` on macOS via Homebrew:
+## `slicer` commands fail with 401 Unauthorized
 
-```bash
-brew install e2fsprogs
+If Slicer for Mac isn't running, its socket at `~/slicer-mac/slicer.sock` doesn't exist. The CLI then falls back to `http://127.0.0.1:8080`, and if another program is listening on that port, you'll see an error such as:
+
 ```
+Failed to fetch VMs: status 401 Unauthorized: unauthorized
+```
+
+Check that the daemon is running, i.e. with `ls ~/slicer-mac/slicer.sock`, and start it again if not. See [Start the daemon](/mac/installation#start-the-daemon).
 
 ## No Internet or LAN access from the VM
 
 One failure mode on macOS is that the VM networking gets stuck on the wrong subnet because the host-side vmnet state becomes stale.
 
-If you also run Docker Desktop, first check that it is using `Docker VMM` mode. That is the supported way to run Docker and Slicer together without subnet conflicts. See [Use Docker from macOS with the Slicer VM socket](/mac/docker).
+If you also run Docker Desktop, first check that it is using `Docker VMM` mode. That is the supported way to run Docker and Slicer together without subnet conflicts. See [Use Docker from macOS via a forwarded socket](/mac/docker).
 
 You may notice one or more of the following:
 
@@ -90,7 +102,7 @@ cd ~/slicer-mac
 Confirm the host bridge and VM gateway were recreated correctly:
 
 ```bash
-ifconfig -a | rg '^(bridge|vmenet)'
+ifconfig -a | grep -E '^(bridge|vmenet)'
 slicer vm list
 slicer vm exec slicer-1 -- ping -c 2 192.168.64.1
 ```

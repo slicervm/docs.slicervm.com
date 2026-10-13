@@ -1,8 +1,8 @@
-# Use Docker from macOS with the Slicer VM socket
+# Use Docker from macOS via a forwarded socket
 
 Slicer for Mac can replace the need to run Docker For Mac, but you can also run both if you wish.
 
-## Want to run Docker for Mac and SlicerVM together?
+## Want to run Docker for Mac and Slicer together?
 
 To run both together, configure Docker for Mac to use the Docker VMM option. Docker VMM is a wrapper for libkrun, which will use a different IP range for VMs that does not conflict with the range used by Slicer.
 

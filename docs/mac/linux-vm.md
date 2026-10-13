@@ -3,7 +3,7 @@
 Slicer for Mac has two types of VMs.
 
 1. A Persistent Linux VM named `slicer-1` - analogous to WSL2 - your *Linux twin* for macOS.
-2. Additional persistent or ephemeral VMs ["sandboxes"](/mac/sandboxes) can be launched into the `sbox` host group.
+2. Additional VMs, ["sandboxes"](/mac/sandboxes), can be launched on demand into the `sbox` host group.
 
 Unlike most sandboxes that optimise for a narrow use-case, each VM is a full Linux Kernel with support for Docker, K3s, eBPF, coding agents, Go/Rust builds with systemd as the init.
 
@@ -70,13 +70,13 @@ If you ever want to "reset" your `slicer-1` VM, you can delete it and then relau
 
 First shut down slicer-mac.
 
-Then run `rm -rf ~/slicer-mac/slicer-1.img`
+Then run `rm -f ~/slicer-mac/slicer-1.img`
 
 Then restart slicer-mac, and you'll get the VM re-created.
 
 ## Folder sharing
 
-Folders can be shared directly into any Slicer VM by specifying paths in the slicer-mac.yaml config file or via an API request.
+Folders can be shared directly into any VM by specifying paths in the slicer-mac.yaml config file or via an API request.
 
 Most of the time copying folders between the host and guest, will be fast enough and more convenient: `slicer cp -r ./source vm:~/destination`.
 
@@ -138,6 +138,6 @@ With K3s running inside Slicer, you can test controllers locally, validate Helm 
 
 ## Next steps
 
-- [Sandboxes](/mac/sandboxes) - spin up ephemeral VMs for AI agents and automation
+- [Sandboxes](/mac/sandboxes) - spin up VMs on demand for AI agents and automation
 - [Copy files to/from a VM](/tasks/copy-files) - use `slicer vm cp` to move files in and out
 - [Execute commands in a VM](/tasks/execute-commands) - run commands remotely with `slicer vm exec`

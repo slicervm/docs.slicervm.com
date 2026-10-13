@@ -23,6 +23,7 @@ Edit the relevant host group in your `slicer-mac.yaml` and flip `rosetta` to `tr
 If your distribution needs Rosetta and `rosetta: true`, copy the helper into the guest and run it there.
 
 ```bash
+cd ~/slicer-mac
 slicer vm cp ./enable-rosetta.sh slicer-1:~/
 ```
 

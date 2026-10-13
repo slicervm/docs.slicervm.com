@@ -1,4 +1,4 @@
-# Mac sleep behavior
+# Mac sleep behaviour
 
 Apple's sleep behaviour can get in the way of running local VMs, whatever solution you happen to use.
 
