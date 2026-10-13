@@ -1,0 +1,3647 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Slice bare-metal into sandboxes and services">
+      
+      
+        <meta name="author" content="OpenFaaS Ltd">
+      
+      
+        <link rel="canonical" href="https://docs.slicervm.com/getting-started/walkthrough/">
+      
+      
+        <link rel="prev" href="../install/">
+      
+      
+        <link rel="next" href="../agent-computer/">
+      
+      
+      <link rel="icon" href="../../images/favicon.ico">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.17">
+    
+    
+      
+        <title>Walkthrough - Slicer</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.bcfcd587.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto,+Helvetica:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto, Helvetica";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#launch-slicer-for-the-first-time-on-linux" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Slicer" class="md-header__button md-logo" aria-label="Slicer" data-md-component="logo">
+      
+  <img src="../../images/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Slicer
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Walkthrough
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6zm0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4zM7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3Z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/slicervm/docs.slicervm.com" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    slicervm/docs.slicervm.com
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../.." class="md-tabs__link">
+          
+  
+  Linux
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../examples/" class="md-tabs__link">
+          
+  
+  Examples
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../platform/overview/" class="md-tabs__link">
+          
+  
+  Platform
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../proxy/overview/" class="md-tabs__link">
+          
+  
+  Proxy
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../mac/overview/" class="md-tabs__link">
+          
+  
+  Mac
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Slicer" class="md-nav__button md-logo" aria-label="Slicer" data-md-component="logo">
+      
+  <img src="../../images/logo.png" alt="logo">
+
+    </a>
+    Slicer
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/slicervm/docs.slicervm.com" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    slicervm/docs.slicervm.com
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Linux
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            Linux
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Introduction
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contact/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Contact us
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_1_3" id="__nav_1_3_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Getting Started
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_1_3">
+            <span class="md-nav__icon md-icon"></span>
+            Getting Started
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../install/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Installation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Walkthrough
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Walkthrough
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#before-you-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      Before you start
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#give-your-agent-its-own-computer" class="md-nav__link">
+    <span class="md-ellipsis">
+      Give your agent its own computer
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-slicer-is-organised" class="md-nav__link">
+    <span class="md-ellipsis">
+      How Slicer is organised
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-create-a-config-for-the-daemon" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Create a config for the daemon
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-start-the-slicer-daemon" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Start the Slicer daemon
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-launch-a-vm-by-name" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Launch a VM by name
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-work-inside-the-vm" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Work inside the VM
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-launch-more-and-clean-up" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. Launch more, and clean up
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-hand-over-to-your-coding-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      6. Hand over to your coding agent
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#optional-ssh-into-vms" class="md-nav__link">
+    <span class="md-ellipsis">
+      Optional: SSH into VMs
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#optional-use-slicer-from-another-machine" class="md-nav__link">
+    <span class="md-ellipsis">
+      Optional: Use Slicer from another machine
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Troubleshooting
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Next steps
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agent-computer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Give your agent its own computer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agent-sandbox/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Sandbox your agent in a microVM
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workspaces/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Automated workspaces
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../daemon/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Running in the background
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_1_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_4" id="__nav_1_4_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Tasks
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_4">
+            <span class="md-nav__icon md-icon"></span>
+            Tasks
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tasks/userdata/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Customise with userdata
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tasks/copy-files/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Copy files to/from a VM
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tasks/worktrees/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Worktrees
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tasks/execute-commands/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Execute commands in a VM
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tasks/expose-ports/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Expose ports from a VM
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tasks/intercept-egress/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Intercept VM egress
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tasks/custom-image/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Build a custom root filesystem
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tasks/monitoring/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Logs & Monitoring
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tasks/share-files-with-nfs/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Share files over NFS
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tasks/nested-virtualization/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Nested Virtualization
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tasks/pvm/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Run slicer without KVM on cloud VMs
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_1_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_5" id="__nav_1_5_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Storage
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_5">
+            <span class="md-nav__icon md-icon"></span>
+            Storage
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../storage/overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../storage/zfs/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    ZFS
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../storage/devmapper/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Devmapper
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_1_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_6" id="__nav_1_6_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Reference
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_6">
+            <span class="md-nav__icon md-icon"></span>
+            Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/api/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    REST API
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/config/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    YAML Config
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/images/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Images for microVMs
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/ssh/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    SSH access to VMs
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/secrets/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Secret management
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/ca-trust/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Custom Certificate Authority
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/sos/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Serial Over SSH (SOS)
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/networking/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Networking
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/vfio/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    VFIO Passthrough
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/troubleshooting/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Troubleshooting
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Examples
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Examples
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    AI and agents
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            AI and agents
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/coding-agents/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Sandboxing Coding Agents
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/gpu-ollama/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Ollama with a GPU
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Containers and CI
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            Containers and CI
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/docker/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Run containers with Docker
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/buildkit/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Remote Docker builds over SSH
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/jenkins/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Run Jenkins for CI/CD
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/remote-vscode/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Remote VSCode
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Home lab and networking
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            Home lab and networking
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/pihole-adblock/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    PiHole Adblocker
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/router-firewall/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Create a Linux Router/Firewall
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_5" id="__nav_2_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Kubernetes
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_5">
+            <span class="md-nav__icon md-icon"></span>
+            Kubernetes
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/ha-k3s/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    HA Kubernetes
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/autoscaling-k3s/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Autoscaling Kubernetes
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/large-scale-k3s/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Large scale Kubernetes
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/multiple-machine-k3s/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Multiple machine Kubernetes
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/k3s-gpu/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    K3s with a GPU
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_6" id="__nav_2_6_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    OpenFaaS
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_6">
+            <span class="md-nav__icon md-icon"></span>
+            OpenFaaS
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/openfaas/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    OpenFaaS on K3s
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/openfaas-edge/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    OpenFaaS Edge (All-In-One)
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Platform
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Platform
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../platform/overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../platform/quickstart/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Quickstart
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../platform/lifecycle/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    VM Lifecycle
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../platform/cold-fork/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Build once, fork many
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../platform/go-sdk/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Go SDK
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../platform/typescript-sdk/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    TypeScript SDK
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../platform/ephemeral-tasks/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Run a task in Slicer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../platform/single-instance/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Slicer per host
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../platform/instance-per-tenant/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Slicer per tenant
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_10" id="__nav_3_10_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Examples
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_10">
+            <span class="md-nav__icon md-icon"></span>
+            Examples
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../platform/video-conversion/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Video conversion (Go)
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../platform/typescript-video-conversion/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Video conversion (TypeScript)
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/api/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    REST API Reference
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../platform/openapi/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    OpenAPI Spec
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../platform/custom-images/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Build a custom image
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../platform/publish-images/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Publish your own images
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Proxy
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Proxy
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../proxy/overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../proxy/mac/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Setup for Mac
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../proxy/linux/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Setup for Linux
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../proxy/secret-injection/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Secret Injection
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../proxy/transparent/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Transparent Proxy Helper
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Mac
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Mac
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mac/overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mac/installation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Installation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mac/linux-vm/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Persistent Linux VM
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mac/sandboxes/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Sandboxes
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mac/troubleshooting/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Troubleshooting
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_6" id="__nav_5_6_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Configuration
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_6">
+            <span class="md-nav__icon md-icon"></span>
+            Configuration
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mac/rosetta/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Enable Rosetta
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mac/storage/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Storage
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mac/folder-sharing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Folder sharing
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mac/docker/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Docker
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mac/sleep/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Sleep behavior
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mac/tray-integration/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Tray integration
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_7" id="__nav_5_7_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Examples
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_7">
+            <span class="md-nav__icon md-icon"></span>
+            Examples
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mac/coding-agents/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Sandboxing Coding Agents
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#before-you-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      Before you start
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#give-your-agent-its-own-computer" class="md-nav__link">
+    <span class="md-ellipsis">
+      Give your agent its own computer
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-slicer-is-organised" class="md-nav__link">
+    <span class="md-ellipsis">
+      How Slicer is organised
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-create-a-config-for-the-daemon" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Create a config for the daemon
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-start-the-slicer-daemon" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Start the Slicer daemon
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-launch-a-vm-by-name" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Launch a VM by name
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-work-inside-the-vm" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Work inside the VM
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-launch-more-and-clean-up" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. Launch more, and clean up
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-hand-over-to-your-coding-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      6. Hand over to your coding agent
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#optional-ssh-into-vms" class="md-nav__link">
+    <span class="md-ellipsis">
+      Optional: SSH into VMs
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#optional-use-slicer-from-another-machine" class="md-nav__link">
+    <span class="md-ellipsis">
+      Optional: Use Slicer from another machine
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Troubleshooting
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Next steps
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="launch-slicer-for-the-first-time-on-linux">Launch Slicer for the first time on Linux<a class="headerlink" href="#launch-slicer-for-the-first-time-on-linux" title="Permanent link">&para;</a></h1>
+<p>In this guide you'll start Slicer and launch a microVM on demand by name. Then you'll work inside it, and see how to hand the same workflow over to your coding agent. It takes around five minutes on an x86_64 or Arm64 host.</p>
+<p>Each VM is a real Linux machine with its own Kernel and systemd. Docker, Kubernetes and anything else you'd run on a server will just work. A new VM boots in a couple of seconds.</p>
+<h2 id="before-you-start">Before you start<a class="headerlink" href="#before-you-start" title="Permanent link">&para;</a></h2>
+<p><a href="/getting-started/install">Install Slicer</a> and save the license key from your email to <code>~/.slicer/LICENSE</code>. Then <a href="/getting-started/install#run-slicer-commands-without-sudo">join the <code>slicer</code> group</a> so you don't need <code>sudo</code> for every command.</p>
+<h2 id="give-your-agent-its-own-computer">Give your agent its own computer<a class="headerlink" href="#give-your-agent-its-own-computer" title="Permanent link">&para;</a></h2>
+<p>Slicer's <a href="https://github.com/slicervm/agent-skills">agent skills</a> teach your coding agent how to launch its own VMs and work inside them, instead of on your machine. They work with Claude Code, Codex, Amp, OpenCode, Cursor and others.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Most agents</label><label for="__tabbed_1_2">Claude Code plugin</label><label for="__tabbed_1_3">Ask your agent</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code>npx<span class="w"> </span>skills<span class="w"> </span>add<span class="w"> </span>slicervm/agent-skills
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code>/plugin marketplace add slicervm/agent-skills
+/plugin install use-slicer@slicer
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<p><div class="agent-prompt" markdown>
+Install slicervm/agent-skills from GitHub
+</div></p>
+</div>
+</div>
+</div>
+<p>Once Slicer is running, ask your agent for a VM:</p>
+<div class="agent-prompt">
+<p>Spin up a VM using the slicer skill, clone alexellis/arkade into it and build it.</p>
+</div>
+<p>The agent launches a VM, installs what the build needs, and works inside it. Your machine stays untouched, and the VM is still there for you to <code>slicer shell</code> into afterwards. See <a href="/getting-started/agent-computer">Give your agent its own computer</a> for what it runs, or <a href="/getting-started/agent-sandbox">Sandbox your agent in a microVM</a> to run the agent itself inside a VM.</p>
+<p>If you haven't started Slicer yet, follow the steps below first. Starting the daemon needs <code>sudo</code>, so it's best to run that one command yourself.</p>
+<div class="admonition tip">
+<p class="admonition-title">The short version</p>
+<p>In one terminal, create a config and start Slicer:</p>
+<div class="highlight"><pre><span></span><code>mkdir<span class="w"> </span>-p<span class="w"> </span>~/slicer<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>~/slicer
+slicer<span class="w"> </span>new<span class="w"> </span>vm<span class="w"> </span>--count<span class="w"> </span><span class="m">0</span><span class="w"> </span>&gt;<span class="w"> </span>slicer.yaml
+sudo<span class="w"> </span>slicer<span class="w"> </span>up
+</code></pre></div>
+<p>In a second terminal, launch a VM and get a shell:</p>
+<div class="highlight"><pre><span></span><code>slicer<span class="w"> </span>vm<span class="w"> </span>add<span class="w"> </span>vm<span class="w"> </span>--name<span class="w"> </span>dev
+slicer<span class="w"> </span>ready<span class="w"> </span>dev
+slicer<span class="w"> </span>shell<span class="w"> </span>dev
+</code></pre></div>
+<p>Read on for what each step does, and what to try next.</p>
+</div>
+<h2 id="how-slicer-is-organised">How Slicer is organised<a class="headerlink" href="#how-slicer-is-organised" title="Permanent link">&para;</a></h2>
+<p>Slicer runs as a daemon on your host. Its default config file is called <code>slicer.yaml</code>, and you can pass a different path to <code>slicer up</code> if you need to.</p>
+<p>The config defines one or more <strong>host groups</strong>. A host group is a template for VMs with the vCPU, RAM, disk, network range and OS image to use.</p>
+<p>Most of the time you'll launch VMs on demand by name with <code>slicer vm add</code>. This is how coding agents, sandboxes and dev environments use Slicer. It's what <code>count: 0</code> is for - Slicer starts with no VMs and you add them as you need them. This guide uses <code>count: 0</code>.</p>
+<p>Setting <code>count</code> higher launches that many VMs every time Slicer starts. That's best for appliances and clusters that should always be running, such as a <a href="/examples/pihole-adblock">PiHole</a> or the nodes of a <a href="/examples/ha-k3s">Kubernetes cluster</a>.</p>
+<h2 id="1-create-a-config-for-the-daemon">1. Create a config for the daemon<a class="headerlink" href="#1-create-a-config-for-the-daemon" title="Permanent link">&para;</a></h2>
+<p>Create a working directory for Slicer. Your config and each VM's disk image will be stored here.</p>
+<p>The first argument to <code>slicer new</code> is the name of the host group, in this case <code>vm</code>:</p>
+<div class="highlight"><pre><span></span><code>mkdir<span class="w"> </span>-p<span class="w"> </span>~/slicer
+<span class="nb">cd</span><span class="w"> </span>~/slicer
+
+slicer<span class="w"> </span>new<span class="w"> </span>vm<span class="w"> </span>--count<span class="w"> </span><span class="m">0</span><span class="w"> </span>&gt;<span class="w"> </span>slicer.yaml
+</code></pre></div>
+<p>The host group's name is used in three places:</p>
+<ul>
+<li>As the prefix for each VM's hostname i.e. <code>vm-1</code>, <code>vm-2</code></li>
+<li>When launching a VM into that group i.e. <code>slicer vm add vm</code></li>
+<li>To derive each VM's MAC address, so every host group on a machine needs a unique name</li>
+</ul>
+<p>We've used <code>vm</code> to keep this guide generic. Feel free to name it after what it's for instead, such as <code>sandbox</code>, <code>agents</code> or <code>k3s</code>.</p>
+<p>Take a look at what was generated:</p>
+<div class="highlight"><pre><span></span><code>cat<span class="w"> </span>slicer.yaml
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="nt">config</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">host_groups</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">vm</span>
+<span class="w">      </span><span class="nt">storage</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">image</span>
+<span class="w">      </span><span class="nt">storage_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">25G</span>
+<span class="w">      </span><span class="nt">persistent</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">      </span><span class="nt">count</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="w">      </span><span class="nt">vcpu</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="w">      </span><span class="nt">ram_gb</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
+<span class="w">      </span><span class="nt">network</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">bridge</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">brvm0</span>
+<span class="w">        </span><span class="nt">tap_prefix</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">vm</span>
+<span class="w">        </span><span class="nt">gateway</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">192.168.137.1/24</span>
+<span class="w">  </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ghcr.io/openfaasltd/slicer-systemd:6.1.90-x86_64-latest&quot;</span>
+<span class="w">  </span><span class="nt">hypervisor</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">firecracker</span>
+<span class="w">  </span><span class="nt">api</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8080</span>
+<span class="w">    </span><span class="nt">bind_address</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;127.0.0.1&quot;</span>
+<span class="w">    </span><span class="nt">auth</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>count</code></td>
+<td><code>0</code></td>
+<td>No VMs at start-up. Launch them on demand.</td>
+</tr>
+<tr>
+<td><code>vcpu</code> / <code>ram_gb</code></td>
+<td><code>2</code> / <code>4</code></td>
+<td>The default size of each VM, and the most any one VM in this group can be given. Raise them for bigger VMs.</td>
+</tr>
+<tr>
+<td><code>storage</code></td>
+<td><code>image</code></td>
+<td>Each VM's disk is a file in the working directory. It's simple and persistent with no extra setup. See <a href="/storage/overview">snapshot-based storage</a> for faster clones.</td>
+</tr>
+<tr>
+<td><code>storage_size</code></td>
+<td><code>25G</code></td>
+<td>The size of each VM's disk.</td>
+</tr>
+<tr>
+<td><code>persistent</code></td>
+<td><code>true</code></td>
+<td>Keep each VM's disk when it's shut down or Slicer restarts, so it can be relaunched.</td>
+</tr>
+<tr>
+<td><code>network</code></td>
+<td><code>brvm0</code></td>
+<td>VMs join a Linux bridge and get addresses from <code>192.168.137.0/24</code>.</td>
+</tr>
+<tr>
+<td><code>image</code></td>
+<td><code>slicer-systemd</code></td>
+<td>Ubuntu 22.04 with systemd for your host's architecture. Ubuntu 24.04, Rocky Linux and Arch Linux are also <a href="/reference/images">available</a>.</td>
+</tr>
+<tr>
+<td><code>hypervisor</code></td>
+<td><code>firecracker</code></td>
+<td><code>cloud-hypervisor</code> and <code>qemu</code> are also supported.</td>
+</tr>
+<tr>
+<td><code>api</code></td>
+<td><code>127.0.0.1:8080</code></td>
+<td>The API used by the <code>slicer</code> CLI, protected by a token in <code>/var/lib/slicer/auth/token</code>.</td>
+</tr>
+</tbody>
+</table>
+<p>Run <code>slicer new --help</code> to see all the options. Every field is covered in the <a href="/reference/config">config reference</a>.</p>
+<h2 id="2-start-the-slicer-daemon">2. Start the Slicer daemon<a class="headerlink" href="#2-start-the-slicer-daemon" title="Permanent link">&para;</a></h2>
+<p>The daemon needs root to manage KVM and networking. It's the only command in this guide that needs <code>sudo</code>.</p>
+<p>To try Slicer out, run the daemon in the foreground:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>~/slicer
+sudo<span class="w"> </span>slicer<span class="w"> </span>up
+</code></pre></div>
+<p><code>slicer up</code> loads <code>slicer.yaml</code> from the current directory. To use another file, pass its path i.e. <code>sudo slicer up ./other.yaml</code>. The OS image is pulled on the first start, which takes a few seconds.</p>
+<p>Leave it running and open a new terminal for the next steps. Press <code>Control+C</code> to stop it. If you're connected over SSH, you could start it inside <code>tmux</code> or <code>screen</code> to keep it running after you disconnect.</p>
+<p><strong>Or install it as a service from the start</strong></p>
+<p>If you already know you want Slicer running permanently, skip the foreground run and install it as a systemd service instead. It'll start on boot and restart if it fails:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>~/slicer
+sudo<span class="w"> </span>slicer<span class="w"> </span>service<span class="w"> </span>generate<span class="w"> </span>--install
+</code></pre></div>
+<p>This creates a service named <code>slicer</code> that loads <code>slicer.yaml</code>, with <code>~/slicer</code> as its working directory. Run it from the same directory where you created the config, because that's where Slicer keeps each VM's disk and its state.</p>
+<p>Follow its logs with <code>journalctl -u slicer -f</code>. See <a href="/getting-started/daemon">running in the background</a> for more options.</p>
+<h2 id="3-launch-a-vm-by-name">3. Launch a VM by name<a class="headerlink" href="#3-launch-a-vm-by-name" title="Permanent link">&para;</a></h2>
+<p>Launch a VM called <code>dev</code>:</p>
+<div class="highlight"><pre><span></span><code>slicer<span class="w"> </span>vm<span class="w"> </span>add<span class="w"> </span>vm<span class="w"> </span>--name<span class="w"> </span>dev
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>VM created
+  Hostname: vm-1
+  Name:     dev
+  Group:    vm
+  Arch:     amd64
+  IP:       192.168.137.2/24
+  Specs:    2 vCPU, 4GiB RAM, GPUs: 0
+  Persistent: true
+  Duration: 2.944s
+</code></pre></div>
+<ul>
+<li><code>vm</code> is the host group to launch into.</li>
+<li><code>--name dev</code> gives the VM a friendly name to use with every other command.</li>
+</ul>
+<p><code>slicer vm add</code> returns as soon as the VM is created, whilst it carries on booting in the background. Wait for it to be ready:</p>
+<div class="highlight"><pre><span></span><code>slicer<span class="w"> </span>ready<span class="w"> </span>dev
+</code></pre></div>
+<p>This returns once the guest agent inside the VM is up, usually in under a second. In scripts, you can combine both steps with <code>slicer vm add vm --name dev --wait</code>.</p>
+<p>List your VMs:</p>
+<div class="highlight"><pre><span></span><code>slicer<span class="w"> </span>ls
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>AGE  NAME  HOSTNAME  STATUS   IP             RAM   CPU  PERSIST  TAGS
+---  ----  --------  ------   --             ---   ---  -------  ----
+0s   dev   vm-1      Running  192.168.137.2  4GiB  2    yes
+</code></pre></div>
+<p>Each VM also gets a generated hostname such as <code>vm-1</code>. Either will work with the CLI, but the name is easier to remember. Add <code>--tag</code> to attach your own metadata i.e. <code>--tag project=website</code>.</p>
+<h2 id="4-work-inside-the-vm">4. Work inside the VM<a class="headerlink" href="#4-work-inside-the-vm" title="Permanent link">&para;</a></h2>
+<p>Open a shell:</p>
+<div class="highlight"><pre><span></span><code>slicer<span class="w"> </span>shell<span class="w"> </span>dev
+</code></pre></div>
+<div class="terminal">
+<div class="terminal-bar"><span></span><span></span><span></span><em>alex@host: ~/slicer</em></div>
+<pre><span class="prompt">alex@host:~/slicer$</span> slicer shell dev
+<span class="muted">Connecting to VM: vm-1
+Connected! Press Ctrl+] to exit.</span>
+Welcome to Ubuntu 22.04.5 LTS (GNU/Linux 6.1.90 x86_64)
+
+* Image built by SlicerVM (2026)
+* Website: https://slicervm.com
+* Docs: https://docs.slicervm.com
+
+<span class="prompt">ubuntu@vm-1:~$</span> uname -r &amp;&amp; uptime
+6.1.90
+ 19:20:57 up 4 min,  0 users,  load average: 0.00, 0.00, 0.00
+<span class="prompt">ubuntu@vm-1:~$</span></pre>
+</div>
+
+<p>Type <code>exit</code> or press <code>Control+]</code> to leave the shell.</p>
+<p>If you leave off the VM name, <code>slicer shell</code>, <code>slicer vm exec</code> and <code>slicer vm logs</code> use the most recently launched VM.</p>
+<p>You'll be logged in as the <code>ubuntu</code> user with passwordless <code>sudo</code>. On the Rocky Linux and Arch images the user is <code>slicer</code>. The shell runs over Slicer's guest agent, so no SSH keys or network routes are needed.</p>
+<p>Run a one-off command:</p>
+<div class="highlight"><pre><span></span><code>slicer<span class="w"> </span>vm<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>dev<span class="w"> </span>--<span class="w"> </span><span class="s2">&quot;uname -a &amp;&amp; df -h /&quot;</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>Linux vm-1 6.1.90 #1 SMP PREEMPT_DYNAMIC Sun Sep 13 00:30:58 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/root        25G  756M   23G   4% /
+</code></pre></div>
+<p>Copy files in and out, and add <code>-r</code> for a folder:</p>
+<div class="highlight"><pre><span></span><code>slicer<span class="w"> </span>cp<span class="w"> </span>./notes.txt<span class="w"> </span>dev:~/notes.txt
+slicer<span class="w"> </span>cp<span class="w"> </span>-r<span class="w"> </span>./project<span class="w"> </span>dev:~/project
+slicer<span class="w"> </span>cp<span class="w"> </span>dev:~/notes.txt<span class="w"> </span>./notes.txt
+</code></pre></div>
+<p>Install a web server:</p>
+<div class="highlight"><pre><span></span><code>slicer<span class="w"> </span>vm<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>dev<span class="w"> </span>--<span class="w"> </span><span class="s2">&quot;sudo apt-get update -qq &amp;&amp; sudo apt-get install -y nginx&quot;</span>
+</code></pre></div>
+<p>With bridge networking, each VM's IP is reachable directly from the Slicer host:</p>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-s<span class="w"> </span>http://192.168.137.2<span class="w"> </span><span class="p">|</span><span class="w"> </span>head<span class="w"> </span>-n<span class="w"> </span><span class="m">4</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">title</span><span class="p">&gt;</span>Welcome to nginx!<span class="p">&lt;/</span><span class="nt">title</span><span class="p">&gt;</span>
+</code></pre></div>
+<p>You can also forward a port to <code>localhost</code>. That's useful when the VM is on an isolated network, or when you're <a href="#optional-use-slicer-from-another-machine">using Slicer from another machine</a>:</p>
+<div class="highlight"><pre><span></span><code>slicer<span class="w"> </span>vm<span class="w"> </span>forward<span class="w"> </span>dev<span class="w"> </span>-L<span class="w"> </span><span class="m">3000</span>:127.0.0.1:80
+</code></pre></div>
+<p>Then open <code>http://127.0.0.1:3000</code>. The forward runs until you press <code>Control+C</code>. Slicer's API already uses port <code>8080</code> on the host, so pick a different local port.</p>
+<h2 id="5-launch-more-and-clean-up">5. Launch more, and clean up<a class="headerlink" href="#5-launch-more-and-clean-up" title="Permanent link">&para;</a></h2>
+<p>Launch as many VMs as your host can hold. Each one can be smaller than the host group's <code>vcpu</code> and <code>ram_gb</code> but not bigger:</p>
+<div class="highlight"><pre><span></span><code>slicer<span class="w"> </span>vm<span class="w"> </span>add<span class="w"> </span>vm<span class="w"> </span>--name<span class="w"> </span>build<span class="w"> </span>--cpus<span class="w"> </span><span class="m">1</span><span class="w"> </span>--ram-gb<span class="w"> </span><span class="m">2</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>VM created
+  Hostname: vm-2
+  Name:     build
+  Group:    vm
+  Arch:     amd64
+  IP:       192.168.137.3/24
+  Specs:    1 vCPU, 2GiB RAM, GPUs: 0
+  Persistent: true
+  Duration: 1.076s
+</code></pre></div>
+<p>Add <code>--rm</code> for a throwaway VM whose disk is discarded when it stops.</p>
+<p>View a VM's boot log and then delete it:</p>
+<div class="highlight"><pre><span></span><code>slicer<span class="w"> </span>vm<span class="w"> </span>logs<span class="w"> </span>build<span class="w"> </span><span class="p">|</span><span class="w"> </span>tail<span class="w"> </span>-n<span class="w"> </span><span class="m">3</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>[    0.698393] vmmeter[597]: 2026/10/12 19:21:55 Collecting metrics for: vm-2 on port: 34723
+[    0.700387] configure-dns.sh[565]: + &#39;[&#39; -f /runner/userdata.sh &#39;]&#39;
+[    0.701032] vmmeter[597]: 2026/10/12 19:21:55 VSOCK listening on port: 515
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>slicer<span class="w"> </span>vm<span class="w"> </span>delete<span class="w"> </span>build
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>Deleted vm-2 (group vm)
+</code></pre></div>
+<p>VMs are persistent by default. When you stop and start Slicer, <code>dev</code> will be relaunched with its disk intact along with any files and packages you added.</p>
+<p>When Slicer stops, it shuts each VM down cleanly so nothing is lost. For throwaway sandboxes, you can generate the config with <code>slicer new --graceful-shutdown=false</code> so Slicer exits straight away instead.</p>
+<h2 id="6-hand-over-to-your-coding-agent">6. Hand over to your coding agent<a class="headerlink" href="#6-hand-over-to-your-coding-agent" title="Permanent link">&para;</a></h2>
+<p>With the <a href="#give-your-agent-its-own-computer">agent skills</a> installed, your agent uses the same commands you've just run. Some things to try next:</p>
+<div class="agent-prompt">
+<p>Copy this repo into my <code>dev</code> VM, build it there, and bring the binary back to <code>./bin</code>.</p>
+</div>
+<div class="agent-prompt">
+<p>Install Docker in my <code>dev</code> VM and forward its socket, so I can run <code>docker build</code> locally against it.</p>
+</div>
+<div class="agent-prompt">
+<p>Use Slicer to launch a new VM called <code>k3s</code>, install K3s in it, and merge the kubeconfig into <code>~/.kube/config</code>.</p>
+</div>
+<p>To run a coding agent itself inside a VM, see <a href="/getting-started/agent-sandbox">Sandbox your agent in a microVM</a>.</p>
+<h2 id="optional-ssh-into-vms">Optional: SSH into VMs<a class="headerlink" href="#optional-ssh-into-vms" title="Permanent link">&para;</a></h2>
+<p>You don't need SSH to work with Slicer. <code>slicer shell</code>, <code>exec</code>, <code>cp</code> and <code>forward</code> all go through Slicer's API and the guest agent inside each VM.</p>
+<p>SSH is handy for tools that expect it, such as <code>scp</code>, <code>rsync</code> or VS Code's Remote SSH. VMs run an OpenSSH server. To add your keys, pass one of these to <code>slicer new</code>:</p>
+<ul>
+<li><code>--find-ssh-keys</code> - add the public keys found in <code>~/.ssh/</code></li>
+<li><code>--github USERNAME</code> - import the keys from your GitHub profile</li>
+<li><code>--ssh-key "ssh-ed25519 ..."</code> - add a key directly</li>
+</ul>
+<p>They're written to the config under <code>ssh_keys</code> or <code>github_user</code>.</p>
+<p>From the Slicer host, connect using the VM's IP:</p>
+<div class="highlight"><pre><span></span><code>ssh<span class="w"> </span>ubuntu@192.168.137.2
+</code></pre></div>
+<p>To reach VMs from another machine on your network, print the route commands with <code>slicer vm route ./slicer.yaml</code> and run them on that machine. Never run them on the Slicer host itself, as it will break its networking.</p>
+<p>See <a href="/reference/ssh">SSH access to VMs</a> for more.</p>
+<h2 id="optional-use-slicer-from-another-machine">Optional: Use Slicer from another machine<a class="headerlink" href="#optional-use-slicer-from-another-machine" title="Permanent link">&para;</a></h2>
+<p>The <code>slicer</code> CLI is a client for the daemon's REST API. The API binds to <code>127.0.0.1</code> by default, but if you expose it over HTTPS, you can drive Slicer from your laptop or anywhere else.</p>
+<p>Copy the token from <code>/var/lib/slicer/auth/token</code> on the Slicer host, then point the CLI at the API:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">SLICER_URL</span><span class="o">=</span>https://slicer.example.com
+<span class="nb">export</span><span class="w"> </span><span class="nv">SLICER_TOKEN_FILE</span><span class="o">=</span>~/.slicer/token
+
+slicer<span class="w"> </span>ls
+slicer<span class="w"> </span>shell<span class="w"> </span>dev
+</code></pre></div>
+<p>Everything in this guide works the same way remotely, including <code>cp</code> and <code>forward</code>. See the <a href="/reference/api#authentication">API reference</a> for exposing it safely with an inlets tunnel or Caddy.</p>
+<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Problem</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>No license found on start-up</td>
+<td>Your license key is emailed to you when you start a trial or subscribe. Save it to <code>~/.slicer/LICENSE</code>.</td>
+</tr>
+<tr>
+<td><code>permission denied</code> on <code>/var/lib/slicer/auth/token</code></td>
+<td>Join the <code>slicer</code> group with <code>sudo usermod -aG slicer $USER</code>. Then log out and back in or run <code>newgrp slicer</code>.</td>
+</tr>
+<tr>
+<td><code>requested RAM ... exceeds host group limit</code></td>
+<td><code>--cpus</code> and <code>--ram-gb</code> can't exceed the host group's <code>vcpu</code> and <code>ram_gb</code>. Raise them in <code>slicer.yaml</code> and restart Slicer.</td>
+</tr>
+<tr>
+<td><code>Bridge conflict: ... already in use</code></td>
+<td>A previous run didn't exit cleanly. Start with <code>sudo slicer up --force</code>.</td>
+</tr>
+<tr>
+<td>Your LAN already uses <code>192.168.137.0/24</code></td>
+<td>Regenerate the config with a free range, i.e. <code>--cidr 192.168.140.0/24</code>.</td>
+</tr>
+<tr>
+<td><code>connection refused</code> from the CLI</td>
+<td>Slicer isn't running. Check the terminal where you ran <code>slicer up</code>, or <code>systemctl status slicer</code>.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="next-steps">Next steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="/getting-started/workspaces">Automate a project's workspace with <code>slicer workspace</code></a>, Slicer's alternative to a Dockerfile and Compose.</li>
+<li><a href="/tasks/userdata">Customise VMs with userdata</a> to install packages on first boot.</li>
+<li><a href="/storage/overview">Use snapshot-based storage</a> with ZFS or devmapper for near-instant VM creation.</li>
+<li>Try an example, such as <a href="/examples/docker">running Docker</a> or a <a href="/examples/ha-k3s">HA Kubernetes cluster</a>.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2025 OpenFaaS Ltd
+
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/self-actuated/" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://twitter.com/selfactuated" target="_blank" rel="noopener" title="twitter.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.1e8ae164.min.js"></script>
+      
+    
+  </body>
+</html>

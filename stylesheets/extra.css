@@ -1,0 +1,78 @@
+code, pre, .highlight code {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace !important;
+}
+
+/* Terminal window used to show real sessions */
+.terminal {
+  margin: 1em 0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #1e1f22;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}
+
+.terminal-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: #2d2f33;
+  color: #a0a4ab;
+  font-size: 0.7rem;
+}
+
+.terminal-bar span {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #5c6068;
+}
+
+.terminal-bar span:nth-child(1) { background: #ff5f57; }
+.terminal-bar span:nth-child(2) { background: #febc2e; }
+.terminal-bar span:nth-child(3) { background: #28c840; }
+
+.terminal-bar em {
+  margin-left: 8px;
+  font-style: normal;
+}
+
+.terminal pre {
+  margin: 0;
+  padding: 12px 16px;
+  color: #e6e6e6;
+  background: transparent;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  overflow-x: auto;
+}
+
+.terminal .prompt { color: #7ee787; }
+.terminal .muted { color: #8b949e; }
+
+/* Prompt card for things to ask a coding agent */
+.agent-prompt {
+  position: relative;
+  margin: 1em 0;
+  padding: 0.9em 1.1em 0.9em 1.1em;
+  border-left: 4px solid var(--md-accent-fg-color);
+  border-radius: 6px;
+  background: var(--md-code-bg-color);
+  font-size: 0.8rem;
+  line-height: 1.6;
+}
+
+.agent-prompt::before {
+  content: "Ask your agent";
+  display: block;
+  margin-bottom: 0.4em;
+  color: var(--md-default-fg-color--light);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.agent-prompt p {
+  margin: 0;
+}
