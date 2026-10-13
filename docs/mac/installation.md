@@ -6,7 +6,7 @@ Slicer for Mac is available on all Slicer license tiers. We've tested on macOS S
 
 You need three binaries: `slicer-mac` (the daemon), `slicer` (the CLI client), and `slicer-tray` (the menu bar app).
 
-If you have the Invididual tier, then first, install the `slicer` CLI and activate your license:
+If you have the Individual tier, then first, install the `slicer` CLI and activate your license:
 
 ```bash
 curl -sLS https://get.slicervm.com | sudo bash
@@ -34,10 +34,10 @@ First of all, get used to it, leave it in the path we recommend (`~/slicer-mac`)
 
 The `slicer-mac` OCI bundle includes a default `slicer-mac.yaml` in the folder after install, so you can use that file directly.
 
-The generated `slicer-mac.yaml` has two host groups:
+The included `slicer-mac.yaml` has two host groups:
 
 - **`slicer`** (`count: 1`) - your persistent Linux VM, starts with the daemon
-- **`sbox`** (`count: 0`) - ephemeral sandboxes, launched on demand for things like coding agents.
+- **`sbox`** (`count: 0`) - sandboxes, launched on demand for things like coding agents.
 
 ```yaml
 config:
@@ -48,7 +48,7 @@ config:
       ram_gb: 8
       storage_size: 15G
       share_home: "~/" # Set to "" to disable sharing
-      rosetta: true
+      rosetta: false
       network:
         mode: nat
         gateway: 192.168.64.1/24
@@ -57,12 +57,12 @@ config:
       vcpu: 2
       ram_gb: 4
       storage_size: 15G
-      rosetta: true
+      rosetta: false
       network:
         mode: nat
         gateway: 192.168.64.1/24
 
-  image: "ghcr.io/openfaasltd/slicer-systemd-arm64-avz:latest"
+  image: "ghcr.io/openfaasltd/slicer-systemd-2404-arm64-avz:6.12.70-aarch64-avz-latest"
   hypervisor: apple
 
   api:
@@ -75,11 +75,13 @@ Need Rosetta for x86_64 binaries? Follow [Enable Rosetta](/mac/rosetta).
 
 Run the daemon. The first run pulls and prepares the VM image automatically.
 
-If you ever need to regenerate the `slicer-mac.yaml` file, you can do so with the command below:
+If you want to replace it with a fresh configuration generated from the CLI
+defaults, use the command below and review the output before overwriting your
+current file:
 
 ```bash
 cd ~/slicer-mac
-./slicer-mac new > slicer-mac.yaml
+./slicer-mac new > slicer-mac.yaml.new
 ```
 
 ## Start the daemon
@@ -107,7 +109,7 @@ cd ~/slicer-mac
 By default, shells open in Terminal.app. For Ghostty or another terminal:
 
 ```bash
-slicer-tray --terminal "ghostty"
+./slicer-tray --terminal "ghostty"
 ```
 
 ## Set up the Slicer CLI
@@ -145,10 +147,10 @@ slicer vm list
 slicer vm shell sbox-1
 
 # Copy a file in
-slicer vm cp ~/file.txt sbox-1:~/
+slicer vm cp ~/file.txt sbox-1:~/file.txt
 
 # Use that file, remotely via exec:
-slicer vm exec sbox-1 -- stat ~/file.txt
+slicer vm exec sbox-1 -- "stat ~/file.txt"
 
 # Delete that VM
 slicer vm delete sbox-1
@@ -168,7 +170,7 @@ cd ~/slicer-mac
 ./slicer-mac install
 ```
 
-Once running in the backgroud, you can use the `slicer-tray service` commands to manage it.
+Once running in the background, you can use the `slicer-mac service` commands to manage it.
 
 The `daemon` service is `slicer-mac` itself, and the `tray` service is the `slicer-tray` menu bar helper.
 
@@ -208,9 +210,11 @@ slicer install slicer-mac
 mv ~/slicer-mac/slicer-mac.yaml{.bak,}
 ```
 
-The upgrade is actually the same command you ran to install `slicer-mac`. We just make a back of your customised `slicer-mac.yaml` file before hand, and restore it after the upgrade.
+The upgrade is actually the same command you ran to install `slicer-mac`. We just make a backup of your customised `slicer-mac.yaml` file before hand, and restore it after the upgrade.
+
+Upgrading doesn't refresh the VM image that Slicer for Mac has already cached, so new sandboxes keep starting from it, along with its older guest agent. An outdated guest agent can make newer CLI features fail, i.e. `slicer vm cp -r` from a VM reporting `copy response did not include cp-v1 metadata`. To pick up the latest image, see [Rebuild or reset local state](/mac/storage#rebuild-or-reset-local-state). Existing VMs such as `slicer-1` keep their own disk until you recreate them.
 
 ## Next steps
 
 - [Linux VM](/mac/linux-vm) - mount shared folders, forward Docker and K3s
-- [Sandboxes](/mac/sandboxes) - spin up ephemeral VMs
+- [Sandboxes](/mac/sandboxes) - spin up VMs on demand

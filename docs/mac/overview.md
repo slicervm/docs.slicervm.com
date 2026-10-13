@@ -31,8 +31,8 @@ If you need to run x86_64 binaries, see [Enable Rosetta](/mac/rosetta) after the
 
 The config file for Slicer for Mac is named `slicer-mac.yaml`, it defines two host groups. Host groups launch and manage microVMs. The names are flexible on Slicer for Linux, but Slicer for Mac has two fixed groups instead.
 
-- The `slicer` group - a runs a Linux VM that start-up and stays running. This is your day-to-day Linux environment, similar to WSL on Windows, and is fully persistent.
-- The `sbox` group aka "sandbox" - is for ephemeral VMs launched on demand through the CLI, API, or by one of your AI coding agents. These VMs are ephemeral by default, but can be made permanent via `slicer vm launch sbox --persistent`
+- The `slicer` group runs a Linux VM that starts with Slicer for Mac and stays running. This is your day-to-day Linux environment, similar to WSL on Windows, and is fully persistent.
+- The `sbox` group, aka "sandbox", is for VMs launched on demand through the CLI, API, or by one of your AI coding agents. They keep their disk until you delete them. Add `--rm` for a throwaway sandbox that's discarded when it stops.
 
 ## Conceptual architecture
 
@@ -70,7 +70,7 @@ In a similar way, a sandbox such as `sbox-1` may have K3s installed, exposing po
 
 Slicer for Mac uses Apple's [VZNATNetworkDeviceAttachment](https://developer.apple.com/documentation/virtualization/vznatnetworkdeviceattachment). Guests access the Internet through your host.
 
-If you also run Docker Desktop on the same Mac, configure it to use `Docker VMM` mode to avoid networking conflicts with Slicer. See [Use Docker from macOS with the Slicer VM socket](/mac/docker).
+If you also run Docker Desktop on the same Mac, configure it to use `Docker VMM` mode to avoid networking conflicts with Slicer. See [Use Docker from macOS via a forwarded socket](/mac/docker).
 
 * The host can ingress to guests using their IP or `slicer vm forward`
 * Guests can talk to the host to access things like HTTP proxies, or a Docker pull-through cache, etc.
@@ -88,13 +88,13 @@ Slicer for Linux supports ZFS and devmapper for Copy-on-Write support.
 
 ## MacBooks and sleep
 
-Host sleep behavior for MacBooks is controlled by `sleep_action` in `slicer-mac.yaml` and affects VM lifecycle.
-See [Sleep behavior](/mac/sleep) for full guidance and per-mode behavior.
+Host sleep behaviour for MacBooks is controlled by `sleep_action` in `slicer-mac.yaml` and affects VM lifecycle.
+See [Sleep behaviour](/mac/sleep) for full guidance and per-mode behaviour.
 
 ## Next steps
 
 - [Installation](/mac/installation) - install binaries and start Slicer for Mac
 - [Linux VM](/mac/linux-vm) - configure your persistent VM, shared folders, Docker, and K3s aka `slicer-1`
-- [Sandboxes](/mac/sandboxes) - spin up and tear down VMs via API for ephemeral tasks
+- [Sandboxes](/mac/sandboxes) - spin up and tear down VMs via API for short-lived tasks
 - [Coding agents](/mac/coding-agents) - automation to stand up a VM with Claude Code, OpenCode, and other agents inside the VM
 - [Troubleshooting](/mac/troubleshooting) - recover from stale vmnet or DHCP state on macOS

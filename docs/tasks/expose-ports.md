@@ -1,6 +1,6 @@
-# Expose ports and services from Slicer VMs
+# Expose ports and services from microVMs
 
-There are serveral ways to access services listening on TCP ports within a Slicer VM.
+There are several ways to access services listening on TCP ports within a VM.
 
 ## Direct access via the VM's IP
 

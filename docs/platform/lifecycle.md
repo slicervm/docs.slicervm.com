@@ -107,7 +107,7 @@ Also available on a specific host group:
 GET /hostgroup/sbox/nodes?tag_prefix=user=
 ```
 
-### How to represent Slicer VMs in your product
+### How to represent VMs in your product
 
 Whether your product surfaces VMs to humans (a dashboard, a CLI, a support tool) or to other systems (a scheduler, a billing pipeline, an API), the shape is the same:
 

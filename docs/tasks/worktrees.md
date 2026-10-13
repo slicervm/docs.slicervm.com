@@ -4,9 +4,9 @@
 
 Use `slicer worktree` to:
 
-- [Push a whole repo](#push-a-repo-into-a-vm) — you want to work on or run an agent against your current branch in an isolated VM, then bring the commits back.
-- [Push a worktree](#push-a-worktree-into-a-vm) — you want to work on a feature branch in a VM while keeping your main working directory untouched on the host, without stashing or committing unfinished changes.
-- [Use an agent sandbox](#use-a-worktree-with-agent-sandbox-commands) — you want to provision a VM with a coding agent installed and then sync a worktree to have the agent work on the code in isolation.
+- [Push a whole repo](#push-a-repo-into-a-vm) - you want to work on or run an agent against your current branch in an isolated VM, then bring the commits back.
+- [Push a worktree](#push-a-worktree-into-a-vm) - you want to work on a feature branch in a VM while keeping your main working directory untouched on the host, without stashing or committing unfinished changes.
+- [Use an agent sandbox](#use-a-worktree-with-agent-sandbox-commands) - you want to provision a VM with a coding agent installed and then sync a worktree to have the agent work on the code in isolation.
 
 ## Push a repo into a VM
 
@@ -36,8 +36,8 @@ slicer worktree push vm-1 .
 
 !!! note "More than one host group?"
     `--launch` auto-selects the host group only when the daemon has exactly
-    one. If several exist — the default on Slicer for Mac, which ships with
-    `slicer` and `sbox` — pass `--hostgroup`, e.g.
+    one. If several exist - the default on Slicer for Mac, which ships with
+    `slicer` and `sbox` - pass `--hostgroup`, e.g.
     `slicer worktree push --launch --hostgroup sbox .`
 
 ## Push a worktree into a VM
@@ -76,7 +76,7 @@ slicer worktree push vm-1 .
 
 ## Use a worktree with agent sandbox commands
 
-Agent commands (`slicer opencode`, `slicer claude`, `slicer codex`, and others) boot a VM and install a coding agent, see [Sandboxing Coding Agents](/examples/coding-agents). For a git repository, pass `--worktree` (alias `--wt`) to provision the VM, push the current worktree in with a working, self-contained `.git`, install the agent into that path, and attach — all in one command:
+Agent commands (`slicer opencode`, `slicer claude`, `slicer codex`, and others) boot a VM and install a coding agent, see [Sandboxing Coding Agents](/examples/coding-agents). For a git repository, pass `--worktree` (alias `--wt`) to provision the VM, push the current worktree in with a working, self-contained `.git`, install the agent into that path, and attach - all in one command:
 
 ```bash
 cd ~/src/myrepo
@@ -96,7 +96,7 @@ git push
 To reuse a VM you provisioned earlier, push into it explicitly:
 
 ```bash
-# Provision VM only — coding agent installed, no code copied in
+# Provision VM only - coding agent installed, no code copied in
 # Take note of the VM name
 slicer opencode
 

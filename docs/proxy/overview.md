@@ -16,7 +16,7 @@ Rules can be driven through the CLI, REST API, or with code using the SDKs.
 
 ## Concepts
 
-Slicer separates the nouns. Register a client, register secrets, then bind them for a period and let them expire. Clients are identified by the auth header they send to the proxy — no fake secrets, no source-IP heuristics.
+Slicer separates the nouns. Register a client, register secrets, then bind them for a period and let them expire. Clients are identified by the auth header they send to the proxy - no fake secrets, no source-IP heuristics.
 
 ```
 ┌─ client ──────────┐         ┌─ secret ─────────────┐
@@ -41,7 +41,7 @@ Slicer separates the nouns. Register a client, register secrets, then bind them 
 ```
 * A client owns zero or more allow rules - no rules means default deny
 * An allow rule may be bare for access to a domain for a given TTL (automatic expiry)
-* Or an allow rule may also reference a secret — when it does, the proxy injects the credential into matching requests.
+* Or an allow rule may also reference a secret - when it does, the proxy injects the credential into matching requests.
 
 
 ## Conceptual workflow

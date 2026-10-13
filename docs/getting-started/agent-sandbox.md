@@ -51,7 +51,7 @@ Attach:          slicer opencode vm-4
 To delete:       slicer vm delete vm-4
 ```
 
-You get a fresh VM with the agent installed and logged in, and nothing else copied from your machine. Attach to it whenever you're ready:
+You get a fresh VM with the agent installed and logged in, and nothing else copied from your machine. On Slicer for Mac, sandboxes go into the `sbox` host group. Attach to it whenever you're ready:
 
 ```bash
 slicer opencode vm-4
@@ -91,7 +91,6 @@ Around six seconds later, you're in the agent's session, running inside the VM i
 
   ┃  Ask anything… "What is the tech stack of this project?"
   ┃
-  ┃  Build · deepseek-v4-flash-0731 toilgate
   ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
                                               tab agents  ctrl+p commands
   <span class="muted">~/src/arkade:master</span></pre>
@@ -104,7 +103,7 @@ Around six seconds later, you're in the agent's session, running inside the VM i
 We asked the agent to make a small change and commit it:
 
 <div class="agent-prompt" markdown>
-Add a line under the title in README.md that says: Built in a Slicer sandbox. Then commit it with the message: Note the Slicer sandbox build
+Add the line "Built in a Slicer sandbox." under the title in README.md, then commit it with the message "Note the Slicer sandbox build".
 </div>
 
 The commit is made inside the VM. Your own checkout hasn't changed yet.
@@ -149,7 +148,7 @@ Pass `--rm` when you launch a sandbox to make it throwaway, so it's deleted when
 
 ## Without a git repository
 
-To copy a plain directory in instead, pass its path without `--worktree`, i.e. `slicer claude ./my-project`. Files matching a `.slicerignore` at its root are left out. Copy results back out with `slicer cp -r`.
+To copy a plain directory in instead, pass its path without `--worktree`, i.e. `slicer claude ./my-project`. For a VM with no agent, use `slicer workspace ./my-project`. Files matching a `.slicerignore` at its root are left out. Copy results back out with `slicer cp -r`.
 
 ## Next steps
 

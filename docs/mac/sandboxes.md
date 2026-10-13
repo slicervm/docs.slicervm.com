@@ -1,6 +1,6 @@
 # Sandboxes
 
-The `sbox` host group is for ephemeral arm64 Linux VMs that you launch on demand. Each sandbox gets its own kernel and filesystem.
+The `sbox` host group is for arm64 Linux microVMs that you launch on demand. Each sandbox gets its own kernel and filesystem.
 
 This is the second half of the Slicer model for Mac:
 
@@ -14,7 +14,7 @@ Use sandboxes when you want fast isolation without changing your persistent envi
 |                        macOS Host                                |
 |                                                                  |
 |  +----------------------------+   +---------------------------+  |
-|  | sbox-1 (ephemeral)         |   | sbox-2 (ephemeral)        |  |
+|  | sbox-1 (on demand)         |   | sbox-2 (on demand)        |  |
 |  | 2 vCPU, 4GB RAM            |   | 2 vCPU, 4GB RAM           |  |
 |  |                            |   |                           |  |
 |  | opencode + git repo        |   | Docker build + test       |  |
@@ -43,16 +43,16 @@ You can launch sandboxes from the CLI, [Go SDK](/platform/go-sdk/), or [REST API
 
 ## Launch, use, and delete
 
-Launch an ephemeral sandbox that is deleted when you reboot it or stop Slicer for Mac:
+Launch a sandbox. It keeps its disk until you delete it, even across reboots and restarts of Slicer for Mac:
 
 ```bash
 slicer vm launch sbox
 ```
 
-To launch a sandbox that's persistent and survives with a permanent disk:
+To launch a throwaway sandbox that's discarded as soon as it stops, add `--rm`:
 
 ```bash
-slicer vm launch sbox --persistent
+slicer vm launch sbox --rm
 ```
 
 Launch a sandbox with memorable tags that you can query later on through the API or `slicer vm list`:
@@ -81,28 +81,21 @@ Open an interactive shell:
 slicer vm shell sbox-1
 ```
 
-Stop and remove an ephemeral sandbox:
-
-```bash
-slicer vm shutdown sbox-1
-
-# Or
-slicer vm delete sbox-1
-```
-
-Stop a persistent sandbox (and retain it):
+Stop a sandbox and keep its disk:
 
 ```bash
 slicer vm shutdown sbox-1
 ```
 
-Permanently delete a persistent sandbox:
+Delete a sandbox and its disk:
 
 ```bash
 slicer vm delete sbox-1
 ```
 
-Relaunch a persistent sandbox (after a `slicer vm shutdown` or running `sudo reboot` in the guest):
+A sandbox launched with `--rm` is removed as soon as it stops, so there's nothing to delete.
+
+Relaunch a stopped sandbox (after a `slicer vm shutdown` or running `sudo reboot` in the guest):
 
 ```bash
 slicer relaunch sbox-1
@@ -122,7 +115,7 @@ Edit the `sbox` host group in `slicer-mac.yaml` to change the default vCPU, RAM,
   vcpu: 2
   ram_gb: 4
   storage_size: 15G
-  rosetta: true
+  rosetta: false
   network:
     mode: nat
     gateway: 192.168.64.1/24

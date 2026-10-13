@@ -11,10 +11,10 @@ By installing and starting Slicer, you agree to the [End User License Agreement 
 
 Slicer is useful for both one-off/ephemeral workloads and long-running Linux services.
 
-All Slicer VMs are called VMs both in the YAML, the API, and codebase, however, we talk about them in two different ways:
+Slicer's microVMs are called VMs in the YAML, the API, and the codebase. We talk about them in two different ways:
 
-* **Sandboxes** — API-driven, disposable environments for short-lived execution and automation. These VMs are launched into a host group which has a `count: 0` on start-up.
-* **Services** — persistent VMs where you need stable hosts for hosting, long-term testing, etc. These VMs are launched from a host group which has a `count: 1` or higher.
+* **Sandboxes** - API-driven, disposable environments for short-lived execution and automation. These VMs are launched into a host group which has a `count: 0` on start-up.
+* **Services** - persistent VMs where you need stable hosts for hosting, long-term testing, etc. These VMs are launched from a host group which has a `count: 1` or higher.
 
 Both are managed through the same CLI/API/SDK surfaces.
 
@@ -28,7 +28,7 @@ If you are building a product or internal system on top of Slicer - embedding sa
 
 ## Our own use-cases
 
-Slicer was developed internally at OpenFaaS Ltd, and has been used across product, platform, and support work since 2022.
+Slicer was developed internally at OpenFaaS Ltd and has been used across product, platform, and support work since 2022.
 
 * Booting Kubernetes clusters for Helm chart and platform validation in minutes.
 * Reproducing customer issues quickly in disposable lab environments.

@@ -10,7 +10,7 @@ Use-cases include:
 * CI builds or compiling untrusted customer code
 * On-demand IDEs for pull request development or review
 
-There is no limit on how long a task VM runs - it could be 250ms to process a webhook, 48 hours for fine-tuning, or several weeks. Launch task VMs with `--rm` so their disk is discarded as soon as the task exits.
+There is no limit on how long a task VM runs. It could be 250ms to process a webhook, 48 hours for fine-tuning, or several weeks. Launch task VMs with `--rm` so their disk is discarded as soon as the task exits.
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/5RjtVM4bvp0?si=2TPpSKn9YXFw_Nnt" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
@@ -36,7 +36,7 @@ slicer new task \
 * `--min` uses a slimmer image that boots faster. It leaves out the Kernel options needed for Docker and Kubernetes, which one-shot tasks rarely need.
 * `--net isolated` gives each task its own network namespace. A task can reach the internet, but not other VMs. Use `--allow` and `--drop` to restrict where it can connect to.
 * `--count 0` starts with no VMs, so each task is launched on demand. Without it, `slicer new` defaults to one VM, which would start as soon as Slicer does.
-* `--api-port 8081` keeps this daemon's API separate from any other Slicer instance on the host, which use port 8080 by default.
+* `--api-port 8081` keeps this daemon's API separate from any other Slicer instance on the host, which uses port 8080 by default.
 
 For the fastest launches, add `--storage devmapper` to clone each task's disk from a snapshot. Install Slicer with `--devmapper` to enable it, which works with a loopback file if you don't have a spare disk. [ZFS](/storage/zfs) is just as fast. With the default `image` storage, each task takes a second or two longer to launch.
 
@@ -48,7 +48,7 @@ sudo slicer up ./tasks.yaml
 
 ### Collect the results
 
-Tasks on an isolated network can reach the host on its own IP address, just as other machines on your network do. Find it with `hostname -I`.
+Tasks on an isolated network can't reach the host through their gateway, but they can reach it on its own IP address, just as other machines on your network do. Find it with `hostname -I`.
 
 In a new terminal, save this small HTTP server as `receiver.py`. It prints whatever the tasks send back:
 
@@ -121,7 +121,7 @@ for i in {1..5}; do
 done
 ```
 
-The receiver prints a line as each task finishes:
+The receiver prints a line as each task finishes, including the first one you launched:
 
 ```
 task-1 ran its task.  09:03:24 up 0 min,  0 users,  load average: 0.00, 0.00, 0.00
@@ -132,7 +132,7 @@ task-5 ran its task.  09:03:34 up 0 min,  0 users,  load average: 0.00, 0.00, 0.
 task-6 ran its task.  09:03:36 up 0 min,  0 users,  load average: 0.00, 0.00, 0.00
 ```
 
-With the default `image` storage, each task took under two seconds from launch to reporting back. With `devmapper`, `slicer vm add` returns in a few milliseconds, and a batch of nine finished within three seconds.
+With the default `image` storage, each task took under two seconds from launch to reporting back. With `devmapper`, `slicer vm add` returns in a few milliseconds. In a separate run, a batch of nine tasks finished within three seconds.
 
 Once the tasks have exited, nothing is left behind:
 

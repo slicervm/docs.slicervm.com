@@ -34,7 +34,7 @@ Available agent commands:
 
 If your agent (for example, Pi or Hermes) is not listed above, request support in the Discord, or use `slicer workspace` and install and configure your agent via a bash script or userdata.
 
-To launch i.e. a new slicer VM for Claude:
+To launch a new VM for Claude:
 
 ```
 mkdir -p ~/dev/
@@ -89,7 +89,7 @@ echo 'export ANTHROPIC_API_KEY=sk-ant-...' >> ~/.bashrc
 Then run Claude Code:
 
 ```bash
-cd /home/ubuntu/host/my-project
+cd /home/ubuntu/home/my-project
 claude --dangerously-skip-permissions
 ```
 
@@ -110,10 +110,10 @@ The auth config is stored at `~/.local/share/opencode/auth.json` inside the VM.
 
 ## Work on shared folders
 
-With [folder sharing](/mac/folder-sharing), your Mac project paths can be visible at `/home/ubuntu/host/`.
+With [folder sharing](/mac/folder-sharing), your Mac project paths are visible at `/home/ubuntu/home/`.
 
 ```bash
-cd /home/ubuntu/host/code/my-project
+cd /home/ubuntu/home/code/my-project
 
 # Run Claude Code
 claude --dangerously-skip-permissions
@@ -143,14 +143,14 @@ For one-off and automated tasks, launch a sandbox instead of using your persiste
 slicer vm launch sbox
 
 # Copy a repo in
-slicer vm cp ./my-project sbox-1:/home/ubuntu/my-project
+slicer vm cp -r ./my-project sbox-1:/home/ubuntu/my-project
 
 # Run the agent
-slicer vm exec --uid 1000 --cwd /home/ubuntu/my-project sbox-1 -- \
+slicer vm exec --cwd /home/ubuntu/my-project sbox-1 -- \
   claude --dangerously-skip-permissions -p "Write tests for main.go"
 
 # Copy results out
-slicer vm cp sbox-1:/home/ubuntu/my-project ./my-project-result
+slicer vm cp -r sbox-1:/home/ubuntu/my-project ./my-project-result
 
 # Delete when done
 slicer vm delete sbox-1
@@ -160,6 +160,6 @@ The sandbox has its own kernel and filesystem. If the agent does something unexp
 
 ## Next steps
 
-- [Sandboxes](/mac/sandboxes) - more on launching and managing ephemeral VMs
+- [Sandboxes](/mac/sandboxes) - more on launching and managing sandboxes
 - [Run headless agents non-interactively](/examples/coding-agents#run-headless-agents-non-interactively) - one-shot agent runs on Slicer for Linux
 - [Trying Claude Code with Ollama](https://slicervm.com/blog/trying-claude-code-with-ollama) - using Claude Code with a local LLM backend

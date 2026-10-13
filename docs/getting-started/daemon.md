@@ -74,7 +74,7 @@ vm-1                      192.168.137.2   4GiB         2        Running    2026-
 For the TCP option (with the default port of 8080), you'd run:
 
 ```bash
-sudo slicer vm list
+slicer vm list
 HOSTNAME                  IP              RAM          CPUS     STATUS     CREATED              TAGS                
 --------                  --              ---          ----     ------     -------              -----               
 vm-1                      192.168.137.2   4GiB         2        Running    2026-02-27 16:30:53      

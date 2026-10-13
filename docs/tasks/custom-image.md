@@ -1,6 +1,6 @@
 # Build a custom root filesystem
 
-You can customise a Slicer VM in two ways:
+You can customise a VM in two ways:
 
 1. Via [userdata on first boot](/tasks/userdata) (a bash script included via the config file)
 2. By extending an existing root filesystem with Docker and adding various `COPY` and `RUN` statements

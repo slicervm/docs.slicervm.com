@@ -2,15 +2,15 @@
 
 Neither Firecracker nor Cloud Hypervisor support "shared folders" natively, but it is on the immediate roadmap to add this capability to the `slicer-agent`.
 
-For the time being, one of the most convenient options is to use [NFS (Network File System)](https://en.wikipedia.org/wiki/Network_File_System) to share files between your host machine and Slicer VMs. This is particularly useful for development workflows, data processing, or when you need persistent storage that survives VM restarts.
+For the time being, one of the most convenient options is to use [NFS (Network File System)](https://en.wikipedia.org/wiki/Network_File_System) to share files between your host machine and its microVMs. This is particularly useful for development workflows, data processing, or when you need persistent storage that survives VM restarts.
 
 You should also consider [`slicer cp`](/tasks/copy-files) as an alternative to NFS, along with a self-hosted S3 server and SSH-based solutions like sshfs, sftp, scp and restic.
 
-This example shows you how to set up an NFS server on your host machine and mount it from within a Slicer VM.
+This example shows you how to set up an NFS server on your host machine and mount it from within a VM.
 
 ## Prerequisites
 
-You'll need a running Slicer VM. Follow the [walkthrough](/getting-started/walkthrough) to create one if you haven't already.
+You'll need a running VM. Follow the [walkthrough](/getting-started/walkthrough) to create one if you haven't already.
 
 ## Set up the NFS server on the host
 

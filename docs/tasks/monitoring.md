@@ -109,14 +109,14 @@ $ slicer vm top --api http://192.168.1.114:8080
 If slicer is running remotely but requires authentication:
 
 ```bash
-$ slicer vm top --api http://192.168.1.114:8080 --token TOKEN_VALUE
-$ slicer vm top --api http://192.168.1.114:8080 --token-file TOKEN_VALUE
+$ slicer vm top --url http://192.168.1.114:8080 --token TOKEN_VALUE
+$ slicer vm top --url http://192.168.1.114:8080 --token-file ./token
 ```
 
-When slicer is running locally, and authentication is enabled, use `sudo` and slicer will attempt to read the auth token from the default location of `/var/lib/slicer/auth/token`.
+When Slicer is running locally, the CLI reads the auth token from `/var/lib/slicer/auth/token`. Members of the `slicer` group can read it without `sudo`.
 
 ```bash
-$ sudo slicer vm top
+$ slicer vm top
 ```
 
 ### Automated monitoring with `node_exporter`

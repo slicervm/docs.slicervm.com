@@ -179,15 +179,15 @@ Add a host with a custom GitHub user to override the SSH keys:
 ### Block until ready (`?wait=` and `?timeout=`)
 
 By default, `POST /hostgroup/NAME/nodes` returns as soon as the VM is
-scheduled — the in-guest agent may still be booting. Two optional query
+scheduled - the in-guest agent may still be booting. Two optional query
 parameters let the server hold the response until readiness, so callers
 don't need their own poll loop on `/vm/{hostname}/health`:
 
-- `wait=agent` — block until `agent_uptime > 0` (the agent is up and can
+- `wait=agent` - block until `agent_uptime > 0` (the agent is up and can
   accept `exec` calls).
-- `wait=userdata` — additionally block until `userdata_ran == true`
+- `wait=userdata` - additionally block until `userdata_ran == true`
   (the cloud-init-style userdata script has completed).
-- `timeout=30s` — Go-style duration. Defaults to `5m` when `wait` is
+- `timeout=30s` - Go-style duration. Defaults to `5m` when `wait` is
   set. On timeout the VM is cleaned up and the endpoint returns **408**.
 
 ```bash
@@ -382,9 +382,11 @@ Execute commands on a VM. Requires the `slicer-agent` service running in the gue
 Query parameters:
 - `cmd` (required): command to execute
 - `args` (optional, multiple): command arguments
-- `uid` (optional): user ID to run command as (default: 0)
-- `gid` (optional): group ID to run command as (default: 0)
-- `cwd` (optional): working directory
+- `uid` (optional): user ID to run command as. When omitted, the agent
+  detects the guest's default non-root user. Pass `0` explicitly for root.
+- `gid` (optional): group ID to run command as. When omitted, the agent uses
+  the selected user's primary group.
+- `cwd` (optional): working directory (default: the selected user's home)
 - `shell` (optional): shell interpreter (default: /bin/bash)
 - `stdin` (optional): enable stdin pipe (true/false)
 - `stdout` (optional): enable stdout capture (true/false)
@@ -396,7 +398,7 @@ Body: stdin data (if `stdin=true`)
 
 Response: streaming newline-delimited JSON with stdout/stderr/exit_code
 
-Newer agents emit typed frames on the streaming response — `started`
+Newer agents emit typed frames on the streaming response - `started`
 (first frame, carries `pid` and `started_at`), `stdout`, `stderr`, and
 `exit` (last frame, carries `exit_code` and `ended_at`). Older agents
 emit untyped frames that mix `stdout`/`stderr`/`exit_code` on a single
@@ -438,7 +440,7 @@ Response:
 ```
 
 The request shape is the same (query parameters, not a JSON body). The
-response does not include `started_at` / `ended_at` — those are only on
+response does not include `started_at` / `ended_at` - those are only on
 streaming frames. `stdin` is not supported with `buffered=true`; use
 the streaming endpoint if you need to pipe stdin.
 
@@ -446,7 +448,7 @@ the streaming endpoint if you need to pipe stdin.
 
 HTTP endpoints under `/vm/{hostname}/fs/*` read and mutate the guest
 filesystem directly via the in-guest agent. Prefer these over shelling
-out through `/exec` — they're faster, don't depend on `ls`/`stat`/`mkdir`
+out through `/exec` - they're faster, don't depend on `ls`/`stat`/`mkdir`
 being on the guest PATH, and avoid shell-quoting hazards on unusual
 filenames.
 
@@ -476,7 +478,7 @@ HTTP GET
 `/vm/{hostname}/fs/stat?path=/etc/hostname`
 
 Response: a single `SlicerFSInfo` object (same shape as one entry from
-`readdir`). Returns **404** if the path does not exist — useful as a
+`readdir`). Returns **404** if the path does not exist - useful as a
 cheap `exists` check.
 
 ### Create a directory
