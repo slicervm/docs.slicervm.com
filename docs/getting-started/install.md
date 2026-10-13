@@ -10,9 +10,15 @@ You can run Slicer on a varied range of hardware, from mini PCs, to your Mac, to
 * x86_64 or Arm64 (including Raspberry Pi)
 * Ubuntu LTS is the preferred/supported OS (Debian, and RHEL-like should also work)
 
-See the [appendix](#appendix) for suggested local hardware and cloud-based options.
+Check that KVM is available. If this command prints a device, you're ready to go:
 
-Slicer is designed to run on a basic OS installation, without Docker, Kubernetes, or other virtualisation tools. Slicer installs and manage its own dependencies, such as Firecracker, [QEMU](https://www.qemu.org/), and containerd.
+```bash
+ls -l /dev/kvm
+```
+
+If it's missing, enable virtualisation (VT-x/AMD-V) in your BIOS, or for a cloud VM, pick an instance type with nested virtualisation. See the [appendix](#appendix) for suggested local hardware and cloud-based options.
+
+Slicer is designed to run on a basic OS installation, without Docker, Kubernetes, or other virtualisation tools. Slicer installs and manages its own dependencies, such as Firecracker, [QEMU](https://www.qemu.org/), and containerd.
 
 ## Quick installation
 
@@ -26,15 +32,21 @@ curl -sLS https://get.slicervm.com | sudo bash
 
 The installer sets up [Firecracker](https://firecracker-microvm.github.io), [QEMU](https://www.qemu.org/), [containerd](https://containerd.io/) for storage, and a few networking options.
 
-**Setup the license key**
+### Set up the license key
 
 If you have a [trial or subscription for](https://slicervm.com/pricing/) Slicer Individual, Team or Platform, then you'll have received a license key via email. Save it to `~/.slicer/LICENSE`. This license will not expire, so long as your subscription remains active.
 
 > Note for GitHub Sponsors (not Polar): after installation, you should run `slicer activate` to link your GitHub account to your Slicer installation. The keys for sponsors last for 30 days, but can be refreshed using the same command.
 
-Next, start your first VM with the [walk through](/getting-started/walkthrough).
+### Run slicer commands without sudo
 
-For production, use [snapshot based storage](#snapshot-based-storage) for near-instance VM creation times.
+The installer creates a `slicer` group. Its members can read the API token and local API sockets without `sudo`. Add your user to the group so only `slicer up` needs `sudo`:
+
+```bash
+sudo usermod -aG slicer $USER
+```
+
+Log out and back in for it to take effect, or run `newgrp slicer` to use it in the current shell.
 
 ### Updating slicer
 
@@ -44,11 +56,15 @@ To update Slicer, use the `slicer update` command:
 sudo slicer update
 ```
 
+## Next steps
+
+Now that Slicer is installed, [start your first VM with the walkthrough](/getting-started/walkthrough).
+
 ## Appendix
 
 ### Local hardware for Slicer
 
-Ideal for labs/or and the home office:
+Ideal for labs and the home office:
 
 * Low powered mini PC i.e. [Intel N100](https://blog.alexellis.io/n100-mini-computer/), Beelink,  Minisforum,  Acemagic, etc
 * [Adlink Ampere Developer Platform](https://www.adlinktech.com/Products/computer_on_modules/COM-HPC-Server-Carrier-and-Starter-Kit/Ampere_Altra_Developer_Platform?lang=en) / [system76 Thelio Astra](https://system76.com/desktops/thelio-astra-a1.1-n1/configure) / [Raspberry Pi 4 or 5](https://www.raspberrypi.com/products/raspberry-pi-5/) (an NVMe is better than SD card)
@@ -73,7 +89,7 @@ Additional cloud-based options for KVM are [included on this page on our sister 
 
 ### Snapshot-based storage
 
-Snapshot-based storage is not required for development and testing, instead, it's recommended that most users use the `image` storage approach instead, until they want to trade a little extra setup, for much improved VM disk clone times.
+Snapshot-based storage is not required for development and testing. We recommend starting with the default `image` storage, then switching when you want to trade a little extra setup for much faster VM disk clone times, i.e. for production or when launching many short-lived VMs.
 
 Snapshot-based storage enables much faster VM creation times. ZFS is the recommended option for Slicer, devmapper is also supported. See [storage for slicer](/storage/overview) for more info on the different storage backends.
 

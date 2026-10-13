@@ -31,7 +31,8 @@ Generate a host group config with `--ca` so slicer mints a CA, then
 patch in the egress lockdown so the proxy is the only reachable host:
 
 ```sh
-slicer new agents --cidr 192.168.137.0/24 --count 0 --ca > agents.yaml
+slicer new agents --cidr 192.168.137.0/24 --count 0 \
+  --graceful-shutdown=false --ca > agents.yaml
 ```
 
 ```diff

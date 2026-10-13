@@ -27,6 +27,7 @@ You can generate a working config file with the following command:
 
 ```bash
 slicer new sbox --count=0 \
+  --graceful-shutdown=false \
   --net=isolated \
   --drop=0.0.0.0/0 \
   --allow=192.168.222.1:3128 \
