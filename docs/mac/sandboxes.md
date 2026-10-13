@@ -115,7 +115,7 @@ Edit the `sbox` host group in `slicer-mac.yaml` to change the default vCPU, RAM,
   vcpu: 2
   ram_gb: 4
   storage_size: 15G
-  rosetta: true
+  rosetta: false
   network:
     mode: nat
     gateway: 192.168.64.1/24

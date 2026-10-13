@@ -382,9 +382,11 @@ Execute commands on a VM. Requires the `slicer-agent` service running in the gue
 Query parameters:
 - `cmd` (required): command to execute
 - `args` (optional, multiple): command arguments
-- `uid` (optional): user ID to run command as (default: 0)
-- `gid` (optional): group ID to run command as (default: 0)
-- `cwd` (optional): working directory
+- `uid` (optional): user ID to run command as. When omitted, the agent
+  detects the guest's default non-root user. Pass `0` explicitly for root.
+- `gid` (optional): group ID to run command as. When omitted, the agent uses
+  the selected user's primary group.
+- `cwd` (optional): working directory (default: the selected user's home)
 - `shell` (optional): shell interpreter (default: /bin/bash)
 - `stdin` (optional): enable stdin pipe (true/false)
 - `stdout` (optional): enable stdout capture (true/false)
