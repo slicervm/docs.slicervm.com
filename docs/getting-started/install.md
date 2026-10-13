@@ -56,6 +56,8 @@ To update Slicer, use the `slicer update` command:
 sudo slicer update
 ```
 
+Check which version you have with `slicer version`.
+
 ## Next steps
 
 Now that Slicer is installed, [start your first VM with the walkthrough](/getting-started/walkthrough).
@@ -81,7 +83,7 @@ Cloud-based bare-metal:
 
 Enterprise:
 
-* On-premises datacenter with your own bare-metal servers
+* On-premises data centre with your own bare-metal servers
 * OpenStack / VMware (with nested virtualisation)
 * Azure, DigitalOcean, GCP VMs (with nested virtualisation)
 

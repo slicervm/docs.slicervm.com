@@ -58,8 +58,6 @@ If you haven't started Slicer yet, follow the steps below first. Starting the da
     slicer shell dev
     ```
 
-    Read on for what each step does, and what to try next.
-
 ## How Slicer is organised
 
 Slicer runs as a daemon on your host. Its default config file is called `slicer.yaml`, and you can pass a different path to `slicer up` if you need to.
@@ -136,7 +134,7 @@ Run `slicer new --help` to see all the options. Every field is covered in the [c
 
 ## 2. Start the Slicer daemon
 
-The daemon needs root to manage KVM and networking. It's the only command in this guide that needs `sudo`.
+The daemon needs root to manage KVM and networking. Only `slicer up` and installing it as a service need `sudo` in this guide.
 
 To try Slicer out, run the daemon in the foreground:
 
@@ -191,7 +189,7 @@ VM created
 slicer ready dev
 ```
 
-This returns once the guest agent inside the VM is up, usually in under a second. In scripts, you can combine both steps with `slicer vm add vm --name dev --wait`.
+This returns once the guest agent inside the VM is up, usually in under a second. To do both in one step, i.e. in scripts, use `slicer vm add vm --name dev --wait`.
 
 List your VMs:
 
@@ -400,7 +398,7 @@ Everything in this guide works the same way remotely, including `cp` and `forwar
 
 ## Next steps
 
-* [Automate a project's workspace with `slicer workspace`](/getting-started/workspaces), Slicer's alternative to a Dockerfile and Compose.
+* [Automated workspaces](/getting-started/workspaces) with `slicer workspace`, Slicer's alternative to a Dockerfile and Compose.
 * [Customise VMs with userdata](/tasks/userdata) to install packages on first boot.
 * [Use snapshot-based storage](/storage/overview) with ZFS or devmapper for near-instant VM creation.
 * Try an example, such as [running Docker](/examples/docker) or a [HA Kubernetes cluster](/examples/ha-k3s).

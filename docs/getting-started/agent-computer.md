@@ -66,7 +66,7 @@ slicer vm exec arkade -- \
 slicer vm exec arkade -- \
   "curl -fsSLo go.tar.gz https://go.dev/dl/go1.26.0.linux-amd64.tar.gz && ..."
 
-# Run the build in the background, then wait for it
+# Run the build in the background, then wait for it using the exec ID it prints
 slicer vm bg exec arkade \
   --cwd /home/ubuntu/arkade \
   --shell=/bin/bash -- \
@@ -75,7 +75,7 @@ slicer vm bg exec arkade \
 slicer vm bg wait arkade $EXEC_ID --timeout 10m
 
 # Check the binary runs
-slicer vm exec arkade --cwd ~/arkade -- "./arkade version"
+slicer vm exec arkade --cwd /home/ubuntu/arkade -- "./arkade version"
 ```
 
 It found the host group, launched a named VM, read the Go version from `go.mod`, and installed that toolchain inside the VM. It ran the build as a background job, so a slow build couldn't time out its own shell. Then it checked the binary actually ran:
@@ -108,7 +108,7 @@ VMs are persistent by default, so the agent can come back to the same VM later i
 The binaries are still inside the VM. Ask the agent for release builds for every platform, copied back to your machine:
 
 <div class="agent-prompt" markdown>
-Run make dist in the arkade VM and copy the bin folder back to ./bin
+Use Slicer to run make dist in the arkade VM and copy the bin folder back to ./bin
 </div>
 
 It builds them in the VM, then copies the folder out with `slicer cp`, which you can also run yourself:
@@ -142,7 +142,7 @@ Use Slicer to copy this repo into a new VM, run the test suite there, and tell m
 </div>
 
 <div class="agent-prompt" markdown>
-Use Slicer to build this project in a VM and copy the binary back to `./bin`.
+Use Slicer to try the latest Node.js release in a fresh VM, without installing it here.
 </div>
 
 <div class="agent-prompt" markdown>
