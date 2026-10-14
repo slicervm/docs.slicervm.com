@@ -194,18 +194,37 @@ err = client.ResumeVM(ctx, node.Hostname)
 | `GetVMStats(ctx, hostname)` | Get CPU, memory, and disk stats |
 | `GetVMLogs(ctx, hostname, lines)` | Get serial console logs |
 
-### Cold fork operations
+### Fork operations
 
 | Method | Description |
 |--------|-------------|
-| `CommitVM(ctx, hostname)` | Commit a stopped, persistent VM |
-| `CommitVMWithOptions(ctx, hostname, opts)` | Commit with tags, labels, or a cache key |
+| `CommitVM(ctx, hostname)` | Create a disk commit from a stopped, persistent VM |
+| `CommitVMWithOptions(ctx, hostname, opts)` | Select disk or memory mode, with optional tags, labels, or a cache key |
 | `ListCommits(ctx, opts)` | List or filter committed parents |
 | `ForkCommittedVM(ctx, commitID, options...)` | Fork with defaults or functional options |
 | `committed.Fork(ctx, options...)` | Fork the `SlicerCommittedVM` returned by `CommitVM` |
 | `DeleteCommit(ctx, commitID)` | Delete an unused committed parent |
 
-Fork options include `WithVCPU`, `WithRAMBytes`, `WithTags`, `WithReplaceTags`, `WithSecrets`, `WithNetwork`, `WithPersistent`, `WithEphemeral`, `WithFixups`, `WithWait`, and `WithTimeout`. Omitting options keeps the correctness-first persistent default; `WithFixups()` disables guest identity fix-ups, and `WithWait(SlicerForkWaitNone)` returns after launch acknowledgement.
+To create a memory commit, set `SlicerCommitVMOptions.Mode` to `"memory"`, equivalent to the CLI's `--memory` flag. Omitting `Mode` defaults to a disk commit. Here, `source` is the hostname of a running, persistent VM prepared according to the [hot-fork guide](/platform/forking/#hot-forking):
+
+```go
+committed, err := client.CommitVMWithOptions(ctx, source, slicer.SlicerCommitVMOptions{
+    Mode: "memory",
+})
+if err != nil {
+    log.Fatal(err)
+}
+
+child, err := client.ForkCommittedVM(ctx, committed.CommitID)
+if err != nil {
+    log.Fatal(err)
+}
+fmt.Println(child.Hostname)
+```
+
+By default, `ForkCommittedVM` waits for agent readiness and guest identity finalisation before returning.
+
+Fork options include `WithVCPU`, `WithRAMBytes`, `WithTags`, `WithReplaceTags`, `WithSecrets`, `WithNetwork`, `WithPersistent`, `WithEphemeral`, `WithFixups`, `WithWait`, and `WithTimeout`. Omitting options keeps the correctness-first persistent default. `WithVCPU`, `WithRAMBytes`, and disabling guest identity fix-ups with `WithFixups()` are supported for disk commits only. `WithWait(SlicerForkWaitNone)` returns after launch acknowledgement for either mode.
 
 ### Guest operations
 
