@@ -306,6 +306,11 @@ components:
     SlicerCommitRequest:
       type: object
       properties:
+        mode:
+          type: string
+          enum: [disk, memory]
+          default: disk
+          description: Disk captures a stopped persistent VM; memory captures a running persistent VM's memory, disk, and device state.
         tags:
           type: array
           items: { type: string }
@@ -322,8 +327,8 @@ components:
         hostname: { type: string }
         commit_id: { type: string }
         status: { type: string, enum: [committed] }
-        parent_status: { type: string, enum: [stopped] }
-        mode: { type: string, enum: [disk] }
+        parent_status: { type: string, enum: [stopped, running] }
+        mode: { type: string, enum: [disk, memory] }
         tags:
           type: array
           items: { type: string }
@@ -340,7 +345,7 @@ components:
         source_hostname: { type: string }
         source_host_group: { type: string }
         created_at: { type: string, format: date-time }
-        mode: { type: string, enum: [disk] }
+        mode: { type: string, enum: [disk, memory] }
         tags:
           type: array
           items: { type: string }
@@ -385,16 +390,16 @@ components:
           items:
             type: string
             enum: [all, none, hostname, machine-id, ssh-host-keys]
-          description: Omit for all correctness fix-ups. Pass an empty array, or none by itself, to disable them; all and none must be used alone.
+          description: Omit for all correctness fix-ups. For disk commits, pass an empty array, or none by itself, to disable them; all and none must be used alone. Memory forks require hostname, machine-id, and ssh-host-keys fix-ups and remain in network quarantine until finalisation completes.
         vcpu:
           type: integer
           minimum: 1
-          description: vCPU count, up to the source host-group limit.
+          description: vCPU count, up to the source host-group limit. Disk commits only; omit for memory forks.
         ram_bytes:
           type: integer
           format: int64
           minimum: 1
-          description: RAM in bytes, up to the source host-group limit.
+          description: RAM in bytes, up to the source host-group limit. Disk commits only; omit for memory forks.
         network:
           $ref: '#/components/schemas/SlicerForkNetworkPolicy'
 
@@ -407,7 +412,7 @@ components:
         status: { type: string, enum: [forked] }
         parent_status: { type: string, enum: [unchanged] }
         child_status: { type: string, enum: [starting, running] }
-        mode: { type: string, enum: [disk] }
+        mode: { type: string, enum: [disk, memory] }
         persistent: { type: boolean }
       required: [hostname, source_hostname, commit_id, status, child_status, mode, persistent]
 
@@ -1205,8 +1210,14 @@ paths:
 
   /vm/{hostname}/commit:
     post:
-      summary: Commit a stopped persistent VM disk
-      description: Creates an immutable disk parent for Firecracker cold forks.
+      summary: Commit a persistent VM for cold or hot forking
+      description: |
+        Captures a persistent VM's disk when stopped (mode: disk, default),
+        or its memory, disk, and device state when running (mode: memory).
+        Memory commits briefly pause then resume the source and require
+        Firecracker on Linux amd64, image storage, isolated networking, and
+        a ready guest agent with memory-fork support. Slicer for Mac supports
+        disk commits only.
       security:
         - BearerAuth: []
       parameters:
@@ -1218,6 +1229,13 @@ paths:
         content:
           application/json:
             schema: { $ref: '#/components/schemas/SlicerCommitRequest' }
+            examples:
+              cold:
+                summary: Capture a stopped VM's disk
+                value: { mode: disk }
+              hot:
+                summary: Capture a running VM's memory and disk
+                value: { mode: memory }
       responses:
         "200":
           description: VM committed
@@ -1225,7 +1243,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/SlicerCommitResponse' }
         "400":
-          description: VM or storage is not eligible for a cold commit
+          description: Invalid mode, or VM, storage, or networking is not eligible for the selected commit mode
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
@@ -1235,7 +1253,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
         "409":
-          description: VM is running, backing is missing, or cache key is in use
+          description: VM state or guest agent is not ready for the selected mode, source is a memory fork child, backing is missing, or cache key is in use
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
@@ -1267,7 +1285,8 @@ paths:
           schema: { type: string }
         - in: query
           name: mode
-          schema: { type: string, enum: [disk] }
+          description: Filter by commit mode; omit to list both disk and memory commits.
+          schema: { type: string, enum: [disk, memory] }
       responses:
         "200":
           description: Matching commits, newest first
@@ -1284,8 +1303,15 @@ paths:
 
   /vm/commits/{commit_id}/fork:
     post:
-      summary: Fork a committed VM disk
-      description: Firecracker-only. Waits for agent readiness and guest finalisation by default. With wait=none, acknowledges launch while finalisation continues asynchronously.
+      summary: Fork a committed VM from disk or memory
+      description: |
+        Disk commits boot a new VM; memory commits resume captured processes.
+        Memory forks require Firecracker on Linux amd64, image storage, and
+        isolated networking. They retain the captured CPU and RAM allocations
+        and require all guest identity fix-ups. Slicer for Mac supports disk
+        forks only. Waits for agent readiness and guest finalisation by default.
+        With wait=none, acknowledges launch while finalisation continues
+        asynchronously.
       security:
         - BearerAuth: []
       parameters:
@@ -1315,7 +1341,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/SlicerForkResponse' }
         "400":
-          description: Invalid network policy, wait mode, or unsupported host group
+          description: Invalid network policy, wait mode, resources, fix-ups, or unsupported host group
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
