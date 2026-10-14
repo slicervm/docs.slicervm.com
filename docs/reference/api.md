@@ -654,10 +654,54 @@ HTTP POST
 
 `/vm/{hostname}/commit`
 
-The VM must be stopped and persistent. The optional JSON body accepts
-`tags` (an array of strings), `labels` (a string map), and `cache_key`.
+The optional JSON body accepts:
+
+* `mode`: `disk` (default) for a cold commit, or `memory` for a hot commit.
+* `tags`: an array of strings.
+* `labels`: a string map.
+* `cache_key`: a caller-owned unique key used to find a commit.
+
+| Mode | Source VM | Captured state | Fork behaviour |
+|------|-----------|----------------|----------------|
+| `disk` | Stopped and persistent | Disk | Boots a new VM |
+| `memory` | Running and persistent | Memory, disk, and device state | Resumes captured processes in a new VM |
+
+Use cold forking wherever possible. It supports more configurations and lets you
+adjust CPU and RAM per fork. Only use hot forking when process start-up takes
+enough time to justify capturing memory.
+
+Memory commits require Firecracker on Linux amd64, `image` storage, isolated
+networking, and a ready guest agent with memory-fork support. Slicer briefly
+pauses the source during capture, then resumes it. Slicer for Mac supports
+disk commits only. See [hot-forking requirements and agent compatibility](/platform/forking/#hot-forking).
+
+For a prepared, stopped source VM, create a disk commit:
+
+```bash
+COMMIT=$(curl --fail --silent --show-error \
+  -H "Authorization: Bearer $SLICER_TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d '{"mode":"disk"}' \
+  "$SLICER_URL/vm/$SOURCE/commit" | jq -r '.commit_id')
+```
+
+Alternatively, keep the prepared source running and capture its memory:
+
+```bash
+COMMIT=$(curl --fail --silent --show-error \
+  -H "Authorization: Bearer $SLICER_TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d '{"mode":"memory"}' \
+  "$SLICER_URL/vm/$SOURCE/commit" | jq -r '.commit_id')
+```
+
+These examples use an HTTP(S) `SLICER_URL`, a `SLICER_TOKEN` for an authenticated
+daemon, and `SOURCE` set to the source VM's hostname.
 
 Response 200: `SlicerCommitResponse`
+
+The response includes `commit_id` and `mode`. `parent_status` is `stopped` for a
+disk commit or `running` for a memory commit.
 
 ## List VM commits
 
@@ -666,7 +710,7 @@ HTTP GET
 `/vm/commits`
 
 Optional query parameters: repeatable `tag`, `cache_key`, `source`, and
-`mode`.
+`mode` (`disk` or `memory`). Omit `mode` to list both kinds of commit.
 
 Response 200: an array of `SlicerCommitInfo`
 
@@ -676,6 +720,15 @@ HTTP POST
 
 `/vm/commits/{commit_id}/fork`
 
+The commit's mode determines whether the child boots from disk or resumes
+captured memory. Use the same endpoint for both:
+
+```bash
+curl --fail --silent --show-error \
+  -H "Authorization: Bearer $SLICER_TOKEN" \
+  -X POST "$SLICER_URL/vm/commits/$COMMIT/fork"
+```
+
 Fork waits for guest-agent readiness and finalisation by default. Set
 `wait=none` to acknowledge launch without waiting; if asynchronous
 finalisation later fails, the daemon removes the forked VM. The optional
@@ -683,11 +736,15 @@ finalisation later fails, the daemon removes the forked VM. The optional
 
 The optional JSON body accepts:
 
-* `vcpu` and `ram_bytes` to scale down within the source host group's limits.
+* `vcpu` and `ram_bytes` to scale down within the source host group's limits
+  for disk commits only. Omit both for memory commits; their CPU and RAM
+  allocations cannot change.
 * `persistent` (default `true`); set it to `false` for an ephemeral fork.
 * `fixups`: `hostname`, `machine-id`, and `ssh-host-keys`. Omit the field for
   all correctness fix-ups, or pass an empty array to disable them. The special
-  values `all` and `none` are also accepted when used alone.
+  values `all` and `none` are also accepted when used alone. Memory forks require
+  all three fix-ups and remain in network quarantine until finalisation completes;
+  they cannot disable identity fix-ups.
 * `tags` with `tag_mode` set to `append` (default) or `replace`.
 * `secrets` to replace inherited grants; an empty array clears the grants and
   removes their files during finalisation.

@@ -58,6 +58,9 @@ extra:
 
 plugins:
   - search
+  - redirects:
+      redirect_maps:
+        'platform/cold-fork.md': 'platform/forking.md'
 
 markdown_extensions:
   - attr_list
@@ -156,7 +159,7 @@ nav:
       - Overview: platform/overview.md
       - Quickstart: platform/quickstart.md
       - VM Lifecycle: platform/lifecycle.md
-      - Build once, fork many: platform/cold-fork.md
+      - Build once, fork many: platform/forking.md
       - Go SDK: platform/go-sdk.md
       - TypeScript SDK: platform/typescript-sdk.md
       - Run a task in Slicer: platform/ephemeral-tasks.md
