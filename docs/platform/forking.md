@@ -1,12 +1,30 @@
 # Build once, fork many
 
+Forking lets you prepare a source VM once and start many independent VMs from it, without repeating the setup before every job. Slicer supports two ways to fork:
+
+* **[Cold forking](#cold-forking)** commits the disk of a stopped VM. Each fork boots from that disk state.
+* **[Hot forking](#hot-forking)** commits the memory and disk of a running VM. Each fork resumes the captured processes.
+
+Both use the same commit and fork workflow, so you can fork as many clean VMs as you need from a single prepared source.
+
+!!! info "Prefer cold forking"
+    Use cold forking where possible. It supports more configurations and lets you adjust CPU and RAM for each fork. Use hot forking when process start-up takes enough time to justify capturing memory.
+
+## Cold fork or hot fork?
+
+Cold forking commits the disk of a stopped VM and boots each fork from that state. It works across more configurations, can scale CPU and RAM per fork, and suits jobs where the preparation is stored on disk, such as compilers, dependencies, and checked-out source trees.
+
+Hot forking commits a running VM and resumes its processes. It is the better fit when the cost is in-process start-up: a browser that must initialise before it can work, a model that must be loaded into memory, or a runtime with a long warm-up. Each fork skips the guest boot and process initialisation and starts at the exact point where the source was captured.
+
+## Cold forking
+
 Cold forking starts new microVMs from the disk state of a stopped, persistent VM.
 
 Use it when the VM needs an expensive setup step before each job: installing a compiler, downloading dependencies, pulling container images, or preparing an agent. Set up one builder, commit its disk, then fork as many clean VMs as you need.
 
 Only disk state is committed. Each forked VM boots normally with its own hostname, machine ID, and network identity by default.
 
-## Requirements
+### Requirements
 
 Cold fork currently requires:
 
@@ -19,7 +37,7 @@ Network overrides on `slicer vm fork`, including `--allow`, `--no-allow`, and `-
 
 The CLI creates persistent forked VMs by default. Pass `--rm` for an ephemeral fork whose cloned storage is discarded when the VM stops or is deleted.
 
-## Create an empty host group
+### Create an empty host group
 
 This example uses the min image for the fastest boot, image storage for the simplest setup, and isolated networking so the fork can have its egress removed:
 
@@ -40,7 +58,7 @@ sudo -E slicer up slicer.yaml
 
 The generated isolated host group allows egress by default. The builder can download packages and dependencies before its disk is committed.
 
-## Prepare the builder
+### Prepare the builder
 
 In another terminal, create a persistent VM:
 
@@ -70,7 +88,7 @@ slicer vm exec "$BUILDER" -- \
 
 Do not store reusable credentials in the builder. Every fork inherits its disk.
 
-## Commit the disk
+### Commit the disk
 
 Shut down the builder, then commit it:
 
@@ -93,9 +111,9 @@ The commit ID identifies an immutable disk parent, for example:
 cmt-runnersx1-a1b2c3d4e5f6a7b8
 ```
 
-The source VM remains stopped. A committed source cannot be committed again with different metadata; create another persistent builder when you need a different base.
+The source VM remains stopped. A committed source cannot be committed again with different metadata. Create another persistent builder when you need a different base.
 
-## Fork a VM
+### Fork a VM
 
 To inherit the host group's existing network policy:
 
@@ -122,7 +140,7 @@ echo "$RUNNER"
 
 The DROP is enforced on the Slicer host, outside the guest. A root process inside the VM cannot remove it with `iptables`, ignore it by opening a raw socket, or bypass it by unsetting a proxy variable.
 
-The CLI returns as soon as the VM starts unless you pass `--wait`. The examples use `--wait` so `slicer-agent` has finalised the VM's identity before the next command runs. If the client disconnects, the daemon continues the fork. Recover the allocated hostname through the unique job tag, then describe it:
+The CLI waits for guest-agent readiness and identity finalisation by default. Use `--no-wait` to return after the child is accepted. The examples pass `--wait` explicitly. If the client disconnects, the daemon continues the fork. Recover the allocated hostname through the unique job tag, then describe it:
 
 ```bash
 RUNNER=$(slicer vm list --json | jq -r --arg tag "job=$JOB" \
@@ -130,15 +148,16 @@ RUNNER=$(slicer vm list --json | jq -r --arg tag "job=$JOB" \
 slicer vm describe "$RUNNER"
 ```
 
-## Control fork behaviour
+### Control fork behaviour
 
-By default, Slicer fixes the hostname, machine ID, and SSH host keys. SSH host-key work is skipped when `sshd` is not installed; otherwise Slicer follows the image's configured `HostKey` paths.
+By default, Slicer fixes the hostname, machine ID, and SSH host keys. If `sshd` is installed, Slicer follows the image's configured `HostKey` paths. Otherwise, it skips the SSH host-key work.
 
 For maximum throughput when duplicated guest identity is acceptable, skip every fix-up and do not wait:
 
 ```bash
 RUNNER=$(slicer vm fork "$COMMIT" \
   --no-fixups \
+  --no-wait \
   --rm \
   --quiet)
 ```
@@ -161,7 +180,7 @@ RUNNER=$(slicer vm fork "$COMMIT" \
 
 `--no-secrets` also removes inherited secret files during finalisation. Omitting tag, secret, network, CPU, or RAM options inherits the committed VM's launch configuration. Userdata is disk state and is not run again on a fork.
 
-## Use and delete the VM
+### Use and delete the VM
 
 The forked VM inherits the compiler, source tree, vendored dependencies, and Go build cache from the builder. Change one line and rebuild:
 
@@ -182,7 +201,7 @@ slicer vm delete "$RUNNER"
 
 The committed parent remains available for another fork.
 
-## Reuse the builder step
+### Reuse the builder step
 
 A cache key lets an API-driven workflow skip the whole builder step on its next run. It is similar to a Docker build cache, but Slicer caches the complete committed disk rather than individual layers.
 
@@ -215,7 +234,7 @@ The caller owns the cache key. Include the inputs which make the builder result 
 
 The same lookup is available through `GET /vm/commits?cache_key=...`, `ListCommits()` in the [Go SDK](/platform/go-sdk/), and `client.commits.list()` in the [TypeScript SDK](/platform/typescript-sdk/).
 
-## Organise committed parents
+### Organise committed parents
 
 Add tags, labels, or a deterministic cache key when the calling application needs to find a committed parent later. Commit metadata is immutable, so set it on the initial `slicer vm commit` command, as shown above.
 
@@ -234,20 +253,123 @@ Delete a committed parent when neither its source VM nor any forked VM uses it:
 slicer vm commit delete "$COMMIT"
 ```
 
-## Cold fork, suspend, and restore
+### Cold fork, suspend, and restore
 
 Cold fork and suspend solve different problems:
 
 * `slicer vm commit` records disk state from a stopped VM. Each fork is a new VM which boots from that state.
 * `slicer vm suspend` records memory, disk, and device state. `slicer vm restore` resumes the same VM later.
 
-Persistent Firecracker VMs in Slicer, and VMs in Slicer for Mac, can suspend and restore today. A suspended VM cannot yet be forked into several VMs.
+Persistent Firecracker VMs in Slicer, and VMs in Slicer for Mac, can suspend and restore today. A suspended VM cannot yet be forked into several VMs. To fork a *running* VM and resume its processes instead of booting from disk, see [hot forking](#hot-forking).
 
-## Cold fork or a custom image?
+### Cold fork or a custom image?
 
 A [custom Slicer image](/platform/custom-images/) is the better fit for a versioned base which needs to be distributed across several hosts. It can be built in CI, pushed to a registry, and referenced from a host group.
 
-Cold fork is a leaner local loop. Prepare a running VM interactively, commit it, then fork locally without building a Dockerfile, pushing and pulling an OCI image, or unpacking it again on the Slicer host.
+Cold forking lets you prepare a VM interactively, commit it, then fork locally without building a Dockerfile, pushing and pulling an OCI image, or unpacking it again on the Slicer host.
+
+## Hot forking
+
+Hot forking starts new microVMs from the captured memory and disk state of a running VM. Each fork resumes the captured processes. Only the source VM is captured. Every fork is an independent VM with its own hostname, machine ID, network identity, and private writable disk.
+
+!!! note "Linux only"
+    Hot forking is available on Linux only. Slicer for Mac supports disk-based cold forks only.
+
+### Requirements
+
+* Firecracker on Linux amd64
+* `image` storage
+* Isolated networking
+* A running, persistent source VM
+* A ready `slicer-agent` version 0.1.238 or later
+* The source VM running on the same CPU and RAM shape you want for the forks
+
+Memory forks cannot change the CPU or RAM shape of the captured VM.
+Slicer for Mac supports disk-based cold forks only.
+
+### Browser automation use case
+
+For example, services that take screenshots, scrape web pages, or automate browser interactions can use hot forking to avoid repeating browser start-up for every job. Install a browser in a source VM and start it on a blank page. Leave it running while it waits for a job, then capture the VM's memory and disk.
+
+Each fork resumes an independent copy of the browser, already running and ready to navigate. The guest boot, runtime start-up, and browser initialisation happen once, during preparation.
+
+Each child then receives its own URL and task, such as taking a screenshot, scraping page content, or interacting with forms and links. Changes in one child do not affect the source or other forks.
+
+The following commands show the VM lifecycle. Browser setup and job delivery depend on your application.
+
+### Configure a host group
+
+Generate a configuration with image storage and isolated networking, then start Slicer:
+
+```bash
+slicer new browsers \
+  --count 0 \
+  --cpu 2 \
+  --ram 2 \
+  --storage image \
+  --net isolated \
+  > browsers.yaml
+
+sudo -E slicer up browsers.yaml
+```
+
+### Prepare the source VM
+
+In another terminal, create a persistent VM and open a shell:
+
+```bash
+SOURCE=$(slicer vm add browsers \
+  --persistent \
+  --wait \
+  --json | jq -r '.hostname')
+
+slicer vm shell "$SOURCE"
+```
+
+Prepare the workload you want each fork to resume. For example, install a browser and its dependencies, start it on a blank page, and have it wait for a job. Run it as a service or background process so it stays running when you exit the shell.
+
+Each fork inherits process state, background jobs, and credentials.
+
+### Capture its memory
+
+Keep the source running and create a memory commit. Slicer briefly pauses the VM, captures RAM and disk, then resumes it:
+
+```bash
+COMMIT=$(slicer vm commit "$SOURCE" \
+  --memory \
+  --tag browser-ready \
+  --cache-key browser-v1 \
+  --quiet)
+```
+
+The `--memory` flag is required to create a hot (memory) commit.
+
+### Fork and use a VM
+
+Fork the commit to resume the prepared browser in a new VM:
+
+```bash
+RUNNER=$(slicer vm fork "$COMMIT" --wait --rm --quiet)
+slicer vm shell "$RUNNER"
+```
+
+Slicer assigns a new hostname, machine ID, and SSH host keys. These updates are mandatory, and the child stays in network quarantine until they finish. Forking waits by default. Use `--no-wait` to return earlier.
+
+Forks inherit the source's launch configuration. You can replace or clear tags and secret grants. `--rm` discards the child's disk when it stops. CPU and RAM allocations can not be changed.
+
+At this point, your prepared workload is running in the fork and ready for a job.
+
+When finished, exit the shell and delete the child:
+
+```bash
+slicer vm delete "$RUNNER"
+```
+
+The commit remains available for further forks.
+
+See [Organise committed parents](#organise-committed-parents) for how to list, filter, and delete memory commits.
+
+You can automate this entire workflow with the [Go SDK](/platform/go-sdk/), from preparing the source and creating commits to running jobs in forks and cleaning up.
 
 ## See also
 
