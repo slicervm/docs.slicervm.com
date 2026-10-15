@@ -87,7 +87,7 @@ VMs have no inbound access from the host network. Use `slicer vm exec`, `slicer 
 
 | Backend | Notes |
 |---|---|
-| `image` | Disk image cloned from the rootfs. Simplest to set up. Requires `storage_size`. See the [walkthrough](/getting-started/walkthrough). |
+| `image` | Disk image cloned from the rootfs. Simplest to set up. Requires `storage_size`. Launches are fastest when Slicer runs from an [XFS directory](/storage/overview#use-xfs-for-faster-launches). See the [walkthrough](/getting-started/walkthrough). |
 | `devmapper` | Device mapper snapshots. Fastest cloning. See [devmapper docs](/storage/devmapper). |
 | `zfs` | ZFS volumes. See [ZFS docs](/storage/zfs). |
 
