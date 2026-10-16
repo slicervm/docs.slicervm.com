@@ -39,12 +39,39 @@ slicer vm exec vm-1 --shell /bin/zsh -- "echo $SHELL"
 slicer vm exec vm-1 --shell "" whoami
 ```
 
+## Piping stdin into a command
+
 Combine with local commands using pipes and STDIO:
 
 ```bash
 # Pipe local file content to VM command
 cat /etc/hostname | slicer vm exec vm-1 -- base64 --wrap 9999
 ```
+
+Local stdin is streamed to the command when it is redirected from a file,
+or when it is a pipe or socket that already holds input or has been
+closed. An idle pipe is left unattached — coding agents, CI wrappers, and
+process supervisors often start children with a pipe on stdin that never
+carries data, and streaming it would hold the request body open for the
+life of the command.
+
+Pass `--stdin` when the command has to read from a producer that has not
+written anything yet, otherwise that input is dropped and the command
+sees empty stdin:
+
+```bash
+# Force stdin for a producer that may not write straight away
+docker save alpine:latest | slicer vm exec vm-1 --stdin -- docker load
+```
+
+Use `--stdin=false` to never attach stdin, whatever the caller supplies.
+
+A command exits as soon as it is done, even when stdin is still open, so
+`tail -f app.log | slicer vm exec vm-1 --stdin -- grep -m1 ERROR` returns
+on the first match. Guest agents released before this behaviour wait for
+stdin to reach EOF before reporting the exit, so `--stdin` on a stream
+that never closes blocks against an older VM image until `slicer-agent`
+in it is updated.
 
 ## Streaming vs buffered exec via the REST API
 
