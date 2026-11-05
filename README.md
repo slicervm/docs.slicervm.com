@@ -18,10 +18,12 @@ Run the docs site locally:
 mkdocs serve
 ```
 
-Or run in Docker:
+Or run in Docker, installing the documentation dependencies before starting the preview server:
 
 ```bash
-docker run --rm -it -p 8000:8000 -v `pwd`:/docs squidfunk/mkdocs-material:latest
+docker run --rm -it -p 8000:8000 -v "$PWD:/docs" \
+  --entrypoint sh squidfunk/mkdocs-material:latest \
+  -c 'pip install -r requirements.txt && exec mkdocs serve --dev-addr=0.0.0.0:8000'
 ```
 
 Docs are available at `http://127.0.0.1:8000`.
