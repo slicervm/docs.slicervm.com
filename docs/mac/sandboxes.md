@@ -101,6 +101,20 @@ Relaunch a stopped sandbox (after a `slicer vm shutdown` or running `sudo reboot
 slicer relaunch sbox-1
 ```
 
+## Offline sandboxes
+
+Launch a sandbox without a virtual network device:
+
+```bash
+slicer vm add sbox --network none --wait
+```
+
+An offline sandbox has no NIC or IP lease and cannot reach the Internet, host network, or Slicer Proxy. Shell, exec, file copy, health checks, and port forwarding remain available over vsock.
+
+Sandboxes use NAT by default. To install dependencies before running offline, [prepare a VM online, commit its disk, and fork it with `--network none`](/platform/forking/#prepare-online-fork-offline). Pass `--network none` for every offline fork, even when its source was offline. Omitting the flag or leaving it empty creates a VM with NAT networking.
+
+Offline networking is not available for the persistent `slicer-1` VM.
+
 ## Customise sandbox resources
 
 Bear in mind that `slicer-1` is already set up to use 8GB of RAM by default, so if you only have a 16GB Mac, launching two sandboxes, at 4GB of RAM each, may overcommit your system.

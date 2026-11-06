@@ -176,6 +176,16 @@ Add a host with a custom GitHub user to override the SSH keys:
 }
 ```
 
+### Network attachment
+
+Create a VM without a virtual NIC or IP lease:
+
+```json
+{"network":{"mode":"none"}}
+```
+
+Set `network.mode` to `none` for an offline VM. An omitted or empty mode uses the host group's networking. This setting applies when creating individual VMs or forking a commit. Shell, exec, file copy, health checks, and forwarding remain available over vsock for offline VMs.
+
 ### Block until ready (`?wait=` and `?timeout=`)
 
 By default, `POST /hostgroup/NAME/nodes` returns as soon as the VM is
@@ -648,6 +658,8 @@ HTTP GET
 
 Returns the VM's configuration, fork lineage, and effective network policy.
 
+`network.mode` reports the concrete mode, such as `bridge`, `isolated`, `nat` (macOS), or `none`. Offline VMs include `network.override.mode: "none"`. Online VMs omit the override's `mode` field.
+
 Response 200: `SlicerVMDescription`
 
 ## Commit a VM
@@ -671,6 +683,8 @@ The optional JSON body accepts:
 Use cold forking wherever possible. It supports more configurations and lets you
 adjust CPU and RAM per fork. Only use hot forking when process start-up takes
 enough time to justify capturing memory.
+
+On Linux, disk commits and forks require a bridge or isolated host group. CNI and macvtap groups cannot commit or fork.
 
 Memory commits require Firecracker on Linux amd64, `image` storage, isolated
 networking, and a ready guest agent with memory-fork support. Slicer briefly
@@ -750,9 +764,12 @@ The optional JSON body accepts:
 * `tags` with `tag_mode` set to `append` (default) or `replace`.
 * `secrets` to replace inherited grants; an empty array clears the grants and
   removes their files during finalisation.
-* An isolated-network `network` override with `allow` and `drop` arrays.
+* `network.mode`: `none` or an empty string on Linux and macOS, as described under [network attachment](#network-attachment).
+* Isolated-network firewall overrides in `network.allow` and `network.drop` arrays.
 
-Network overrides require an isolated host group.
+Every offline disk fork must explicitly request `network.mode: "none"`. An omitted or empty mode uses the host group's networking, regardless of the source VM's attachment or whether the source still exists. Memory forks cannot select `none`.
+
+Firewall overrides require an isolated host group and cannot be combined with `none`.
 
 The hostname is allocated by Slicer and returned in the response.
 

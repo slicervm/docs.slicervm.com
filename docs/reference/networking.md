@@ -1,6 +1,6 @@
 # Networking modes for Slicer microVMs
 
-The Firecracker, QEMU, and Cloud Hypervisors use TAP devices for networking. A Linux TAP operates at Layer 2 (Data Link Layer), one end is attached to the microVM, and the other end is attached to the host system.
+The Firecracker, QEMU, and Cloud Hypervisors use TAP devices for networking. A Linux TAP operates at Layer 2 (Data Link Layer), one end is attached to the microVM, and the other end is attached to the host system. Firecracker also supports offline VMs with no virtual network device.
 
 Slicer supports multiple networking modes for microVMs, each with their own pros and cons. Generally, you should use the default option (Bridge Networking) unless you have specific requirements that need a different mode.
 
@@ -10,9 +10,11 @@ How do you pick?
 
 * [Bridge networking](#bridge-networking) is the default - use it when you want to get started. It lets VMs talk to each other, so it's ideal for K3s where nodes need direct IP to IP access. The host can ingress to VMs via their IP.
 
-* [Macvtap networking](#macvtap-networking-direct-lan-access) places VMs directly on your LAN as if they were physical machines. Use it for homelab clusters, appliances like Pi-hole, or any long-running services that need to be first-class citizens on your network. Supports both DHCP (router-assigned IPs) and static IP pools. Note that the host itself cannot reach VMs by IP in this mode.
-
 * [Isolated networking](#isolated-mode-networking) is best when you're running appliances that are connected to the Internet, and can run untrusted workloads, or for other multi-tenant services. You can block VMs from egressing to specific IPs or entire CIDRs like your LAN i.e. `192.168.0.0/24`. There is no ingress available other than via `slicer forward` or via network tunnels such as [Inlets](https://inlets.dev).
+
+* [No networking](#no-networking) runs Firecracker VMs offline with no NIC or IP address. Use it for workloads with dependencies already installed.
+
+* [Macvtap networking](#macvtap-networking-direct-lan-access) places VMs directly on your LAN as if they were physical machines. Use it for homelab clusters, appliances like Pi-hole, or any long-running services that need to be first-class citizens on your network. Supports both DHCP (router-assigned IPs) and static IP pools. Note that the host itself cannot reach VMs by IP in this mode.
 
 * [CNI mode](#cni-networking) is generally not recommended or required, but enables additional networking modes, and shares a single pool of IPs across all Slicer daemons running in this mode.
 
@@ -254,6 +256,22 @@ Then reload and restart Slicer and the isolated network mode microVMs:
 sudo chmod 644 /etc/systemd/network/00-veth-ignore.network
 sudo systemctl restart systemd-networkd
 ```
+
+## No networking
+
+Launch an offline VM in an existing host group:
+
+```bash
+slicer vm add vm --network none --wait
+```
+
+The VM has no virtual NIC, IP lease, TAP, veth, or network namespace. It cannot reach the Internet, LAN, or Slicer Proxy. `slicer vm exec`, `shell`, `cp`, health checks, and forwarding to guest loopback services remain available over vsock.
+
+`none` is a per-VM option on `slicer vm add` and `slicer vm fork`. Explicit IP and allow/drop overrides cannot be combined with `none`.
+
+When creating VMs without networking, use userdata that can run offline and supply guest SSH keys directly with `--ssh-key`. Guest GitHub key downloads are skipped on offline VMs. To install dependencies online and then run offline, see [prepare online, fork offline](/platform/forking/#prepare-online-fork-offline).
+
+Omitting the `--network` flag uses the host group's configured networking for both creation and forks, regardless of the source VM's attachment.
 
 ## Macvtap Networking (Direct LAN Access)
 
