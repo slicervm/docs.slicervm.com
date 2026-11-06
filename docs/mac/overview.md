@@ -68,7 +68,7 @@ In a similar way, a sandbox such as `sbox-1` may have K3s installed, exposing po
 
 ## Networking
 
-Slicer for Mac uses Apple's [VZNATNetworkDeviceAttachment](https://developer.apple.com/documentation/virtualization/vznatnetworkdeviceattachment). Guests access the Internet through your host.
+Slicer for Mac uses Apple's [VZNATNetworkDeviceAttachment](https://developer.apple.com/documentation/virtualization/vznatnetworkdeviceattachment) by default. Guests access the Internet through your host. Sandboxes can also run [offline with `--network none`](/mac/sandboxes/#offline-sandboxes), with no NIC or IP address and management over vsock.
 
 If you also run Docker Desktop on the same Mac, configure it to use `Docker VMM` mode to avoid networking conflicts with Slicer. See [Use Docker from macOS via a forwarded socket](/mac/docker).
 

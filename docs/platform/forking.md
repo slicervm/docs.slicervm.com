@@ -26,14 +26,14 @@ Only disk state is committed. Each forked VM boots normally with its own hostnam
 
 ### Requirements
 
-Cold fork currently requires:
+On Linux, cold forking requires:
 
 * Firecracker
 * `image`, `devmapper`, or `zfs` storage
 * Bridge or isolated networking
 * A stopped, persistent source VM
 
-Network overrides on `slicer vm fork`, including `--allow`, `--no-allow`, and `--drop`, require isolated networking. Cold forking itself also works with bridge networking, but the forked VM inherits the host group's network policy unchanged.
+Firewall overrides on `slicer vm fork`, including `--allow`, `--no-allow`, and `--drop`, require Linux isolated networking and are unavailable on macOS. Both platforms support `--network none` for a fork with no virtual NIC.
 
 The CLI creates persistent forked VMs by default. Pass `--rm` for an ephemeral fork whose cloned storage is discarded when the VM stops or is deleted.
 
@@ -121,7 +121,7 @@ To inherit the host group's existing network policy:
 RUNNER=$(slicer vm fork "$COMMIT" --wait --tag role=runner --quiet)
 ```
 
-For a forked VM with no egress, clear the inherited allow list and drop everything else:
+On Linux with isolated networking, clear the inherited allow list and drop everything else for a fork with no egress. On macOS, use [an offline fork](#prepare-online-fork-offline) instead:
 
 ```bash
 JOB=arkade-run-$(cat /proc/sys/kernel/random/uuid)
@@ -147,6 +147,21 @@ RUNNER=$(slicer vm list --json | jq -r --arg tag "job=$JOB" \
   '.[] | select((.tags // []) | index($tag)) | .hostname' | head -n1)
 slicer vm describe "$RUNNER"
 ```
+
+### Prepare online, fork offline
+
+After installing dependencies and committing the builder's disk as above, launch an offline fork:
+
+```bash
+RUNNER=$(slicer vm fork "$COMMIT" --network none --wait --quiet)
+slicer vm exec "$RUNNER" -- /home/ubuntu/arkade/arkade --help
+```
+
+The fork retains the installed dependencies but has no NIC or IP lease. Exec, shell, file copy, and forwarding to guest loopback services continue to work over vsock. This workflow also works with disk commits on macOS.
+
+On Linux and macOS, pass `--network none` for every offline fork. Omitting the flag uses the host group's networking and creates a fork with networking enabled again.
+
+Offline forks require disk commits. Hot forking does not support offline forks.
 
 ### Control fork behaviour
 
@@ -178,7 +193,7 @@ RUNNER=$(slicer vm fork "$COMMIT" \
   --quiet)
 ```
 
-`--no-secrets` also removes inherited secret files during finalisation. Omitting tag, secret, network, CPU, or RAM options inherits the committed VM's launch configuration. Userdata is disk state and is not run again on a fork.
+`--no-secrets` also removes inherited secret files during finalisation. Omitting tag, secret, CPU, or RAM options inherits the committed VM's launch configuration. On Linux, firewall overrides are inherited for online forks. Userdata is disk state and is not run again on a fork.
 
 ### Use and delete the VM
 

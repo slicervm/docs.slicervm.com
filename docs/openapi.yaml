@@ -209,10 +209,11 @@ components:
 
     SlicerCreateNodeRequest:
       type: object
-      description: Public parameters for allocator-led VM creation.
+      description: Public parameters for allocator-led VM creation. An omitted or empty network.mode uses the host group's configured online networking. Host groups cannot use none; select it per VM through the create or disk-fork request.
       properties:
         ip:
           type: string
+          description: Static IP; incompatible with an effective network.mode of none.
         ram_bytes:
           type: integer
           format: int64
@@ -277,18 +278,39 @@ components:
 
     SlicerVMNetworkDescription:
       type: object
-      required: [host_group, effective]
+      required: [mode, policy_source, host_group, effective]
       properties:
-        mode: { type: string }
+        mode:
+          type: string
+          enum: [bridge, isolated, cni, macvtap, nat, none]
+          description: Concrete VM network mode. nat is used by slicer-mac; none means no NIC.
         policy_source:
           type: string
           enum: [host_group, mixed, vm]
+          description: Source of the effective allow/drop firewall lists, independent of attachment selection.
         host_group:
           $ref: '#/components/schemas/SlicerResolvedNetworkPolicy'
         override:
-          $ref: '#/components/schemas/SlicerForkNetworkPolicy'
+          $ref: '#/components/schemas/SlicerVMNetworkOverride'
         effective:
           $ref: '#/components/schemas/SlicerResolvedNetworkPolicy'
+
+    SlicerVMNetworkOverride:
+      type: object
+      description: Saved per-VM network overrides. Omitted when there are no overrides to expose; internal online attachment markers are not returned.
+      properties:
+        mode:
+          type: string
+          enum: [none]
+          description: Saved no-NIC attachment. Omitted for online attachments.
+        allow:
+          type: array
+          items: { type: string }
+          description: Replaces the host-group allow list; omitted inherits, an empty list clears it.
+        drop:
+          type: array
+          items: { type: string }
+          description: Replaces the host-group drop list; omitted inherits, an empty list clears it.
 
     SlicerVMDescription:
       allOf:
@@ -357,17 +379,29 @@ components:
 
     SlicerForkNetworkPolicy:
       type: object
-      description: Isolated-network overrides for the forked VM.
+      description: |
+        Network attachment selection and optional firewall overrides for create
+        and fork requests. On Linux, none requires Firecracker. On macOS, none
+        is supported for sbox sandboxes and their disk forks. none cannot be
+        combined with an explicit IP, allow or drop, even empty lists. Firewall
+        overrides require Linux isolated networking.
       properties:
+        mode:
+          type: string
+          enum: ["", none]
+          description: none attaches no NIC or IP lease; management remains available over vsock. Omission or an empty string uses the host-group network on both creation and forks, regardless of the source VM's attachment. Every offline disk fork must explicitly request none. Memory forks cannot select none.
         allow:
           type: array
           items: { type: string }
+          description: Replaces the inherited allow list; omitted inherits, an empty list clears it.
         drop:
           type: array
           items: { type: string }
+          description: Replaces the inherited drop list; omitted inherits, an empty list clears it.
 
     SlicerForkRequest:
       type: object
+      description: Forks use the host group's network unless network.mode is explicitly none. The source VM's attachment is not inherited. Online forks retain inherited allow/drop overrides; none clears them. On Linux, forks require a bridge or isolated host group, including when none is requested. CNI and macvtap groups cannot fork.
       properties:
         tags:
           type: array
@@ -1214,6 +1248,8 @@ paths:
       description: |
         Captures a persistent VM's disk when stopped (mode: disk, default),
         or its memory, disk, and device state when running (mode: memory).
+        On Linux, disk commits and forks require a bridge or isolated host group,
+        even when the VM has no NIC. CNI and macvtap groups cannot commit or fork.
         Memory commits briefly pause then resume the source and require
         Firecracker on Linux amd64, image storage, isolated networking, and
         a ready guest agent with memory-fork support. Slicer for Mac supports
