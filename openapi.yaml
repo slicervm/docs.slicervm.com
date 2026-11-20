@@ -69,7 +69,7 @@ components:
           type: string
         status:
           type: string
-          description: "Running or Paused"
+          description: VM state, such as Running, Paused, Stopped, or Suspended.
 
     SlicerSnapshot:
       type: object
@@ -856,6 +856,10 @@ paths:
           name: node
           required: true
           schema: { type: string }
+        - in: query
+          name: force
+          schema: { type: boolean, default: false }
+          description: Skip guest shutdown before deletion. Otherwise the daemon uses its graceful_shutdown and shutdown_timeout settings.
       responses:
         "200":
           description: Node deleted
@@ -1142,6 +1146,9 @@ paths:
   /vm/{hostname}/shutdown:
     post:
       summary: Shutdown or reboot VM
+      description: >
+        After the guest acknowledges shutdown, Firecracker VMs have up to
+        config.shutdown_timeout to exit before Slicer forces them to stop.
       security:
         - BearerAuth: []
       parameters:
@@ -1154,10 +1161,17 @@ paths:
           schema:
             type: string
             enum: [shutdown, reboot]
-          description: Defaults to reboot unless hypervisor is cloud-hypervisor.
+          description: >
+            On macOS, defaults to shutdown and treats reboot as shutdown.
+            On Linux, defaults to shutdown for force=true, Cloud Hypervisor or
+            QEMU, and reboot for Firecracker otherwise.
+        - in: query
+          name: force
+          schema: { type: boolean, default: false }
+          description: On Linux, stop the VM directly. Only valid for shutdown.
       responses:
         "200":
-          description: Shutdown initiated
+          description: Text indicating shutdown completed, the VM was already stopped, or the request was initiated.
           content:
             text/plain:
               schema:

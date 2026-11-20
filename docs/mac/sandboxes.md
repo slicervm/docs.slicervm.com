@@ -87,6 +87,8 @@ Stop a sandbox and keep its disk:
 slicer vm shutdown sbox-1
 ```
 
+Shutdown can return while the sandbox is still stopping. Before relaunching it or committing its disk, check that `slicer vm describe sbox-1 --json` reports `"status": "Stopped"`.
+
 Delete a sandbox and its disk:
 
 ```bash
