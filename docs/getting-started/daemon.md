@@ -98,6 +98,10 @@ To stop the service run `sudo systemctl stop slicer`, and to prevent it loading 
 
 You can create multiple Slicer services to run different sets of VMs or configurations on the same host.
 
+## Allow time for VMs to stop
+
+The generated systemd unit sets `TimeoutStopSec` to 120 seconds for the whole service. Slicer stops VMs one at a time. If several VMs or a longer per-VM [`shutdown_timeout`](../reference/config.md#graceful-shutdown) can push the total past 120 seconds, increase `--timeout-stop-sec` when running `slicer service generate`.
+
 ## Preserve VM state across host reboots
 
 If you use the Firecracker hypervisor, you can add `--suspend-on-shutdown` to `slicer service generate` so that Slicer suspends running VMs to disk when the daemon is stopped. On the next daemon start, Slicer automatically restores the VMs that were suspended by the shutdown path.
@@ -113,9 +117,7 @@ sudo slicer service generate --install \
   ./slicer.yaml
 ```
 
-The generated unit defaults `TimeoutStopSec` to `120` seconds. Increase it with `--timeout-stop-sec` if your VMs need more time to suspend.
-
-If suspend fails, Slicer falls back to its normal graceful or forceful shutdown behavior.
+When sizing `--timeout-stop-sec`, allow time for each snapshot as well as a fallback shutdown if suspension fails.
 
 ## Generate a systemd unit
 

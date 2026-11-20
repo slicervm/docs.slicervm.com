@@ -8,7 +8,7 @@ An [OpenAPI 3.0 specification](/platform/openapi/) is also available for client 
 A note on Slicer Services vs Slicer Sandboxes:
 
 * A Slicer Service is a VM launched via YAML - protected from VM deletion - disk persistent is controlled via the `persistent` flag in the YAML config. `storage: image` is persistent by default.
-* A Slicer Sandbox is a VM launched via API - and is ephemeral/disposable. It can be deleted, and disk/snapshot is cleaned up on shutdown of the VM or deletion. Shutting down Slicer will terminate and delete all sandboxes.
+* A Slicer Sandbox is a VM launched via the API. A persistent sandbox keeps its disk across shutdown and can be relaunched. An ephemeral sandbox is removed when it stops.
 
 ## Authentication
 
@@ -243,6 +243,8 @@ Response 200:
 HTTP DELETE
 
 `/hostgroup/NAME/nodes/HOSTNAME`
+
+Deletion uses the daemon's [graceful shutdown settings](config.md#graceful-shutdown). Pass `force=true` to skip guest shutdown.
 
 Response 200:
 
@@ -601,9 +603,13 @@ HTTP POST
 `/vm/{hostname}/shutdown`
 
 Query parameters:
-- `action` (optional): `shutdown` or `reboot`
 
-Response 200: text/plain
+- `action` (optional): Pass `action=shutdown` to stop the VM. On macOS, the default is `shutdown`, and `reboot` also shuts down the VM. On Linux, the default is `reboot` on Firecracker and `shutdown` on Cloud Hypervisor or QEMU. Setting `force=true` defaults to `shutdown`.
+- `force` (optional): On Linux, `true` stops the VM directly. Valid for shutdown only.
+
+On Firecracker, once the guest accepts shutdown, Slicer waits up to [`shutdown_timeout`](config.md#graceful-shutdown) before forcing it to stop. A persistent VM stays stopped until relaunched.
+
+**200 OK** (`text/plain`). On Firecracker, `action=shutdown` returns after the VM stops. A reboot request returns once accepted. On macOS, check that `slicer vm describe HOSTNAME --json` reports `Stopped` before committing or relaunching the VM.
 
 ## Pause a VM
 

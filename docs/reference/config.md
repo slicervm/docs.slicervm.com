@@ -122,8 +122,20 @@ See the [API reference](/reference/api) for endpoint documentation.
 | `kernel_image` | string | | OCI image containing a kernel (optional) |
 | `kernel_file` | string | | Path to a kernel binary (optional, extracted from rootfs if not set) |
 | `hypervisor` | string | `firecracker` | `firecracker` or `cloud-hypervisor` |
-| `graceful_shutdown` | bool | `true` | Send ACPI shutdown before killing VMs |
 | `pci` | map | | PCI device passthrough. See [VFIO docs](/reference/vfio) |
+
+## Graceful shutdown
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `graceful_shutdown` | bool | `true` | Request graceful shutdown during daemon stop or VM deletion. `false` stops VMs directly. |
+| `shutdown_timeout` | duration | `1m` | Per-VM grace period. Use a positive Go-style duration such as `90s` or `1m30s`. |
+
+Generate a config that gives each VM up to 90 seconds to shut down cleanly before Slicer forces it to stop:
+
+```bash
+slicer new vm --shutdown-timeout=90s > slicer.yaml
+```
 
 When running Slicer as a daemon with Firecracker, you can also pass
 `--suspend-on-shutdown` to `slicer up` to suspend running VMs when the daemon
